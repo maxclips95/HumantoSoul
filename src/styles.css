@@ -1,0 +1,295 @@
+/* ---------------------------------------------------------
+   GLOBAL RESET
+--------------------------------------------------------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: #fdf5f0;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* ---------------------------------------------------------
+   HEADER (MIXED THEME 3 + 4 + 5)
+--------------------------------------------------------- */
+.header {
+    background: #c41e3a;
+    height: auto;
+    padding: 10px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0px 2px 10px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 9999; /* Increased z-index to ensure visibility */
+}
+
+/* Logo */
+.logo img {
+    width: 65px;
+    height: 65px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* ---------------------------------------------------------
+   NAVIGATION
+--------------------------------------------------------- */
+.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.nav-item {
+    cursor: pointer;
+    position: relative;
+    padding: 8px 10px;
+    transition: 0.3s;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    color: white;
+    text-decoration: none;
+}
+
+.nav-item:hover {
+    background-color: #a0172e;
+    color: white;
+    border-color: white;
+}
+
+/* Active highlight */
+.nav-item.active {
+    background-color: white;
+    color: #c41e3a;
+    border-color: white;
+}
+
+/* ---------------------------------------------------------
+   DROPDOWN
+--------------------------------------------------------- */
+/* Ensure dropdown menu functionality */
+.dropdown-parent {
+    position: relative;
+}
+
+.dropdown-panel {
+    display: none;
+    position: absolute;
+    top: 45px;
+    left: 0;
+    background: white;
+    min-width: 250px;
+    border-radius: 12px;
+    box-shadow: 0px 5px 25px rgba(0,0,0,0.15);
+    padding: 10px 0;
+    z-index: 9999;
+}
+
+.dropdown-parent:hover .dropdown-panel {
+    display: block;
+}
+
+.dropdown-link {
+    padding: 12px 20px;
+    font-size: 0.95rem;
+    transition: 0.2s;
+    white-space: nowrap;
+}
+
+.dropdown-link:hover {
+    background: #f7f3ff;
+    color: #8e44ff;
+}
+
+/* ---------------------------------------------------------
+   LANGUAGE SELECTOR
+--------------------------------------------------------- */
+.language-selector select {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+/* ---------------------------------------------------------
+   SECTIONS
+--------------------------------------------------------- */
+.section {
+    padding: 60px 25px;
+}
+
+.section-title {
+    font-size: 2.2rem;
+    font-weight: bold;
+    text-align: center;
+    color: #c41e3a;
+    margin-bottom: 35px;
+}
+
+/* ---------------------------------------------------------
+   CARDS
+--------------------------------------------------------- */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 25px;
+}
+
+.card {
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.08);
+    transition: 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-img {
+    width: 100%;
+    height: 170px;
+    object-fit: cover;
+}
+
+.card-content {
+    padding: 18px;
+}
+
+/* ---------------------------------------------------------
+   BUTTONS BASE
+--------------------------------------------------------- */
+.btn, .card-btn {
+    background: #c41e3a;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn:hover, .card-btn:hover {
+    background: #a0172e;
+}
+
+/* ---------------------------------------------------------
+   HERO TEXT
+--------------------------------------------------------- */
+.hero-text {
+    text-align: center;
+}
+
+/* ---------------------------------------------------------
+   BACK TO TOP BUTTON
+--------------------------------------------------------- */
+.back-to-top {
+    position: fixed;
+    right: 25px;
+    bottom: 25px;
+    width: 55px;
+    height: 55px;
+    background: #c41e3a;
+    color: white;
+    font-size: 22px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.25);
+    transition: 0.3s;
+}
+
+.back-to-top:hover {
+    background: #a0172e;
+}
+
+/* ---------------------------------------------------------
+    RESPONSIVE
+--------------------------------------------------------- */
+@media (max-width: 900px) {
+    .nav-menu {
+        gap: 18px;
+    }
+}
+
+@media (max-width: 700px) {
+    .header {
+        flex-direction: column;
+        height: auto;
+        gap: 12px;
+        padding: 20px;
+    }
+}
+
+/* ---------------------------------------------------------
+   OFFICIAL CHANNEL BUTTON
+--------------------------------------------------------- */
+.channel-link {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 25px;
+}
+
+.channel-link a {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #d60034;
+    border: 2px solid #d60034;
+    padding: 12px 28px;
+    border-radius: 30px;
+    text-decoration: none;
+    transition: 0.3s;
+    display: inline-block;
+}
+
+.channel-link a:hover {
+    background: #d60034;
+    color: white;
+}
+
+/* ---------------------------------------------------------
+   LOAD MORE BUTTON — FINAL (No duplicates)
+--------------------------------------------------------- */
+.load-more-container {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.load-more-btn {
+    padding: 14px 40px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #FF6A00, #FFB300);
+    color: white;
+    border: none;
+    border-radius: 40px;
+    cursor: pointer;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+    transition: 0.3s;
+}
+
+.load-more-btn:hover {
+    transform: translateY(-3px);
+    background: linear-gradient(135deg, #E65D00, #FFA000);
+}
+
+/* ---------------------------------------------------------
+   REDUCE SPACE ABOVE YOUTUBE FEED
+--------------------------------------------------------- */
+.youtube-section {
+    padding-top: 20px !important;
+    margin-top: -25px !important;
+}
