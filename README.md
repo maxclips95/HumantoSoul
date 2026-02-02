@@ -39,23 +39,11 @@ This script will:
 2. Start the Node.js server to serve the site on **port 5000**.
 3. Handle process cleanup automatically.
 
-## ⚙️ Configuration (.env)
+## ⚙️ Configuration
 
-The root directory must contain a `.env` file for the application to function:
-
-```env
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD_HASH=$2b$12$... (Use bcrypt hash)
-JWT_SECRET=JaiGurudev-Super-Secret-Key-XXXX
-SERVER_PORT=5000
-PRODUCTION_URL=https://www.jaigurudevukm.in
-
-# Email (for Contact Form)
-EMAIL_SERVICE=gmail
-EMAIL_USER=your-email@gmail.com
-EMAIL_PASS=your-app-specific-password
-EMAIL_TO=info@jaigurudevukm.com
-```
+1. Create a `.env` file in the root directory.
+2. Refer to the [.env.example](file:///c:/Users/Administrator/Desktop/jai_gurudev_clone/.env.example) file for the required variables.
+3. Replace the placeholder values with your actual configuration.
 
 ## 📜 Maintenance
 
