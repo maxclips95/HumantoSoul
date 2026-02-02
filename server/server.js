@@ -101,7 +101,8 @@ app.use(helmet({
       connectSrc: [
         "'self'",
         "https://translate.googleapis.com",
-        "https://translate.google.com"
+        "https://translate.google.com",
+        "https://www.youtube.com"
       ],
       styleSrc: [
         "'self'",
@@ -126,23 +127,14 @@ app.use(helmet({
       frameSrc: [
         "'self'",
         "https://translate.google.com",
-        "https://translate.googleapis.com"
+        "https://translate.googleapis.com",
+        "https://www.youtube.com",
+        "https://youtube.com"
       ],
       fontSrc: [
         "'self'",
         "https://fonts.gstatic.com",
         "https://cdnjs.cloudflare.com"
-      ],
-      frameSrc: [
-        "'self'",
-        "https://www.youtube.com",
-        "https://youtube.com",
-        "https://translate.google.com"
-      ],
-      connectSrc: [
-        "'self'",
-        "https://translate.googleapis.com",
-        "https://www.youtube.com"
       ]
     }
   },
