@@ -1,192 +1,383 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
+import TranscriptModal from "../components/TranscriptModal";
+
+
+const ReadingModal = ({ title, content, onClose }) => {
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      backgroundColor: 'black',
+      color: 'white',
+      zIndex: 10000,
+      overflowY: 'auto',
+      padding: '40px 20px',
+      display: 'flex',
+      justifyContent: 'center'
+    }}>
+      <div style={{ maxWidth: '900px', width: '100%', position: 'relative' }}>
+        <button
+          onClick={onClose}
+          style={{
+            position: 'fixed',
+            top: '20px',
+            right: '30px',
+            background: 'none',
+            border: '2px solid white',
+            color: 'white',
+            fontSize: '20px',
+            borderRadius: '50%',
+            width: '40px',
+            height: '40px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10001
+          }}
+        >
+          ✕
+        </button>
+
+        <div style={{ marginTop: '40px', paddingBottom: '60px' }}>
+          <h1 style={{
+            marginTop: '20px',
+            fontSize: '2.5rem',
+            borderBottom: '1px solid #333',
+            paddingBottom: '20px',
+            marginBottom: '30px',
+            lineHeight: '1.2'
+          }}>
+            {title}
+          </h1>
+          <div style={{
+            fontSize: '1.2rem',
+            lineHeight: '2',
+            whiteSpace: 'pre-wrap',
+            color: '#ddd'
+          }}>
+            {content}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
 export default function Prophecies() {
   const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [textProphecies, setTextProphecies] = useState([]); // Array for text cards
+  const [showModal, setShowModal] = useState(false);
+  const [selectedText, setSelectedText] = useState(null); // Selected item for modal
+  const [selectedTranscript, setSelectedTranscript] = useState(null); // For transcript modal
 
   useEffect(() => {
-    fetch("/api/prophecies")
-      .then((res) => res.json())
-      .then((data) => setItems(data))
-      .catch(console.error);
+    axios.get("/api/prophecies")
+      .then((res) => {
+        const data = res.data;
+        // Handle both flat array (legacy) and nested structure
+        let allItems = [];
+        if (Array.isArray(data)) {
+          allItems = data;
+        } else {
+          const manual = Array.isArray(data.manual) ? data.manual : [];
+          const automated = Array.isArray(data.automated) ? data.automated : [];
+          allItems = [...manual, ...automated];
+        }
+
+        // Deduplicate by Link (prefer Manual over Automated if link matches, or just keep first)
+        const uniqueItems = [];
+        const seenLinks = new Set();
+
+        for (const item of allItems) {
+          if (item.link && !seenLinks.has(item.link)) {
+            uniqueItems.push(item);
+            seenLinks.add(item.link);
+          }
+        }
+
+        // Sort: videos with approved transcripts first, then others
+        uniqueItems.sort((a, b) => {
+          const aHasTranscript = a.transcriptStatus === 'Approved' ? 1 : 0;
+          const bHasTranscript = b.transcriptStatus === 'Approved' ? 1 : 0;
+          return bHasTranscript - aHasTranscript;
+        });
+        setItems(uniqueItems);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+
+    // Fetch Text Prophecies (Array)
+    axios.get("/api/prophecy-highlight")
+      .then(res => {
+        setTextProphecies(Array.isArray(res.data) ? res.data : []);
+      })
+      .catch(err => console.error("Error fetching highlight:", err));
   }, []);
 
+  // Disable body scroll when modal is open
+  useEffect(() => {
+    if (showModal || selectedTranscript) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [showModal, selectedTranscript]);
+
+  if (loading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '50vh',
+        flexDirection: 'column',
+        color: '#c41e3a'
+      }}>
+        <div className="loader" style={{
+          border: '4px solid #f3f3f3',
+          borderTop: '4px solid #c41e3a',
+          borderRadius: '50%',
+          width: '40px',
+          height: '40px',
+          animation: 'spin 1s linear infinite'
+        }}></div>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+        <p style={{ marginTop: '10px', fontSize: '1.1rem', fontWeight: '500' }}>Loading Prophecies...</p>
+      </div>
+    );
+  }
+
   return (
-    <section className="section" style={{ padding: "40px 20px" }}>
-      
-      {/* MAIN PAGE TITLE */}
-      <h1
-        className="section-title"
-        style={{
-          textAlign: "center",
-          color: "#c41e3a",
-          marginBottom: "30px"
-        }}
-      >
-        ✳ बाबा जयगुरुदेव की भविष्यवाणी ✳
-      </h1>
+    <section className="section" style={{ padding: "10px 20px" }}>
 
-      {/* LARGE LONG TEXT CONTENT — FIXED */}
-      <div
-        className="prophecy-long-text"
-        style={{
-          background: "white",
-          padding: "25px",
-          borderRadius: "10px",
-          lineHeight: "2.0",
-          fontSize: "1.2rem",
-          color: "#222",
-          whiteSpace: "pre-line"
-        }}
-      >
-        {`
-                                            कलयुग में कलयुग जाएगा और कलयुग में सतयुग आएगा (युग-परिवर्तन: कलयुग → सतयुग )             
-
-* अभी कलयुग आए हुए पाँच हज़ार साल हुए हैं; पर इस अल्पावधि में जो पाप कलयुग के अंतिम चरण में होने चाहिए थे, वे अब हो रहे हैं — इसलिए इसी युग में कुछ समय के लिए सतयुग आ रहा है।
-* जब दोनों युगों की टक्कर होगी तो महाभारत जैसा विनाश होगा; एक झटके में बीसों करोड़ लोग समाप्त हो जायेंगे।
-* कलयुग अभी पूरा नहीं हुआ; उसके पहले चरण में ही पाप इतना बढ़ गया कि महात्माओं ने युग-परिवर्तन की चेतावनी दी। सतयुग आएगा, उसके बाद कलयुग पुनः लग जायेगा।
-* युगों की टकराहट पर महाभारत जैसा युद्ध और तब विनाश अनिवार्य है।
-
- युद्ध, हथियार और वैश्विक तनाव
-
-* अनेक देशों के पास खतरनाक हथियार और मिसाइलें हैं; निशानों पर मिसाइलें फिट हैं।
-* अगर किसी राष्ट्राध्यक्ष का मस्तक गरम हो और कोई बटन दबा दे तो जहाँ मिसाइलें गिरेंगी सब कुछ जलकर राख हो जाएगा। उसके साथ-साथ अन्य देशों में भी बटन दब सकते हैं।
-* महाभारत की लड़ाई इतिहास में 18 दिन की बताई गई है; भविष्य में युद्ध 18 मिनट का भी हो सकता है पर भारी नरसंहार कर सकता है।
-* भारत-पाकिस्तान में लड़ाई होगी; पूर्व पाकिस्तान (बांग्लादेश) में क्रान्ति/परिवर्तन होगा और भविष्य में पूरब का पाकिस्तान खत्म होने का उल्लेख है; आगे पश्चिम का पाकिस्तान भी खतम हो सकता है।
-* बताया गया कि पाकिस्तान कीटाणु बम गिरायेगा; ऐसी स्थिति में हवा में फैले विकिरण/कीटाणु जीव-जंतु और मनुष्य दोनों को मार डालेगा — और कहा गया कि तूफ़ान द्वारा ये कण पाकिस्तान की ओर लौटकर वहां के लोगों को ही मार डालेंगे।
-* भविष्य में चीन-अमेरिका के बीच बड़ा तनाव और संभव आक्रमण का वर्णन है — अमेरिका चीन के ख़िलाफ़ आक्रोश और युद्ध कर सकता है।
-* विश्व-स्तरीय राजनीतिक और सैन्य परिवर्तन अत्यंत भारी होंगे।
-
- प्राकृतिक आपदाएँ, सूखा व अकाल
-
-* पूरे विश्व में सूखा पड़ेगा; नदियाँ, नहरें, तालाब सूख जायेंगे।
-* बिजली उत्पादन बंद होगा, फैक्ट्रियाँ बंद हो जाएँगी, ट्यूबवेल/पम्पों को बिजली नहीं मिलेगी।
-* अन्न की भारी कमी के कारण भयंकर भूखमरी फैलेगी और करोड़ों लोग मरेंगे।
-* पानी न गिरने पर नदियाँ व नहरें सूख जायेंगी; बाँधों पर पानी नहीं रहेगा; जल-स्तर इतना नीचे चला जाएगा कि सिंचाई संभव नहीं रहेगी।
-* अकाल मृत्यु बहुत होगी; कई-कई कोस पर खाली गाँव/चिराग दिखाई देंगे।
-* एक समय ऐसा आएगा कि लोग रुपये-पैसे, गहने छोड़कर अनाज पाने के लिए आख़िरी तक जा उतरेंगे।
-* कुदरत धीरे-धीरे संकेत देगी और फिर अचानक कठोर झटका दे देगी — शाम को कुछ और और सुबह सब कुछ बदल गया होगा।
-* भयंकर भूकम्प आने का वर्णन है — इमारतें उछलेंगी, रात में सोएँगा कोई और सुबह उठेगा तो स्थिति बदल चुकी होगी।
-* कुदरत के एक डंडे में करोड़ों का सफाया संभव है।
-
-बीमारियाँ और चिकित्सा संकट
-
-* भीषण नई-नई बीमारियाँ फैलेंगी जिनका निदान डॉक्टरों को समझ न आएगा; दवाएँ असर नहीं करेंगी।
-* महामारी/रोगों के घोर आक्रमण से व्यक्ति-व्यक्ति त्रस्त होंगे; दवा-विशेष काम न करेगी और राजकोष खाली हो जाएगा।
-* स्वास्थ्य संकट के कारण सामाजिक और आर्थिक तंत्र ठप्प हो जाएगा।
-
- प्रकृति, पाप और परिणाम (आध्यात्मिक कारण-प्रभाव)
-
-* सृष्टि/प्रकृति को मनुष्यों द्वारा गन्दा कर दिया गया है; यह कदापि बर्दाश्त नहीं करेगी।
-* मानव ने प्रकृति द्वारा निर्धारित आहार (प्राकृतिक व्यवस्था) का उल्टा काम किया — मांसाहार ने ओज-शक्ति घटाई और मनुष्य पशुवत हो गया।
-* पापों का घड़ा भर चुका है; अब वह फूटेगा। पाप, भ्रूण-हत्या, हत्या, अनैतिकता का फल प्रकृति द्वारा दिया जाएगा।
-* महात्मा समझाते हैं पर लोग उनके दायरे में नहीं आते; इसलिए प्राकृतिक आपदाएँ और दंड आएँगे।
-* कुदरत का डण्डा बजते ही मनुष्य धर्म की ओर मुड़ेगा; नहीं तो दण्ड अवश्य मिलेगा।
-
-आन्तरिक पतन — सामाजिक नैतिकता में गिरावट
-
-* पढ़े-लिखे लोग इन्द्रिय सुखों में मशगूल हैं; व्यभिचार, भ्रष्टाचार, रक्त-हिंसा, भ्रूण-हत्या इत्यादि बढ़ गए हैं।
-* इससे परिवार, व्यवस्था तथा राज्य भ्रष्ट हुए; मानवता पथभ्रष्ट हो गयी है।
-* महात्माओं, साधुओं, ऋषि-मुनियों के उपदेशों का प्रचार कम हो गया; परम्पराएँ टूट गयीं।
-* धार्मिक संस्थाएँ और साधु-सन्यासियों का प्रभाव घटने से सामाजिक अनुशासन व मानवता में कमी आई।
-
- बचाव का मार्ग — सत्संग, शाकाहार, सेवा
-
-* महात्माओं का संदेश — मांस, मछली, अंडा, शराब, नशा, अनैतिक कार्य, तोड़फोड़, हड़ताल, आगज़नी छोड़ दो।
-* शुद्ध शाकाहार अपनाओ; परिवार में शाकाहार बढ़ाओ — यह मुसीबतों से बचने का मार्ग है।
-* गुरु-कृपा, सत्संग, भजन और सेवा से जगत को बचाया जा सकता है।
-* सत्संग में जाने से कर्मों की मैल धुलती है और दिव्य नेत्र का अनुभव होता है; यह आत्म-दर्शन का मार्ग है।
-* जो महात्माओं की बात मानेंगे वे सुरक्षित रहेंगे; जो नहीं मानेंगे उन्हें कष्ट भुगतने होंगे।
-
- दैवी (औतारी) शक्तियाँ और उनका अवतरण
-
-* देश को सुधारने वाली शक्तियों का अवतरण हो चुका है; उनका कार्य अधर्म का नाश और धर्म की स्थापना है।
-* इन माताओं/शक्तियों के गर्भ से ऐसे बच्चे जन्म ले चुके हैं जिनमें दैवी शक्ति है — ये समय पर प्रकट होंगे और कार्य करेंगे।
-* ये शक्तियाँ सतगुरु/संत सत्तपुरुषों के आदेश पर ही सक्रिय होंगी।
-* इन शक्तियों का समाज एक प्रकार का संगठन बनाकर धरती पर कार्य करेगा — पर आदेश के बिना वे कुछ नहीं कर सकतीं।
-* जो आगाहियाँ दी जाती हैं, पहले समझाया जाता है; न मानने पर कठोर कार्रवाई/संसोधन होगा।
-
- धर्म-निर्देश, नैतिक आरती और चेतावनियाँ (सूची रूप में)
-
-* धर्म अपनाओ — बहुत भयंकर कोहराम आने वाला है।
-* बुराईयों से हाथ जोड़कर दूर हो जाओ; वरना विनाश निश्चित है।
-* अंडा, मांस, मछली, शराब का परित्याग करो — वरना पछताओगे।
-* रिश्वत लेना पाप है — बंद करो; महाबली शासक को भी एक-एक पाई का हिसाब देना पड़ेगा।
-* माता-पिता और गुरु का आदर करो — अनादर पर दंड का संकेत है।
-* भारतीय संस्कृति, रहन-सहन, आचार-विचार अपनाओ; पश्चिमी सभ्यता की नक़ल करने पर संकट होगा।
-* आंदोलन, तोड़फोड़, हड़ताल, आगज़नी देशद्रोह के कार्य हैं — इन्हें बन्द करो।
-* सतयुग का स्वागत करो — सतयुग शीघ्र आ रहा है; अच्छे समाज का निर्माण करो।
-
- नरक, यमदूत और कर्मफल
-
-* जो बुरा करते हैं, मृत्यु के बाद यमदूत कर्मानुसार यातनाएँ देंगे।
-* आबादी बहुत कम हो जाएगी; दस-दस कोस पर चिराग दिखाई देंगे।
-* यम-त्रास से बचने के लिए पूर्ण गुरु की तलाश करो और उसके सत्संग में आओ।
-* सत्संग से जीवात्मा की आँत्मिक आंख खुलती है और आत्मदर्शन होता है।
-* जीवन में सत्संग न किये तो मृत्यु के बाद भारी यातनाएँ मिल सकती हैं।
-
-शराब-मांस सम्बन्धी विशेष बातें और सामाजिक सुझाव
-
-* मांस, मछली, अंडा: हत्या और पाप का कारण — इन्हें छोड़ना चाहिए।
-* अंडा मासिक पक्षी का रक्त/वीर्य जैसा बताया गया है — बच्चों को अंडे न खिलाने की सलाह।
-* शराब, ताड़ा, अफीम-इत्यादि बुद्धि नष्ट करते हैं और परिवार बर्बाद करते हैं।
-* यदि देश से शराब और मांस हट जाये तो आधा पाप कर्म रुक जायेगा; पचास प्रतिशत अपराध घटेंगे।
-* सरकारों से विनती है कि धर्म के प्रचार को बढ़ाएं और शराब-मांस पर प्रतिबंध लाएं।
-
-धार्मिक-सामाजिक आलोचना
-
-1. मुसलमान धर्म का कैदी होता तो बदकारी कम होती।
-2. हिन्दु धर्म का पाबन्द होता तो व्यभिचार कम होता।
-3. ईसाई धर्म में जीव-हिंसा कम होती।
-4. अफ़िसर धर्मबद्ध होता तो रिश्वत न लेता।
-5. चोर समाज की जकड़ से चोरी रुकती।
-6. जुआरी, शराबी अक्सर अन्य अनैतिक कर्मों के प्रवर्तक होते हैं।
-   (संदेश: हर धर्म के अनुयायियों ने अपने-अपने आदर्श त्याग दिए; परिणामस्वरूप अनाचार फैला है।)
-
-भावी सामाजिक व्यवस्था और नीति-दृष्टि (भविष्य की झलक)
-
-* छोटे-बड़े पदाधिकारी शाकाहारी होंगे; मांसाहार बंद होगा।
-* मांस, मछली, अंडा और नशे के सेवन करने वालों का पद छीन लिया जाएगा।
-* एम.पी., एम.एल.ए., मंत्री इत्यादि सर्वर शाकाहारी होंगे; दुराचार बंद होगा।
-* विदेशी बैंकों में छिपा धन वापस लाने का निर्देश/प्रयास होगा।
-* हड़ताल, तोड़फोड़ बंद होंगे; कारोबार बदलेगा; पारिवारिक स्थिति सुधरेगी।
-* नग्न सिनेमा बंद होंगे; चोरी, व्यभिचार समाप्त होंगे।
-* दिल्ली से राजधानी हटकर किसी पवित्र भूमि पर नई राजधानी बनेगी; वहाँ से बड़े निर्णय लिए जायेंगे (यू.एन.ओ.-संदर्भ भी मूल पाठ में आया है)।
-* राष्ट्रभाषा संस्कृत और हिन्दी का वर्चस्व हो सकता है; रिश्वतखोरी पर कड़ी पाबंदी लगेगी।
-* कृषकों के कर्ज माफ होंगे; प्राथमिक अध्यापक/अन्य वेतन संबंधी कुछ बातें (मूल पाठ में विशेष अंकित) — सामाजिक संशोधन की अपेक्षा।
-* वृद्ध व अपाहिजों के लिए राज्य कोष सहायता देगा; रोजगार में सुधार होगा।
-* राष्ट्रपति चुनाव सीधे जनता द्वारा — कुछ बदलावों का वर्णन।
-* प्रेम और अहिंसा का युग आयेगा; सभी पूर्ण निरामिष हो जायेंगे — यह भविष्यवाणी/इच्छा व्यक्त की गई है।
-* शीघ्र अपना सुधार कर लो — गुरु-कृपा, सत्संग, भजन, सेवा से ही रक्षा संभव है।
-* यदि कुछ नहीं कर सकते तो कम से कम शाकाहारी बन जाओ।
-* शराब, मांस, अंडा, नशा, तोड़फोड़, हड़ताल, आगज़नी — इन सब से तुरंत दूरी बनाएं।
-* माता-पिता, गुरु का आदर और सत्य-धर्म का पालन जीवन रक्षा का मूल है।
-`}
+      {/* SEO Header Section */}
+      <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+        <h1 style={{ color: '#c41e3a', fontSize: '2.5rem', marginBottom: '15px' }}>
+          Jai Gurudev Prophecies & Future Predictions (Bhavishyavani)
+        </h1>
+        <p style={{ fontSize: '1.1rem', color: '#555', maxWidth: '800px', margin: '0 auto', lineHeight: '1.6' }}>
+          Explore the profound <strong>spiritual warnings</strong> and <strong>future predictions</strong> of Baba Jai Gurudev.
+          Understand the upcoming changes (Parivartan) and how to prepare for the <strong>Golden Age (Satya Yuga)</strong> through spiritual awakening and a Satvic lifestyle.
+        </p>
       </div>
 
+      {/* GLOBAL PROPHECY TEXT */}
+      {/* TEXT PROPHECY GRID - 5 cards per row */}
+      {textProphecies.length > 0 && (
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(5, 1fr)',
+          gap: '15px',
+          maxWidth: '1600px',
+          margin: '0 auto 30px auto',
+          padding: '0 10px'
+        }}>
+          {textProphecies.map(item => {
+            const limit = 150;
+            const isLong = item.content.length > limit;
+            return (
+              <div key={item.id} style={{
+                background: '#fff',
+                padding: '20px',
+                borderRadius: '8px',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+                border: '1px solid #f0f0f0'
+              }}>
+                <span style={{
+                  background: '#c41e3a',
+                  color: 'white',
+                  padding: '3px 8px',
+                  borderRadius: '4px',
+                  fontSize: '0.75rem',
+                  fontWeight: 'bold',
+                  alignSelf: 'flex-start',
+                  marginBottom: '10px'
+                }}>
+                  {item.year || '2026'}
+                </span>
+                <h3 style={{ margin: '0 0 10px 0', fontSize: '1.2rem', color: '#333', lineHeight: '1.25' }}>
+                  {item.title}
+                </h3>
+                <p style={{
+                  color: '#555',
+                  fontSize: '0.95rem',
+                  lineHeight: '1.5',
+                  whiteSpace: 'pre-wrap',
+                  flex: 1,
+                  marginBottom: '15px'
+                }}>
+                  {isLong ? item.content.substring(0, limit) + "..." : item.content}
+                </p>
+                {isLong && (
+                  <button
+                    onClick={() => { setSelectedText(item); setShowModal(true); }}
+                    style={{
+                      background: '#c41e3a',
+                      color: 'white',
+                      border: 'none',
+                      padding: '6px 14px',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontWeight: 'bold',
+                      alignSelf: 'flex-start',
+                      fontSize: '0.85rem'
+                    }}
+                  >
+                    Read More
+                  </button>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {showModal && selectedText && (
+        <ReadingModal
+          title={selectedText.title}
+          content={selectedText.content}
+          onClose={() => setShowModal(false)}
+        />
+      )}
+
       {/* JSON BASED PROPHECY CARDS */}
-      <div className="card-grid" style={{ marginTop: "40px" }}>
+      <div className="card-grid" style={{ marginTop: "0px" }}>
         {items.map((item, index) => (
-          <div key={index} className="card">
-            {item.image && (
-              <img
-                src={item.image}
-                alt={item.title}
-                className="card-img"
-              />
+          <div key={index} className="card" style={{ position: "relative" }}>
+            {item.year && (
+              <div
+                className="year-badge"
+                style={{
+                  position: "absolute",
+                  top: "10px",
+                  right: "10px",
+                  background: "#c41e3a",
+                  color: "white",
+                  padding: "5px 10px",
+                  borderRadius: "5px",
+                  fontWeight: "bold",
+                  zIndex: 1,
+                }}
+              >
+                {item.year}
+              </div>
+            )}
+            {item.thumbnail ? (
+              <a href={item.link} target="_blank" rel="noreferrer">
+                <img src={item.thumbnail} alt={item.title} className="card-img" />
+                <div style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  background: 'rgba(196, 30, 58, 0.8)',
+                  borderRadius: '50%',
+                  width: '50px',
+                  height: '50px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontSize: '24px'
+                }}>▶</div>
+              </a>
+            ) : item.image && (
+              <img src={item.image} alt={item.title} className="card-img" />
             )}
 
             <div className="card-content">
               <h3 className="prophecy-title">{item.title}</h3>
-              <p
+              <div
                 className="prophecy-text"
-                style={{ lineHeight: "1.5", color: "#333" }}
+                style={{ lineHeight: "1.5", color: "#333", whiteSpace: "pre-wrap" }}
               >
-                {item.text}
-              </p>
+                {item.transcriptStatus === 'Approved' && item.transcript ? (
+                  <>
+                    {item.transcript.includes('|||') ? (
+                      <>
+                        {/* Preview - First 150 chars of each */}
+                        <div style={{ marginBottom: '10px' }}>
+                          <em style={{ fontSize: '0.8rem', color: '#c41e3a', fontWeight: 'bold', display: 'block', marginBottom: '3px' }}>हिंदी:</em>
+                          <span style={{ fontSize: '0.9rem', color: '#555' }}>
+                            {item.transcript.split('|||')[0].trim().substring(0, 150)}...
+                          </span>
+                        </div>
+                        <div style={{ marginBottom: '12px' }}>
+                          <em style={{ fontSize: '0.8rem', color: '#c41e3a', fontWeight: 'bold', display: 'block', marginBottom: '3px' }}>English:</em>
+                          <span style={{ fontSize: '0.9rem', color: '#555' }}>
+                            {item.transcript.split('|||')[1].trim().substring(0, 150)}...
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => setSelectedTranscript({
+                            title: item.title,
+                            hindi: item.transcript.split('|||')[0].trim(),
+                            english: item.transcript.split('|||')[1].trim(),
+                            link: item.link
+                          })}
+                          style={{
+                            background: '#c41e3a',
+                            color: 'white',
+                            border: 'none',
+                            padding: '8px 16px',
+                            borderRadius: '5px',
+                            cursor: 'pointer',
+                            fontWeight: 'bold',
+                            fontSize: '0.85rem'
+                          }}
+                        >
+                          📖 Read Full Transcript
+                        </button>
+                      </>
+                    ) : (
+                      <span style={{ display: 'block', fontSize: '0.9rem' }}>
+                        {item.transcript.substring(0, 200)}...
+                      </span>
+                    )}
+                  </>
+                ) : (item.text || item.description?.substring(0, 100) + "...")}
+              </div>
+              {item.link && (
+                <a
+                  href={item.link}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ color: '#c41e3a', fontWeight: 'bold', textDecoration: 'none', display: 'block', marginTop: '10px' }}
+                >
+                  Watch Video →
+                </a>
+              )}
             </div>
           </div>
         ))}
       </div>
+
+      {/* Transcript Modal */}
+      {selectedTranscript && (
+        <TranscriptModal
+          title={selectedTranscript.title}
+          hindiText={selectedTranscript.hindi}
+          englishText={selectedTranscript.english}
+          videoLink={selectedTranscript.link}
+          onClose={() => setSelectedTranscript(null)}
+        />
+      )}
 
     </section>
   );

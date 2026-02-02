@@ -8,20 +8,21 @@ function HeroSection() {
         backgroundImage: `url(${process.env.PUBLIC_URL}/assets/images/temple-bg.jpg)`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        padding: '40px 20px 20px 20px',   // ⬅ moved UP
-        marginTop: '-20px',               // ⬅ reduces empty gap above
+        padding: '0px 20px 20px 20px',
+        marginTop: '-20px',
         textAlign: 'center',
         color: '#1E3A8A',
         position: 'relative',
       }}
     >
-      {/* Soft overlay for beautiful look */}
+      {/* Soft overlay */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
           background: 'rgba(255,255,255,0.4)',
           backdropFilter: 'blur(2px)',
+          zIndex: 1,
         }}
       ></div>
 
@@ -38,7 +39,7 @@ function HeroSection() {
         <h1
           style={{
             fontSize: '3.2rem',
-            color: '#FF9933',
+            color: '#5233ffff',
             fontWeight: '800',
             textShadow: '3px 3px 8px rgba(0,0,0,0.4)',
             margin: '0px 0 15px 0',
@@ -48,66 +49,111 @@ function HeroSection() {
           JaiGuruDev – Name of Supreme God
         </h1>
 
-        {/* MAIN PARAGRAPH */}
-        <p
+        {/* MAIN PARAGRAPH CONTAINER */}
+        <div
           style={{
-            fontSize: '1.1rem',
             margin: '0 auto 20px auto',
             color: '#2E3A59',
-            backgroundColor: 'rgba(255,255,255,0.92)',
-            padding: '16px 20px',
-            borderRadius: '12px',
-            lineHeight: '1.8',
-            textAlign: 'justify',
-            maxWidth: '1500px',
-            boxShadow: '0px 3px 10px rgba(0,0,0,0.1)',
+            backgroundColor: 'rgba(255,255,255,0.4)',
+            backdropFilter: 'blur(20px)',
+            padding: '30px 40px',
+            borderRadius: '20px',
+            maxWidth: '1100px',
+            boxShadow: '0px 10px 30px rgba(0,0,0,0.1)',
+            borderTop: '6px solid #ad33ffff',
+            lineHeight: '1.6',
+            textAlign: 'left',
           }}
         >
-          Experience the Transformative Power of Jaigurudev. The sacred name “Jaigurudev” connects you to the very essence of life and awakens your inner strength. By chanting: “Jaigurudev Jaigurudev Jaigurudev Jai Jaigurudev” every morning and evening, you engage in a divine practice whose effects can be felt immediately. Guidance from Baba Umakant Ji Maharaj — This practice is shared exclusively by Baba Umakant Ji Maharaj, revered as a living spiritual guide, who helps seekers connect with the Supreme and receive divine blessings. Following his guidance can deepen your spiritual connection and bring inner peace, purpose, and lasting transformation. The Precious Human Life and the Path to Liberation — The human body is extremely rare and precious—it is said to be attained only once after millions of births across various forms such as animals, birds, trees, and other beings. This unique opportunity is critical, because only as humans can we consciously pursue the true goal of life: guiding our soul back to the Supreme Lord, the Creator, or Existence itself. Through Naamdan, a sacred initiation given by Baba Umakant Ji Maharaj, you can receive the guidance and meditation practices needed to liberate your soul from the cycles of birth and death. By following this divine path, you can reach your eternal home and experience the blissful presence of the Supreme. This sacred initiation is available only in person at the ashram and cannot be received online. Visiting the ashram and receiving Naamdan allows you to embrace your spiritual destiny and achieve lasting connection with the Divine. Visit the Ashram and Join the Global Community — Attending the ashram during programs allows you to connect directly with Baba Ji, receive guidance, and experience the fullness of blessings in your life. Over 500 million people across 42 countries have embraced this practice, experiencing profound inner transformation. Come, chant, and immerse yourself in the eternal power of Jaigurudev—a journey toward divine grace, limitless possibilities, and the omnipresent blessings of Baba Ji (Omnipresent Avtar of God).
-        </p>
+          {/* INTRO */}
+          <p style={{ fontSize: '1.3rem', fontWeight: '500', color: '#1E3A8A', marginBottom: '20px', textAlign: 'center', fontStyle: 'italic' }}>
+            Spiritual Prophecies, Divine Protection & The Path to Enlightenment
+          </p>
 
-        {/* IMPORTANT NOTE */}
-        <p
-          style={{
-            fontSize: '1.05rem',
-            margin: '0 auto 15px auto',
-            color: '#1E3A8A',
-            backgroundColor: 'rgba(255,255,255,0.92)',
-            padding: '12px',
-            borderRadius: '10px',
-            textAlign: 'justify',
-            maxWidth: '1500px',
-            fontWeight: 'bold',
-            boxShadow: '0px 3px 10px rgba(0,0,0,0.1)',
-          }}
-        >
-          ⚜️ <strong>Important:</strong> Do not disclose or share the Naamdan word
-          and method with anyone. This sacred practice must be received directly
-          from Baba Umakant Ji Maharaj during his programmes.
-        </p>
+          <p style={{ fontSize: '1.1rem', marginBottom: '20px' }}>
+            By chanting <strong>“Jaigurudev Jaigurudev Jaigurudev Jai Jaigurudev”</strong> you engage in a divine practice whose powerful effects include <strong>protection in difficult times</strong> and spiritual awakening. This sacred name provides guidance, <strong>warnings about future times (prophecies)</strong>, and inner strength even when all hope seems lost, offering support to anyone, at any time.
+          </p>
 
-        {/* VISITORS NOTE */}
-        <p
-          style={{
-            fontSize: '1.05rem',
-            margin: '0 auto',
-            color: '#1E3A8A',
-            backgroundColor: 'rgba(255,255,255,0.92)',
-            padding: '12px',
-            borderRadius: '10px',
-            textAlign: 'justify',
-            maxWidth: '1500px',
-            fontWeight: 'bold',
-            boxShadow: '0px 3px 10px rgba(0,0,0,0.1)',
-          }}
-        >
-          🌼 <strong>Note for Visitors:</strong> When referring to the spiritual
-          guide, kindly use "<strong>Maalik (Owner of Souls)</strong>" instead
-          of the personal name.
-        </p>
+          {/* SECTION 1: GUIDANCE */}
+          <div style={{ marginBottom: '20px' }}>
+            <p style={{ fontSize: '1.1rem' }}><span style={sectionHeadingStyle}>Guidance from the Living Guru:</span> This sacred practice is shared exclusively by <strong>Baba Umakant Ji Maharaj</strong>, <strong>revered as a living spiritual Guru, ever-present and omnipresent,</strong> who lovingly guides seekers to connect with the Supreme and receive divine blessings.
+            </p>
+          </div>
+
+          {/* SECTION 2: THE PATH */}
+          <div style={{ marginBottom: '20px' }}>
+            <p style={{ fontSize: '1.1rem' }}><span style={sectionHeadingStyle}>The Precious Human Life & Path to Liberation:</span> <strong>The human body is extremely rare and precious.</strong> Ancient spiritual wisdom reveals that the <strong>soul journeys through 8.4 million forms of life</strong>—including plants, trees, birds, animals, insects, and aquatic beings—before attaining the <strong>rare and precious human birth</strong>. This human form is received only once in that vast journey and offers a unique opportunity to consciously pursue the true purpose of life: <strong>guiding the soul back to the Supreme Lord.</strong>
+            </p>
+          </div>
+
+          {/* SECTION 3: NAAMDAN */}
+          <div style={{ marginBottom: '20px' }}>
+            <p style={{ fontSize: '1.1rem' }}><span style={sectionHeadingStyle}>Naamdan: The Sacred Initiation:</span> Through <strong>Naamdan</strong>, the sacred initiation bestowed by Baba Umakant Ji Maharaj, <strong>seekers receive the guidance and meditation practices essential for liberating the soul from the cycles of birth and death.</strong> This sacred initiation can be received only through <strong>personal presence at the ashram or during his programs held across India and abroad, predominantly in India each month. Online initiation is not offered.</strong>
+            </p>
+          </div>
+
+          {/* SECTION 4: COMMUNITY */}
+          <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: '20px' }}>
+            <p style={{ fontSize: '1.05rem', color: '#4B5563', margin: 0 }}>
+              <span style={sectionHeadingStyle}>Visit the Ashram and Join the Global Community</span> — Over <strong>500 million people across 42 countries</strong> have embraced this practice, experiencing <strong>profound inner transformation</strong>. Chant and immerse yourself in the <strong>eternal power of Jaigurudev</strong>, embarking on a journey toward <strong>divine grace, blessings, and spiritual awakening</strong>.
+            </p>
+          </div>
+        </div>
+
+        {/* IMPORTANT NOTES SECTION */}
+        <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+          {/* IMPORTANT NOTE */}
+          <div
+            style={{
+              fontSize: '1rem',
+              color: '#1E3A8A',
+              backgroundColor: '#F8FAFC',
+              padding: '16px 20px',
+              borderRadius: '12px',
+              textAlign: 'center',
+              fontWeight: '600',
+              boxShadow: '0px 4px 12px rgba(0,0,0,0.05)',
+              border: '1px solid #E2E8F0',
+            }}
+          >
+            ⚜️ <strong>Important:</strong> Do not disclose or share the Naamdan word
+            and method with anyone. This sacred practice must be received directly
+            from Baba Umakant Ji Maharaj during his programmes.
+          </div>
+
+          {/* VISITORS NOTE */}
+          <div
+            style={{
+              fontSize: '1rem',
+              color: '#1E3A8A',
+              backgroundColor: '#F8FAFC',
+              padding: '16px 20px',
+              borderRadius: '12px',
+              textAlign: 'center',
+              fontWeight: '600',
+              boxShadow: '0px 4px 12px rgba(0,0,0,0.05)',
+              border: '1px solid #E2E8F0',
+            }}
+          >
+            🌼 <strong>Note for Visitors:</strong> When referring to the spiritual
+            guide, kindly use "<strong>Maalik (Owner of Souls)</strong>" instead
+            of the personal name.
+          </div>
+        </div>
       </div>
     </section>
   );
 }
 
+const sectionHeadingStyle = {
+  fontSize: '1.25rem',
+  color: '#5233ffff',
+  fontWeight: '700',
+  marginBottom: '10px',
+  borderBottom: '2px solid #5233ffff',
+  display: 'inline-block',
+  paddingBottom: '5px'
+};
+
 export default HeroSection;
+

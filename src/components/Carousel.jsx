@@ -31,38 +31,39 @@ function Carousel() {
             boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
             backgroundColor: '#fff'
         }}>
-            <div 
-                className="carousel-slide" 
-                style={{ 
-                    display: 'flex', 
-                    transition: 'transform 0.5s ease-in-out',
-                    transform: `translateX(-${currentIndex * 100}%)`
+            <div
+                className="carousel-slide"
+                style={{
+                    display: 'flex',
+                    transition: 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                    transform: `translateX(-${currentIndex * 100}%)`,
+                    willChange: 'transform'
                 }}
             >
                 {slides.map((slide, index) => (
                     <div key={index} style={{ width: '100%', flexShrink: 0 }}>
-                        <img 
-                            src={slide} 
-                            alt={`Slide ${index + 1}`} 
-                            style={{ 
-                                width: '100%', 
-                                height: '700px', 
+                        <img
+                            src={slide}
+                            alt={`Slide ${index + 1}`}
+                            style={{
+                                width: '100%',
+                                height: '550px',
                                 objectFit: 'cover',
                                 border: '1px solid #ddd'
-                            }} 
+                            }}
                         />
                     </div>
                 ))}
             </div>
-            
+
             <div className="carousel-dots" style={{
                 display: 'flex',
                 justifyContent: 'center',
                 marginTop: '20px'
             }}>
                 {slides.map((_, index) => (
-                    <div 
-                        key={index} 
+                    <div
+                        key={index}
                         className={`carousel-dot ${index === currentIndex ? 'active' : ''}`}
                         onClick={() => goToSlide(index)}
                         style={{

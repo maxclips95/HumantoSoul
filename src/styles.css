@@ -20,15 +20,19 @@ body {
 .header {
     background: #c41e3a;
     height: auto;
-    padding: 10px 30px;
+    padding: 10px 20px;
+    /* Increased side padding */
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid rgba(0,0,0,0.08);
-    box-shadow: 0px 2px 10px rgba(0,0,0,0.05);
+    justify-content: center;
+    /* Unified center alignment */
+    gap: 20px;
+    /* Space between nav and language selector */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.05);
     position: sticky;
     top: 0;
-    z-index: 9999; /* Increased z-index to ensure visibility */
+    z-index: 9999;
 }
 
 /* Logo */
@@ -45,9 +49,13 @@ body {
 .nav-menu {
     display: flex;
     align-items: center;
-    gap: 20px;
-    font-size: 1rem;
+    gap: 12px;
+    font-size: 0.9rem;
     font-weight: 500;
+    flex-wrap: wrap;
+    justify-content: center;
+    flex: 0 1 auto;
+    /* Don't force to fill space */
 }
 
 .nav-item {
@@ -90,7 +98,7 @@ body {
     background: white;
     min-width: 250px;
     border-radius: 12px;
-    box-shadow: 0px 5px 25px rgba(0,0,0,0.15);
+    box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.15);
     padding: 10px 0;
     z-index: 9999;
 }
@@ -114,10 +122,54 @@ body {
 /* ---------------------------------------------------------
    LANGUAGE SELECTOR
 --------------------------------------------------------- */
-.language-selector select {
-    padding: 6px 12px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
+.language-selector {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    min-width: 120px;
+    /* Reduced from 160px */
+}
+
+#google_translate_element {
+    display: inline-block;
+}
+
+/* Force visibility of the Google dropdown */
+.goog-te-gadget .goog-te-combo {
+    padding: 2px 4px !important;
+    /* Compact padding */
+    border-radius: 4px !important;
+    color: #333 !important;
+    background: #fff !important;
+    border: 1px solid #ccc !important;
+    cursor: pointer !important;
+    font-size: 0.85rem !important;
+    /* Smaller text */
+    width: 140px !important;
+    /* Fixed compact width */
+}
+
+/* Hide 'Powered by' and logo to keep it clean */
+.goog-te-gadget {
+    font-size: 0 !important;
+    color: transparent !important;
+}
+
+.goog-te-gadget img,
+.goog-te-banner-frame {
+    display: none !important;
+}
+
+/* Push header down when Google Translate banner is active */
+.translated-ltr .header,
+.translated-rtl .header {
+    top: 40px !important;
+}
+
+/* Allow Google to shift body naturally if it needs to */
+body {
+    position: relative;
+    top: auto !important;
 }
 
 /* ---------------------------------------------------------
@@ -148,7 +200,7 @@ body {
     background: white;
     border-radius: 14px;
     overflow: hidden;
-    box-shadow: 0px 4px 15px rgba(0,0,0,0.08);
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.08);
     transition: 0.3s ease;
 }
 
@@ -169,7 +221,8 @@ body {
 /* ---------------------------------------------------------
    BUTTONS BASE
 --------------------------------------------------------- */
-.btn, .card-btn {
+.btn,
+.card-btn {
     background: #c41e3a;
     color: white;
     padding: 10px 18px;
@@ -179,7 +232,8 @@ body {
     transition: 0.3s;
 }
 
-.btn:hover, .card-btn:hover {
+.btn:hover,
+.card-btn:hover {
     background: #a0172e;
 }
 
@@ -207,7 +261,7 @@ body {
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    box-shadow: 0px 4px 10px rgba(0,0,0,0.25);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
     transition: 0.3s;
 }
 
@@ -277,7 +331,7 @@ body {
     border: none;
     border-radius: 40px;
     cursor: pointer;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
     transition: 0.3s;
 }
 

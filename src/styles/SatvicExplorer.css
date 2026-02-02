@@ -1,0 +1,422 @@
+.satvic-explorer {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Modal Styling */
+.recipe-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    /* Ensure it is above the sticky header */
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.3s ease;
+}
+
+.recipe-modal {
+    background: white;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    border-radius: 20px;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+    animation: slideUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.close-modal-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.modal-image-header {
+    position: relative;
+    height: 300px;
+}
+
+.modal-image-header img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.modal-header-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 30px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+    color: white;
+}
+
+.modal-badge {
+    background: #FF8E53;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+.modal-header-content h2 {
+    font-size: 2.5rem;
+    margin: 10px 0;
+    font-family: 'Playfair Display', serif;
+    color: white;
+    /* Explicitly white override */
+}
+
+.modal-meta {
+    display: flex;
+    gap: 20px;
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+.modal-content {
+    padding: 30px;
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 30px;
+}
+
+.ingredients ul {
+    list-style: none;
+    padding: 0;
+}
+
+.ingredients li {
+    padding: 10px 0;
+    border-bottom: 1px dashed #eee;
+    color: #444;
+}
+
+.modal-step-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.step-count {
+    background: #333;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.modal-tip {
+    margin: 0 30px 30px;
+    padding: 20px;
+    background: #FFF8E1;
+    border-left: 5px solid #FFC107;
+    border-radius: 8px;
+    color: #5D4037;
+    font-size: 1rem;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .modal-content {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-image-header {
+        height: 200px;
+    }
+}
+
+/* Recipe Placeholder Gradients */
+.recipe-placeholder {
+    width: 100%;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px 12px 0 0;
+}
+
+.recipe-placeholder[data-type="breakfast"] {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.recipe-placeholder[data-type="lunch"] {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.recipe-placeholder[data-type="dinner"] {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.recipe-placeholder[data-type="snack"] {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+.recipe-placeholder[data-type="dessert"] {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+}
+
+.placeholder-icon {
+    font-size: 4rem;
+    opacity: 0.3;
+}
+
+.modal-header-no-image {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 40px 30px;
+    border-radius: 20px 20px 0 0;
+}
+
+.modal-header-no-image .modal-header-content {
+    position: relative;
+    color: white;
+}
+
+.explorer-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.explorer-header h2 {
+    font-size: 3rem;
+    color: #1a1a1a;
+    margin-bottom: 10px;
+    font-family: 'Playfair Display', serif;
+}
+
+.subtitle {
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+}
+
+/* Filter Bar */
+.filter-bar {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.recipe-search {
+    padding: 12px 25px;
+    min-width: 300px;
+    border: 2px solid #f0f0f0;
+    border-radius: 50px;
+    outline: none;
+}
+
+.filter-bar select {
+    padding: 12px 20px;
+    border: 2px solid #f0f0f0;
+    border-radius: 50px;
+    background: white;
+    outline: none;
+    cursor: pointer;
+}
+
+/* Recipe Feed */
+.recipe-feed {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 30px;
+    margin-bottom: 50px;
+}
+
+.satvic-recipe-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.ndtv-recipe-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
+
+.recipe-image-container {
+    position: relative;
+    height: 60px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+}
+
+/* Image zoom effect like professional food blogs */
+.recipe-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.ndtv-recipe-card:hover .recipe-thumb {
+    transform: scale(1.1);
+}
+
+.country-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #333;
+    z-index: 2;
+}
+
+.type-badge {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    background: #FF8E53;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    z-index: 2;
+}
+
+.recipe-info {
+    padding: 20px;
+    text-align: left;
+}
+
+.recipe-info h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.4rem;
+    color: #111;
+    font-family: 'Playfair Display', serif;
+    height: 2.8rem;
+    /* Cap at 2 lines */
+    overflow: hidden;
+}
+
+.meta-stats {
+    display: flex;
+    gap: 15px;
+    font-size: 0.85rem;
+    color: #777;
+    margin-bottom: 15px;
+}
+
+.meta-stats .diff.easy {
+    color: #2ecc71;
+}
+
+.meta-stats .diff.medium {
+    color: #f39c12;
+}
+
+.meta-stats .diff.hard {
+    color: #e74c3c;
+}
+
+.recipe-brief {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.6;
+    height: 3.2rem;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.view-details-btn {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #FF8E53;
+    background: transparent;
+    color: #FF8E53;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.view-details-btn:hover {
+    background: #FF8E53;
+    color: white;
+}
+
+/* Pagination Button */
+.more-results-btn {
+    display: block;
+    margin: 40px auto;
+    padding: 15px 40px;
+    background: #333;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.more-results-btn:hover {
+    background: #000;
+}
+
+.satvic-loader {
+    padding: 40px;
+    font-style: italic;
+    color: #888;
+}
+
+@media (max-width: 768px) {
+    .recipe-feed {
+        grid-template-columns: 1fr;
+    }
+
+    .explorer-header h2 {
+        font-size: 2rem;
+    }
+}

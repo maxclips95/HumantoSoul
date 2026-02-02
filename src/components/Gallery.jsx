@@ -1,59 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 function Gallery() {
-    const [currentPage, setCurrentPage] = useState(1);
-    const imagesPerPage = 9;
-    
-    const galleryImages = Array.from({ length: 27 }, (_, i) => ({
-        id: i + 1,
-        src: `https://via.placeholder.com/300?text=Image+${i + 1}`,
-        alt: `Gallery Image ${i + 1}`
-    }));
+    const [images, setImages] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const totalPages = Math.ceil(galleryImages.length / imagesPerPage);
-    const startIndex = (currentPage - 1) * imagesPerPage;
-    const currentImages = galleryImages.slice(startIndex, startIndex + imagesPerPage);
+    useEffect(() => {
+        const fetchImages = async () => {
+            try {
+                const response = await axios.get('/api/gallery');
+                setImages(response.data);
+            } catch (error) {
+                console.error('Error fetching gallery:', error);
+            }
+            setLoading(false);
+        };
+        fetchImages();
+    }, []);
 
-    const goToPage = (page) => {
-        if (page >= 1 && page <= totalPages) {
-            setCurrentPage(page);
-        }
-    };
+    if (loading) return <p style={{ textAlign: 'center' }}>Loading Gallery...</p>;
 
     return (
-        <section className="section">
-            <h2 className="section-title">Gallery</h2>
-            
-            <div className="card-grid">
-                {currentImages.map((image) => (
-                    <div key={image.id} className="card">
-                        <img src={image.src} alt={image.alt} className="card-image" />
-                        <div className="card-content" style={{ textAlign: 'center' }}>
-                            <p style={{ fontSize: '0.8rem', color: '#666' }}>Jai Gurudev</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
+        <section className="section" style={{ paddingTop: '0' }}>
 
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-                <button 
-                    onClick={() => goToPage(currentPage - 1)} 
-                    disabled={currentPage === 1}
-                    className="btn"
-                    style={{ marginRight: '10px' }}
-                >
-                    Previous
-                </button>
-                <span>Page {currentPage} of {totalPages}</span>
-                <button 
-                    onClick={() => goToPage(currentPage + 1)} 
-                    disabled={currentPage === totalPages}
-                    className="btn"
-                    style={{ marginLeft: '10px' }}
-                >
-                    Next
-                </button>
-            </div>
+
+            {images.length === 0 ? (
+                <p style={{ textAlign: 'center', color: '#666' }}>No images uploaded yet.</p>
+            ) : (
+                <div className="card-grid">
+                    {images.map((image) => (
+                        <div key={image.id} className="card">
+                            <img src={image.src} alt={image.alt || 'Gallery Image'} className="card-image" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                            <div className="card-content" style={{ textAlign: 'center' }}>
+                                <p style={{ fontSize: '0.9rem', color: '#666' }}>{image.alt || 'Jai Gurudev'}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
         </section>
     );
 }

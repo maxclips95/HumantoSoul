@@ -1,0 +1,139 @@
+# System Requirements for Jai Gurudev Application
+
+## Node.js Environment
+- **Node.js**: v18.17.0 or higher (Required for latest React, concurrent execution, and security features)
+- **npm**: v9.6.0 or higher
+
+## Python Environment (NEW - Required for Transcripts)
+- **Python**: v3.8 or higher
+- **yt-dlp**: Latest version (2025.12.8 or higher)
+  - Install: `pip install yt-dlp`
+  - Purpose: YouTube transcript/caption extraction
+  - Critical for video transcript functionality
+
+## Backend Dependencies (Core)
+- **express**: ~4.22.x (Web Server)
+- **cors**: ~2.8.x (Cross-Origin Resource Sharing)
+- **body-parser**: ~1.20.x (Request parsing)
+- **multer**: ~2.0.x (File Uploads)
+- **jsonwebtoken**: ~9.0.x (JWT Authentication)
+- **bcrypt**: ~5.1.x (Secure Password Hashing)
+- **helmet**: ~8.x (Security Headers)
+- **express-rate-limit**: ~8.x (Rate Limiting)
+- **better-sqlite3**: ~12.x (High-Performance SQLite Database)
+- **node-cron**: ~4.2.x (Task Scheduling)
+- **axios**: ~1.13.x (HTTP Client)
+- **node-fetch**: ~2.7.x (Fetch API for Node.js)
+- **xml2js**: ~0.6.x (XML Parsing for YouTube RSS)
+- **nodemailer**: ~7.0.x (Email Sending)
+- **dotenv**: ~16.x (Environment Variables)
+- **fs**: Built-in (File System Operations)
+
+## Transcript System (Updated January 28, 2026)
+- **yt-dlp**: Python package (Primary method - WORKING)
+  - Extracts captions via command-line interface
+  - Supports all caption types (manual, auto-generated)
+  - Cannot be blocked by YouTube
+  
+- **youtube-transcript**: ~1.2.x (Legacy - DEPRECATED)
+  - No longer working due to YouTube API changes (Jan 25, 2026)
+  - Kept for backward compatibility only
+  
+- **youtube-caption-extractor**: ~1.9.x (Legacy - DEPRECATED)
+  - No longer working due to YouTube API changes (Jan 25, 2026)
+  - Kept for backward compatibility only
+
+## Satvic Recipe System
+- **Database**: SQLite (`server/database.db`) with 300+ Authentic Indian Recipes
+- **Compliance**: Satvic Requirements (Vegetarian, No Onion/Garlic option, No Alcohol)
+- **Local Images**: Recipes support local image storage in `public/images/recipes/`
+
+## External Tools & Services
+- **Internet Connection**: Mandatory for:
+  - Google Translate API (Server-side translation)
+  - YouTube Video Embeds
+  - Fetching YouTube Captions via yt-dlp
+  - YouTube RSS Feed (Automated prophecy sync)
+  - Optional: Cloud LLM APIs
+
+## Browser Support
+- **Chrome / Edge / Brave**: Latest versions (Best performance)
+- **Firefox**: Latest version
+- **Safari**: Latest version
+
+## Configuration (.env)
+The backend requires a `.env` file in the root directory:
+- `SERVER_PORT=5000`
+- `ADMIN_USERNAME=admin`
+- `ADMIN_PASSWORD_HASH=...` (Securely hashed with bcrypt)
+- `JWT_SECRET=...` (CRITICAL for production security)
+- `PRODUCTION_URL=https://your-production-domain.com`
+- `EMAIL_SERVICE=gmail`
+- `EMAIL_USER=your-email@gmail.com`
+- `EMAIL_PASS=your-app-password`
+- `EMAIL_TO=recipient@domain.com`
+
+## Port Configuration
+- **Frontend**: 3000 (Default)
+- **Backend API**: 5000 (Default)
+
+## Installation Steps
+
+### 1. Install Node.js Dependencies
+```bash
+# Frontend
+npm install
+
+# Backend
+cd server
+npm install
+```
+
+### 2. Install Python & yt-dlp
+```bash
+# Install Python (if not already installed)
+# Download from: https://www.python.org/downloads/
+
+# Install yt-dlp
+pip install yt-dlp
+
+# Verify installation
+yt-dlp --version
+```
+
+### 3. Configure Environment
+```bash
+# Create .env file in root directory
+# Add all required environment variables (see Configuration section above)
+```
+
+### 4. Start Application
+```bash
+# Quick start (both frontend and backend)
+.\start_dev.ps1
+
+# Or manually:
+npm run dev
+```
+
+## New Features (2026)
+- **yt-dlp Transcript System**: Reliable YouTube caption extraction (January 28, 2026)
+  - Replaces failing Node.js libraries
+  - Extracts 5,000+ character Hindi transcripts
+  - Auto-translates to English
+  - Processing time: ~5-6 seconds per video
+  
+- **Professional UI**: Navy blue/gold spiritual theme
+- **Optimized Navigation**: "Healthy Living" section (formerly Satvic World)
+
+## System Requirements Summary
+- **OS**: Windows 10/11, macOS 10.15+, Linux (Ubuntu 20.04+)
+- **RAM**: 4GB minimum, 8GB recommended
+- **Storage**: 2GB free space (for dependencies and database)
+- **Network**: Stable internet connection for YouTube/translation APIs
+
+---
+
+*Last Updated: January 28, 2026*
+*Transcript System: ✅ WORKING with yt-dlp*
+

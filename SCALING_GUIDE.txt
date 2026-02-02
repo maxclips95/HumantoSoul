@@ -1,0 +1,38 @@
+# Scaling Guide: How to use Cloudflare (FREE) for High Traffic
+
+Since you are using SQLite, the best way to handle millions of visitors for free is to use Cloudflare. It acts as a shield in front of your server.
+
+## 1. What is a CDN (Cloudflare)?
+A CDN (Content Delivery Network) stores a "photocopy" of your website on thousands of servers worldwide. When a user visits:
+- They get the image/text from the nearest Cloudflare server (Fast).
+- Your main server doesn't even "see" the visitor (Saves Power/CPU).
+
+## 2. Setting Up Cloudflare for FREE
+1.  Create an Account: Go to Cloudflare.com and sign up.
+2.  Add Your Site: Enter your domain (e.g., jaigurudevukm.in).
+3.  Choose the Free Plan: Select the $0/month Free plan.
+4.  Update Nameservers: Cloudflare will give you two "Nameservers" (e.g., ashley.ns.cloudflare.com). You must go to your domain provider (GoDaddy/Hostinger) and replace the old nameservers with these.
+
+## 3. Recommended Settings for Speed
+Once inside Cloudflare, turn these on:
+- Caching -> Tiered Cache: On.
+- Speed -> Optimization:
+    - Auto Minify: Check HTML, CSS, and JS (Makes files smaller).
+    - Brotli: On (Better compression).
+- Security -> WAF: Turn on the "Bot Fight Mode" (Blocks 99% of fake traffic/bots).
+
+## 4. Cache Everything (Very Important)
+To make your site handle huge traffic without the server slowing down:
+1.  Go to Rules -> Page Rules.
+2.  Create a rule for yourdomain.com/*
+3.  Setting: Cache Level -> Cache Everything.
+4.  Setting: Edge Cache TTL -> 2 hours.
+
+NOTE: When you use "Cache Everything", your website will be lightning fast. However, when you update an announcement in the Admin Dashboard, it might take 2 hours to show up for users. You can manually click "Purge Cache" in Cloudflare to show updates instantly.
+
+## 5. Summary of Scale with SQLite + Cloudflare
+| System | Role | Benefit |
+|--------|------|---------|
+| SQLite | Database | 100x faster than JSON for data lookups. |
+| Cloudflare | Shield | Blocks bots and delivers images/text without touching your server. |
+| Combined | Professional | You get a $1000/mo setup performance for $0/mo. |

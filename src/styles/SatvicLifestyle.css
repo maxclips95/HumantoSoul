@@ -1,0 +1,271 @@
+.satvic-page {
+    background-color: #f9f9f9;
+    min-height: 100vh;
+}
+
+.satvic-hero {
+    height: 60vh;
+    background: url('https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+}
+
+.hero-overlay h1 {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    font-family: 'Playfair Display', serif;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.hero-subtitle {
+    font-size: 1.6rem;
+    margin-bottom: 2rem;
+    margin-top: 25px;
+    font-weight: 500;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.9);
+    letter-spacing: 0.5px;
+}
+
+.pledge-counter {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    padding: 15px 30px;
+    border-radius: 50px;
+    margin-bottom: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 180px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.pledge-counter .count {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #FFD700;
+    line-height: 1;
+    margin-bottom: 5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.pledge-counter .label {
+    font-size: 0.8rem;
+    color: #ffffff;
+    opacity: 0.95;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+}
+
+.cta-button {
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-weight: bold;
+}
+
+.cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px 40px;
+}
+
+.hero-overlay {
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.1) 40%, rgba(0, 0, 0, 0.1) 60%, rgba(0, 0, 0, 0.8) 100%);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hero-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding-top: 40px;
+}
+
+.hero-bottom-bar {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    padding: 20px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.vertical-divider {
+    width: 1px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.pledge-counter {
+    background: transparent;
+    padding: 0;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin: 0;
+    box-shadow: none;
+}
+
+.pledge-counter .count {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #FFD700;
+    line-height: 1;
+    margin-bottom: 2px;
+    text-shadow: none;
+}
+
+.pledge-counter .label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.9);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+}
+
+.pledge-counter .sub-label {
+    font-size: 0.75rem;
+    color: #FFD700;
+    margin-top: 2px;
+    font-weight: 400;
+    opacity: 0.9;
+}
+
+.cta-button {
+    padding: 12px 35px;
+    font-size: 1rem;
+    background: #e67e22;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.cta-button:hover {
+    transform: translateY(-2px);
+    background: #d35400;
+    box-shadow: 0 5px 15px rgba(230, 126, 34, 0.4);
+}
+
+.satvic-cta-bar {
+    display: none;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content.pledge-modal {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    position: relative;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 2rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+}
+
+.pledge-modal h2 {
+    color: #333;
+    margin-bottom: 10px;
+    font-family: 'Playfair Display', serif;
+}
+
+.pledge-modal form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.pledge-modal input,
+.pledge-modal select {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.submit-btn {
+    background: #4CAF50;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.success-message h3 {
+    color: #4CAF50;
+    font-size: 2rem;
+    margin-bottom: 10px;
+}

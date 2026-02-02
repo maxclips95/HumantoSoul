@@ -1,72 +1,252 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-function Prarthana() {
-    const prarthanas = [
-        {
-            title: "गुरुदेव तेरी चर्चा जब मुझ खुले तो निकले",
-            content: "गुरुदेव तेरी चर्चा जब मुझ खुले तो निकले, तन मन जगत की चर्चा, जब विचार मन से पूछे। व्यवहार के लिए यदि मौजूद अगर कहीं कुछ तो सत्य न्याय दोषित के, याद युग से निकले। ये काम भी हमारे, गुणगान तेरे सुनते, तुमकर उठी को भर में, फिर काम बढ़े कर लें। मन का दुर्ग बचकर, जब गिर पड़े भरम में, तुरत शेर में बेचा कर, गुरु साथ को पकड़ लें। ये पांच यदि चले तो, तेरे ही पात्र पहुंचे, उचकर दान देखा का, हाथ बर्द कर दें। तन मन व मन की खेल, यही आति मैं करूँ नित। तात्काल नित्य करते, यह प्राण मन से निकले।"
-        },
-        {
-            title: "इतनी शक्ति मुझे दो मेरे सतगुरु",
-            content: "इतनी शक्ति मुझे दो मेरे सतगुरु, तेरी शक्ति में खुद को विदाता चढ़ू। माहे राहो में कितनी मुसीबत पड़े, फिर भी तेरा दिया गीत गाता चढ़ू। नाम मोहित मेरे पूर्व के पाप से, तो न जाऊं नहीं हर सताता चढ़ू। इतना वरदान दे दो मेरे देवता, खुद जमूं और जगत को जगाता चढ़ू। हुर्दुरी की मदद की जरूरत नहीं, मुझको केवल तुम्हारी मदद चाहिए। अग्निमाये न मेरे काम रहे में, नाम कर तेरे डंका बजाता चढ़ू। तेरे जैसे अनेकों मिलें तुम्हें, पर हमारे गिर तो तुम्हीं एक हो। तेरी उपासन की मार्गी छोड़े हर कर्म। मर जाऊं तो कितनी मुसीबत पड़े, फिर भी तेरा गीत गाता चढ़ू।"
-        },
-        {
-            title: "गुरुदेव तुम्हारे चरणों में, जानकोटि प्रमाण हुआर है",
-            content: "गुरुदेव तुम्हारे चरणों में, जानकोटि प्रमाण हुआर है। गुरु बिन मैले मन को चौई। गुरु बिन मैले मन को चौई। एक तुम्हीं आधार सतगुरु, एक तुम्हीं आधार।"
-        }
-    ];
-
-    const chetavnies = [
-        {
-            title: "क्या लेकर तू आया जम में क्या लेकर तू जाएगा",
-            content: "क्या लेकर तू आया जम में क्या लेकर तू जाएगा। यह दुनिया के डाट बाट में कभी बरे तू गुला है। बन दोषित मात दक्षिणा, पाकर कभी तू गुला है। लोग सबक से रे मन मूरख, आखिर में पकड़ाएगा। यहाँ भेजूँ विच यदि, मरघट तक संग जाएगे। स्वरूप के तो अद्वित देख, सीट-नीट पर जाएगे। कोई ना तेरा साथी होगा, कल तुझे ही सहेगा। लोग सबक से रे मन मूरख, आखिर में पकड़ाएगा। कंचन जैसी कथा तेरी, तुरंत जताई जाएगी। जिस नारी से छेड़ मेरे तू, गढ़ भी रख डराएगी। एक मात तक मात रखेगी, फिर तू गात न आएगा। लोग सबक से रे मन मूरख, आखिर में पकड़ाएगा। राजा एक दुजारी पड़ित, उसके एक दिन जाना है। आँख सोल बर तेल बाने, जगत दुर्वासित साना है। जनगुरुलेश नाम हो आखिर, साथ तेरा निचाएगा। लोग सबक से रे मन मूरख, आखिर में पकड़ाएगा।"
-        },
-        {
-            title: "कर ले निज काज जवानी में, इस दो दिन की जिन्दगानी में",
-            content: "कर ले निज काज जवानी में, इस दो दिन की जिन्दगानी में। बेहमान जवानी जाती है, फिर सौट कभी नहीं आती है। ऐ मुख हरे मत लो देना, तू किसले और कहानी में। भगवान इस में मिलते हैं, कभी बुड़े एंटर पानी में। तू इतने सोल गुरु की बरट, मिल जाते तो न किसी से बर। गुरु ही सब कुछ के दाता है, सुन से क्या कहते मानी में। कभी इसको पाकर मुल रहा, निज कर्नी को मुल रहा। इन नीती से मुख मोह देख, फिर पार्क भूरी कमा जानी में। जानी हैमर का प्यारा है, लेकर गुरु मक्ष डुलारा है। जो गुरु कहते तू मान उठे, कर भक्ति इस मर्ती में।"
-        }
-    ];
+// --- COMPONENTS ---
+const PrarthanaCard = ({ item, onReadMore }) => {
+    const limit = 200;
+    const isDual = item.content && item.content.includes('|||');
+    const displayTitle = isDual ? item.title.split('|||')[0].trim() : item.title;
+    const displayText = isDual ? item.content.split('|||')[0].trim() : (item.content || "");
+    const isLong = displayText.length > limit;
 
     return (
-        <section className="section">
-            <h2 className="section-title">Prarthana</h2>
-            
-            <div style={{ maxWidth: '800px', margin: '0 auto', lineHeight: '1.6' }}>
-                <p>
-                    प्रार्थना करने से भाव बनता है, अन्तर में गुरु से मिलने की इच्छा होती है। जब भी प्रार्थना की जाए तो जिससे प्रार्थना की जाए उसका ध्यान किया जाए। फिर मन इच्छ-उच्चर न जाए। जैसे गुरु से प्रार्थना की गई तो गुरु का ही ध्यान उस समय होना चाहिए। मन जो नीचे दुनिया की तरफ, शरीर की इंद्रियों की तरफ रहता है, वह ऊपर की तरफ आ जाता है, गुरु की तरफ जाता है। प्रार्थना सब लोगों को बाद होनी चाहिए। यदि विश्व की प्रार्थना की जाए तो और भी अच्छा रहता है, और भी अच्छे भाव जाते हैं।
+        <div className="card" style={{ width: '100%', display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', padding: '20px' }}>
+            <div className="card-content" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <h3 className="card-title" style={{ marginTop: '0', fontSize: '1.25rem', marginBottom: '10px', color: '#c41e3a' }}>{displayTitle}</h3>
+
+                <p className="card-text" style={{ whiteSpace: 'pre-wrap', lineHeight: '1.6', flex: 1, color: '#333' }}>
+                    {isLong ? displayText.substring(0, limit) + "..." : displayText}
                 </p>
-                <p>
-                    प्रार्थना और चेतावनी में अन्तर होता है। चेतावनी जो होती है वह बाद दिखाती है कि एक दिन हमारी मौत आएगी। और प्रार्थना में प्रार्थना की जाती है कि हमारे ऊपर दया करो।
-                </p>
+
+                <button
+                    onClick={() => onReadMore(item)}
+                    style={{
+                        background: '#c41e3a',
+                        border: 'none',
+                        color: 'white',
+                        padding: '8px 16px',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        marginTop: '15px',
+                        fontSize: '0.9rem',
+                        alignSelf: 'flex-start'
+                    }}
+                >
+                    Read More / विस्तार से पढ़ें
+                </button>
+            </div>
+        </div>
+    );
+};
+
+const PrarthanaModal = ({ item, onClose }) => {
+    const [activeTab, setActiveTab] = useState('hindi');
+    if (!item) return null;
+
+    const isDual = item.content && item.content.includes('|||');
+    const hindiTitle = isDual ? item.title.split('|||')[0].trim() : item.title;
+    const englishTitle = isDual ? item.title.split('|||')[1].trim() : "";
+    const hindiContent = isDual ? item.content.split('|||')[0].trim() : item.content;
+    const englishContent = isDual ? item.content.split('|||')[1].trim() : "";
+
+    const isDualView = activeTab === 'dual';
+
+    return (
+        <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.95)',
+            color: 'white',
+            zIndex: 10000,
+            overflowY: 'auto',
+            padding: '40px 20px',
+            display: 'flex',
+            justifyContent: 'center'
+        }}>
+            <div style={{ maxWidth: isDualView ? '1200px' : '900px', width: '100%', position: 'relative', transition: 'max-width 0.3s ease' }}>
+                <button
+                    onClick={onClose}
+                    style={{
+                        position: 'fixed',
+                        top: '20px',
+                        right: '30px',
+                        background: 'none',
+                        border: '2px solid white',
+                        color: 'white',
+                        fontSize: '20px',
+                        borderRadius: '50%',
+                        width: '40px',
+                        height: '40px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 10001
+                    }}
+                >
+                    ✕
+                </button>
+
+                <div style={{ marginTop: '40px', paddingBottom: '60px' }}>
+                    <h1 style={{
+                        marginTop: '20px',
+                        fontSize: '2rem',
+                        borderBottom: '1px solid #333',
+                        paddingBottom: '20px',
+                        marginBottom: '20px',
+                        lineHeight: '1.2',
+                        color: '#c41e3a'
+                    }}>
+                        {activeTab === 'english' && englishTitle ? englishTitle : hindiTitle}
+                    </h1>
+
+                    {isDual && (
+                        <div style={{ display: 'flex', gap: '10px', marginBottom: '25px', flexWrap: 'wrap' }}>
+                            <button
+                                onClick={() => setActiveTab('hindi')}
+                                style={{ padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer', background: activeTab === 'hindi' ? '#c41e3a' : '#333', color: 'white' }}
+                            >
+                                हिंदी (Hindi)
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('english')}
+                                style={{ padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer', background: activeTab === 'english' ? '#c41e3a' : '#333', color: 'white' }}
+                            >
+                                English
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('dual')}
+                                style={{ padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer', background: activeTab === 'dual' ? '#c41e3a' : '#333', color: 'white' }}
+                            >
+                                Dual View (दोनों)
+                            </button>
+                        </div>
+                    )}
+
+                    <div style={{
+                        display: isDualView ? 'grid' : 'block',
+                        gridTemplateColumns: isDualView ? '1fr 1fr' : 'none',
+                        gap: '30px',
+                        fontSize: '1.25rem',
+                        lineHeight: '1.8',
+                        whiteSpace: 'pre-wrap'
+                    }}>
+                        {(activeTab === 'hindi' || isDualView) && (
+                            <div style={{ background: '#111', padding: '30px', borderRadius: '10px', color: '#fff' }}>
+                                {isDualView && <div style={{ color: '#c41e3a', fontWeight: 'bold', marginBottom: '15px', borderBottom: '1px solid #333' }}>हिंदी (Hindi)</div>}
+                                {hindiContent}
+                            </div>
+                        )}
+                        {(activeTab === 'english' || isDualView) && (
+                            <div style={{ background: '#111', padding: '30px', borderRadius: '10px', color: '#fff' }}>
+                                {isDualView && <div style={{ color: '#c41e3a', fontWeight: 'bold', marginBottom: '15px', borderBottom: '1px solid #333' }}>English</div>}
+                                {englishContent || item.content}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+function Prarthana() {
+    const [items, setItems] = useState([]);
+    const [selectedPrarthana, setSelectedPrarthana] = useState(null);
+
+    useEffect(() => {
+        const fetchItems = async () => {
+            try {
+                const response = await axios.get('/api/prarthana');
+                setItems(response.data);
+            } catch (error) {
+                console.error('Error fetching prarthana:', error);
+            }
+        };
+        fetchItems();
+    }, []);
+
+    // Disable body scroll when modal is open
+    useEffect(() => {
+        if (selectedPrarthana) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => { document.body.style.overflow = 'unset'; };
+    }, [selectedPrarthana]);
+
+    // Split items: First one (Featured) vs Rest (Grid)
+    const featuredItem = items.length > 0 ? items[0] : null;
+    const gridItems = items.length > 1 ? items.slice(1) : [];
+
+    return (
+        <section className="section" style={{ paddingTop: '0' }}>
+            <div style={{ marginTop: '0px' }}>
+                {items.length === 0 ? (
+                    <p style={{ textAlign: 'center' }}>No items added yet.</p>
+                ) : (
+                    <>
+                        {/* FEATURED ITEM */}
+                        {featuredItem && (
+                            <div style={{ marginBottom: '40px', padding: '30px', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', borderLeft: '5px solid #c41e3a' }}>
+                                <h2 style={{ color: '#c41e3a', marginBottom: '15px', fontSize: '1.8rem' }}>
+                                    {featuredItem.content && featuredItem.content.includes('|||') ? featuredItem.title.split('|||')[0].trim() : featuredItem.title}
+                                </h2>
+                                <p style={{ whiteSpace: 'pre-wrap', lineHeight: '1.6', fontSize: '1.15rem', color: '#333' }}>
+                                    {featuredItem.content && featuredItem.content.includes('|||') ? featuredItem.content.split('|||')[0].trim() : featuredItem.content}
+                                </p>
+                                <button
+                                    onClick={() => setSelectedPrarthana(featuredItem)}
+                                    style={{
+                                        background: '#c41e3a',
+                                        border: 'none',
+                                        color: 'white',
+                                        padding: '10px 20px',
+                                        borderRadius: '5px',
+                                        cursor: 'pointer',
+                                        marginTop: '20px',
+                                        fontWeight: 'bold'
+                                    }}
+                                >
+                                    Read Full / विस्तार से पढ़ें
+                                </button>
+                            </div>
+                        )}
+
+                        {/* GRID ITEMS */}
+                        {gridItems.length > 0 && (
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                                gap: '25px',
+                                maxWidth: '100%',
+                            }}>
+                                {gridItems.map((item, index) => (
+                                    <PrarthanaCard
+                                        key={item.id || index}
+                                        item={item}
+                                        onReadMore={setSelectedPrarthana}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </>
+                )}
             </div>
 
-            <div style={{ marginTop: '40px' }}>
-                <h3 style={{ color: '#c41e3a', marginBottom: '20px' }}>Prarthana</h3>
-                {prarthanas.map((prarthana, index) => (
-                    <div key={index} style={{ marginBottom: '30px', padding: '20px', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-                        <h4 style={{ color: '#c41e3a', marginBottom: '10px' }}>{prarthana.title}</h4>
-                        <p>{prarthana.content}</p>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-                            <button className="btn" style={{ padding: '5px 10px', fontSize: '0.8rem' }}>Download</button>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            <div style={{ marginTop: '40px' }}>
-                <h3 style={{ color: '#c41e3a', marginBottom: '20px' }}>Chetavni</h3>
-                {chetavnies.map((chetavni, index) => (
-                    <div key={index} style={{ marginBottom: '30px', padding: '20px', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-                        <h4 style={{ color: '#c41e3a', marginBottom: '10px' }}>{chetavni.title}</h4>
-                        <p>{chetavni.content}</p>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-                            <button className="btn" style={{ padding: '5px 10px', fontSize: '0.8rem' }}>Download</button>
-                        </div>
-                    </div>
-                ))}
-            </div>
+            {selectedPrarthana && (
+                <PrarthanaModal
+                    item={selectedPrarthana}
+                    onClose={() => setSelectedPrarthana(null)}
+                />
+            )}
         </section>
     );
 }
 
 export default Prarthana;
+

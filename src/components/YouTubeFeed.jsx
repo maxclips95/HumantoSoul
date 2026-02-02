@@ -1,6 +1,7 @@
 // src/components/YouTubeFeed.jsx
 import React, { useEffect, useState } from "react";
 import VideoModal from "./VideoModal";
+import ProphecySection from "./ProphecySection";
 import "../styles.css";
 
 export default function YouTubeFeed() {
@@ -12,23 +13,26 @@ export default function YouTubeFeed() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
     (async () => {
       try {
         const res = await fetch("/api/youtube");
+        if (!res.ok) throw new Error('Failed to fetch videos');
         const data = await res.json();
+        if (!isMounted) return;
 
         const shortsData =
           (data.shorts?.length
             ? data.shorts
             : data.full?.filter((v) =>
-                v.title.toLowerCase().includes("short")
-              )) || [];
+              v.title.toLowerCase().includes("short")
+            )) || [];
 
         const fullData =
           (data.full?.length
             ? data.full.filter(
-                (v) => !v.title.toLowerCase().includes("short")
-              )
+              (v) => !v.title.toLowerCase().includes("short")
+            )
             : []) || [];
 
         setShorts(shortsData);
@@ -47,8 +51,22 @@ export default function YouTubeFeed() {
   if (loading) {
     return (
       <section className="section youtube-section">
-        <h2 className="section-title">Latest YouTube Videos</h2>
-        <p style={{ textAlign: "center" }}>Loading videos...</p>
+        <h2 className="section-title" style={{ marginBottom: '20px' }}>Latest YouTube Videos</h2>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '200px'
+        }}>
+          <div style={{
+            border: '5px solid #f3f3f3',
+            borderTop: '5px solid #c41e3a',
+            borderRadius: '50%',
+            width: '50px',
+            height: '50px',
+            animation: 'spin 1s linear infinite'
+          }}></div>
+        </div>
       </section>
     );
   }
@@ -67,71 +85,11 @@ export default function YouTubeFeed() {
         </a>
       </div>
 
-      {/* SHORTS */}
-      {shorts.length > 0 && (
-        <>
-          <h2 className="section-title">Short Sandesh</h2>
+      <ProphecySection />
 
-          <div className="card-grid">
-            {shorts.slice(0, visibleShorts).map((video) => (
-              <div
-                key={video.id}
-                className="card"
-                onClick={() => openModal(video.id)}
-              >
-                <img src={video.thumbnail} alt={video.title} className="card-img" />
-                <div className="card-content">
-                  <h3>{video.title}</h3>
-                </div>
-              </div>
-            ))}
-          </div>
 
-          {visibleShorts < shorts.length && (
-            <div className="load-more-container">
-              <button
-                className="load-more-btn"
-                onClick={() => setVisibleShorts((prev) => prev + 15)}
-              >
-                Load More
-              </button>
-            </div>
-          )}
-        </>
-      )}
 
-      {/* FULL */}
-      {full.length > 0 && (
-        <>
-          <h2 className="section-title">Satsang Videos & Clip</h2>
 
-          <div className="card-grid">
-            {full.slice(0, visibleFull).map((video) => (
-              <div
-                key={video.id}
-                className="card"
-                onClick={() => openModal(video.id)}
-              >
-                <img src={video.thumbnail} alt={video.title} className="card-img" />
-                <div className="card-content">
-                  <h3>{video.title}</h3>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {visibleFull < full.length && (
-            <div className="load-more-container">
-              <button
-                className="load-more-btn"
-                onClick={() => setVisibleFull((prev) => prev + 15)}
-              >
-                Load More
-              </button>
-            </div>
-          )}
-        </>
-      )}
 
       {selectedVideo && <VideoModal videoId={selectedVideo} onClose={closeModal} />}
     </section>

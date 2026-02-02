@@ -1,0 +1,621 @@
+{
+  "settings": {
+    "languages": [
+      "en"
+    ],
+    "forceNER": true,
+    "nlu": {
+      "useNoneFeature": true
+    },
+    "tag": "nlp",
+    "threshold": 0.5,
+    "autoLoad": true,
+    "autoSave": true,
+    "modelFileName": "model.nlp",
+    "executeActionsBeforeAnswers": false,
+    "calculateSentiment": true
+  },
+  "nluManager": {
+    "settings": {
+      "tag": "nlu-manager",
+      "useNoneFeature": true
+    },
+    "locales": [
+      "en"
+    ],
+    "languageNames": {},
+    "domainManagers": {
+      "en": {
+        "settings": {
+          "locale": "en",
+          "useNoneFeature": true,
+          "trainByDomain": false,
+          "tag": "domain-manager-en",
+          "nluByDomain": {
+            "default": {
+              "className": "NeuralNlu",
+              "settings": {}
+            }
+          },
+          "useStemDict": true
+        },
+        "stemDict": {
+          "hello": {
+            "intent": "greetings",
+            "domain": "default"
+          },
+          "hi": {
+            "intent": "greetings",
+            "domain": "default"
+          },
+          "gurudev,jai": {
+            "intent": "greetings",
+            "domain": "default"
+          },
+          "propheci": {
+            "intent": "prophecy.latest",
+            "domain": "default"
+          },
+          "latest,propheci": {
+            "intent": "prophecy.latest",
+            "domain": "default"
+          },
+          "announc": {
+            "intent": "news.latest",
+            "domain": "default"
+          },
+          "news": {
+            "intent": "news.latest",
+            "domain": "default"
+          },
+          "updat": {
+            "intent": "news.latest",
+            "domain": "default"
+          },
+          "is,maalik,who": {
+            "intent": "profile.guru",
+            "domain": "default"
+          },
+          "baba,is,ji,who": {
+            "intent": "profile.guru",
+            "domain": "default"
+          },
+          "is,umak,who": {
+            "intent": "profile.guru",
+            "domain": "default"
+          },
+          "about,us": {
+            "intent": "profile.guru",
+            "domain": "default"
+          },
+          "program": {
+            "intent": "programs.list",
+            "domain": "default"
+          },
+          "event": {
+            "intent": "programs.list",
+            "domain": "default"
+          },
+          "satsang": {
+            "intent": "programs.list",
+            "domain": "default"
+          }
+        },
+        "intentDict": {
+          "greetings": "default",
+          "prophecy.latest": "default",
+          "news.latest": "default",
+          "profile.guru": "default",
+          "programs.list": "default"
+        },
+        "sentences": [
+          {
+            "domain": "default",
+            "utterance": "hello",
+            "intent": "greetings"
+          },
+          {
+            "domain": "default",
+            "utterance": "hi",
+            "intent": "greetings"
+          },
+          {
+            "domain": "default",
+            "utterance": "jai gurudev",
+            "intent": "greetings"
+          },
+          {
+            "domain": "default",
+            "utterance": "prophecies",
+            "intent": "prophecy.latest"
+          },
+          {
+            "domain": "default",
+            "utterance": "latest prophecies",
+            "intent": "prophecy.latest"
+          },
+          {
+            "domain": "default",
+            "utterance": "prophecy",
+            "intent": "prophecy.latest"
+          },
+          {
+            "domain": "default",
+            "utterance": "announcements",
+            "intent": "news.latest"
+          },
+          {
+            "domain": "default",
+            "utterance": "news",
+            "intent": "news.latest"
+          },
+          {
+            "domain": "default",
+            "utterance": "updates",
+            "intent": "news.latest"
+          },
+          {
+            "domain": "default",
+            "utterance": "who is maalik",
+            "intent": "profile.guru"
+          },
+          {
+            "domain": "default",
+            "utterance": "who is baba ji",
+            "intent": "profile.guru"
+          },
+          {
+            "domain": "default",
+            "utterance": "who is umakant",
+            "intent": "profile.guru"
+          },
+          {
+            "domain": "default",
+            "utterance": "about us",
+            "intent": "profile.guru"
+          },
+          {
+            "domain": "default",
+            "utterance": "programs",
+            "intent": "programs.list"
+          },
+          {
+            "domain": "default",
+            "utterance": "events",
+            "intent": "programs.list"
+          },
+          {
+            "domain": "default",
+            "utterance": "satsang",
+            "intent": "programs.list"
+          }
+        ],
+        "domains": {
+          "master_domain": {
+            "settings": {
+              "locale": "en",
+              "tag": "nlu-en",
+              "keepStopwords": true,
+              "nonefeatureValue": 1,
+              "nonedeltaMultiplier": 1.2,
+              "spellCheck": false,
+              "spellCheckDistance": 1,
+              "filterZeros": true,
+              "log": true
+            },
+            "features": {
+              "hello": 1,
+              "hi": 1,
+              "jai": 1,
+              "gurudev": 1,
+              "propheci": 1,
+              "latest": 1,
+              "announc": 1,
+              "news": 1,
+              "updat": 1,
+              "who": 1,
+              "is": 1,
+              "maalik": 1,
+              "baba": 1,
+              "ji": 1,
+              "umak": 1,
+              "about": 1,
+              "us": 1,
+              "program": 1,
+              "event": 1,
+              "satsang": 1
+            },
+            "intents": {
+              "greetings": 1,
+              "prophecy.latest": 1,
+              "news.latest": 1,
+              "profile.guru": 1,
+              "programs.list": 1
+            },
+            "intentFeatures": {
+              "greetings": {
+                "hello": 1,
+                "hi": 1,
+                "jai": 1,
+                "gurudev": 1
+              },
+              "prophecy.latest": {
+                "propheci": 1,
+                "latest": 1
+              },
+              "news.latest": {
+                "announc": 1,
+                "news": 1,
+                "updat": 1
+              },
+              "profile.guru": {
+                "who": 1,
+                "is": 1,
+                "maalik": 1,
+                "baba": 1,
+                "ji": 1,
+                "umak": 1,
+                "about": 1,
+                "us": 1
+              },
+              "programs.list": {
+                "program": 1,
+                "event": 1,
+                "satsang": 1
+              }
+            },
+            "featuresToIntent": {
+              "hello": [
+                "greetings"
+              ],
+              "hi": [
+                "greetings"
+              ],
+              "jai": [
+                "greetings"
+              ],
+              "gurudev": [
+                "greetings"
+              ],
+              "propheci": [
+                "prophecy.latest"
+              ],
+              "latest": [
+                "prophecy.latest"
+              ],
+              "announc": [
+                "news.latest"
+              ],
+              "news": [
+                "news.latest"
+              ],
+              "updat": [
+                "news.latest"
+              ],
+              "who": [
+                "profile.guru"
+              ],
+              "is": [
+                "profile.guru"
+              ],
+              "maalik": [
+                "profile.guru"
+              ],
+              "baba": [
+                "profile.guru"
+              ],
+              "ji": [
+                "profile.guru"
+              ],
+              "umak": [
+                "profile.guru"
+              ],
+              "about": [
+                "profile.guru"
+              ],
+              "us": [
+                "profile.guru"
+              ],
+              "program": [
+                "programs.list"
+              ],
+              "event": [
+                "programs.list"
+              ],
+              "satsang": [
+                "programs.list"
+              ]
+            },
+            "neuralNetwork": {
+              "settings": {
+                "useNoneFeature": true,
+                "locale": "en",
+                "tag": "nlu-en",
+                "keepStopwords": true,
+                "nonefeatureValue": 1,
+                "nonedeltaMultiplier": 1.2,
+                "spellCheck": false,
+                "spellCheckDistance": 1,
+                "filterZeros": true,
+                "log": true
+              },
+              "features": [
+                "hello",
+                "hi",
+                "jai",
+                "gurudev",
+                "propheci",
+                "latest",
+                "announc",
+                "news",
+                "updat",
+                "who",
+                "is",
+                "maalik",
+                "baba",
+                "ji",
+                "umak",
+                "about",
+                "us",
+                "program",
+                "event",
+                "satsang",
+                "nonefeature"
+              ],
+              "intents": [
+                "greetings",
+                "prophecy.latest",
+                "news.latest",
+                "profile.guru",
+                "programs.list",
+                "None"
+              ],
+              "perceptrons": [
+                [
+                  11.433699607849121,
+                  11.416954040527344,
+                  5.809403419494629,
+                  5.809403419494629,
+                  -2.7395920753479004,
+                  -0.626796543598175,
+                  -2.6279940605163574,
+                  -2.618375539779663,
+                  -2.6082518100738525,
+                  -1.1501054763793945,
+                  -1.1501054763793945,
+                  -0.4533766210079193,
+                  -0.2883957624435425,
+                  -0.2883957624435425,
+                  -0.3772370517253876,
+                  -1.330729603767395,
+                  -1.330729603767395,
+                  -2.5935232639312744,
+                  -2.5819716453552246,
+                  -2.569948434829712,
+                  -2.5574636459350586,
+                  2.641219051442331
+                ],
+                [
+                  -0.9989193081855774,
+                  -0.995428740978241,
+                  -0.5106302499771118,
+                  -0.5106302499771118,
+                  13.00487995147705,
+                  0.6014248728752136,
+                  -1.0199782848358154,
+                  -1.0181649923324585,
+                  -1.0161737203598022,
+                  -0.7235158681869507,
+                  -0.7235158681869507,
+                  -0.25009554624557495,
+                  -0.19369247555732727,
+                  -0.19369247555732727,
+                  -0.1897347867488861,
+                  -0.6015990972518921,
+                  -0.6015990972518921,
+                  -1.012305498123169,
+                  -1.009743571281433,
+                  -1.0070042610168457,
+                  -1.004088044166565,
+                  1.0221890580208752
+                ],
+                [
+                  -3.0749692916870117,
+                  -3.0585663318634033,
+                  -1.5803792476654053,
+                  -1.5803792476654053,
+                  -3.154121160507202,
+                  -0.5721288919448853,
+                  10.942456245422363,
+                  10.929858207702637,
+                  10.891268730163574,
+                  -1.421491026878357,
+                  -1.421491026878357,
+                  -0.5605356097221375,
+                  -0.3594866394996643,
+                  -0.3594866394996643,
+                  -0.466007798910141,
+                  -1.6258636713027954,
+                  -1.6258636713027954,
+                  -3.140638589859009,
+                  -3.127578020095825,
+                  -3.113924026489258,
+                  -3.0996897220611572,
+                  3.1822687188261147
+                ],
+                [
+                  -0.9548232555389404,
+                  -0.9485684633255005,
+                  -0.562996506690979,
+                  -0.562996506690979,
+                  -1.1272668838500977,
+                  -0.2950704097747803,
+                  -0.9411884546279907,
+                  -0.9389646053314209,
+                  -0.9365548491477966,
+                  5.5599284172058105,
+                  5.5599284172058105,
+                  2.221167802810669,
+                  1.1128171682357788,
+                  1.1128171682357788,
+                  2.2257578372955322,
+                  6.671134948730469,
+                  6.671134948730469,
+                  -0.9979930520057678,
+                  -0.9840518236160278,
+                  -0.9727578163146973,
+                  -0.9637410640716553,
+                  0.9412979633776224
+                ],
+                [
+                  -3.1336123943328857,
+                  -3.1193783283233643,
+                  -1.5976535081863403,
+                  -1.5976535081863403,
+                  -3.1923582553863525,
+                  -0.6197382807731628,
+                  -3.0925655364990234,
+                  -3.0762133598327637,
+                  -3.0593183040618896,
+                  -1.330444574356079,
+                  -1.330444574356079,
+                  -0.5214002132415771,
+                  -0.2880023419857025,
+                  -0.2880023419857025,
+                  -0.513135552406311,
+                  -1.5832335948944092,
+                  -1.5832335948944092,
+                  10.934977531433105,
+                  10.922491073608398,
+                  10.884015083312988,
+                  -3.1527037620544434,
+                  3.201419091239518
+                ],
+                [
+                  -1.0521228313446045,
+                  -1.047575831413269,
+                  -0.5378459095954895,
+                  -0.5378459095954895,
+                  -1.0709295272827148,
+                  -0.2216828316450119,
+                  -1.039139986038208,
+                  -1.0338492393493652,
+                  -1.0283656120300293,
+                  -0.4471977651119232,
+                  -0.4471977651119232,
+                  -0.1743210256099701,
+                  -0.1012105941772461,
+                  -0.1012105941772461,
+                  -0.16775263845920563,
+                  -0.5304635763168335,
+                  -0.5304635763168335,
+                  -1.0201530456542969,
+                  -1.0141043663024902,
+                  -1.007883071899414,
+                  12.967029571533203,
+                  1.0679296419109108
+                ]
+              ]
+            }
+          }
+        }
+      }
+    },
+    "intentDomains": {},
+    "extraSentences": [
+      [
+        "en",
+        "hello"
+      ],
+      [
+        "en",
+        "hi"
+      ],
+      [
+        "en",
+        "jai gurudev"
+      ],
+      [
+        "en",
+        "prophecies"
+      ],
+      [
+        "en",
+        "latest prophecies"
+      ],
+      [
+        "en",
+        "prophecy"
+      ],
+      [
+        "en",
+        "announcements"
+      ],
+      [
+        "en",
+        "news"
+      ],
+      [
+        "en",
+        "updates"
+      ],
+      [
+        "en",
+        "who is maalik"
+      ],
+      [
+        "en",
+        "who is baba ji"
+      ],
+      [
+        "en",
+        "who is umakant"
+      ],
+      [
+        "en",
+        "about us"
+      ],
+      [
+        "en",
+        "programs"
+      ],
+      [
+        "en",
+        "events"
+      ],
+      [
+        "en",
+        "satsang"
+      ]
+    ]
+  },
+  "ner": {
+    "settings": {
+      "tag": "ner",
+      "entityPreffix": "%",
+      "entitySuffix": "%"
+    },
+    "rules": {}
+  },
+  "nlgManager": {
+    "settings": {
+      "tag": "nlg-manager"
+    },
+    "responses": {
+      "en": {
+        "greetings": [
+          {
+            "answer": "Jai Gurudev! I can help you find prophecies, announcements, and teachings."
+          }
+        ]
+      }
+    }
+  },
+  "actionManager": {
+    "settings": {
+      "tag": "action-manager"
+    },
+    "actions": {}
+  },
+  "slotManager": {}
+}

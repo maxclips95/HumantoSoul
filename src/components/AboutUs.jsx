@@ -1,26 +1,95 @@
-import React from 'react';
+import React from "react";
 
-function AboutUs() {
+function SantAndSantMat() {
     return (
-        <section className="section">
-            <h2 className="section-title">About Baba Jaigurudev Ji Maharaj</h2>
-            <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-                <img src="https://via.placeholder.com/200" alt="Baba Jaigurudev Ji Maharaj" style={{ borderRadius: '50%', marginBottom: '20px' }} />
-                <p style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>
-                    "मनुष्य शरीर को साँसों की पूँजी दी गई है। जो गिनती की है, साँस ख़त्म होते ही शरीर गिर जायेगा और मनुष्य मर जायेगा"
-                </p>
-            </div>
-            
-            <div style={{ maxWidth: '800px', margin: '0 auto', lineHeight: '1.6' }}>
+        <section style={{ backgroundColor: "#fff5f0", padding: "40px 20px" }}>
+
+            {/* Main Title */}
+            <h1
+                style={{
+                    textAlign: "center",
+                    color: "red",
+                    fontWeight: "bold",
+                    marginBottom: "40px",
+                }}
+            >
+                Sant and Sant Mat
+            </h1>
+
+            <div style={{ maxWidth: "1000px", margin: "0 auto", lineHeight: "1.8" }}>
+
+                {/* Section 1 */}
+                <h3 style={{ color: "red", marginBottom: "10px" }}>
+                    Who is called a Sant?
+                </h3>
+
                 <p>
-                    विश्व विख्यात परम सन्त बाबा जयगुरुदेव जी महाराज का जन्म भारत देश के उत्तर प्रदेश की पावन भूमि के एक छोटे से गाँव में हुआ। वर्ष के प्रति आश्चर्य व परमात्मा प्राप्ति का मार्ग जानने की इच्छा बाल्यावस्था से ही रही। बाल्यावस्था में ही इनके पिता का देहांत हो गया। भाताजी ने शरीर छोड़ने से पूर्व इनको अपनी अंतिम इच्छा के रूप में आदेश दिया कि प्रभु प्राप्ति का मार्ग अपने इंद्र को आरम्भ कर लेना।
+                    One who has knowledge of the beginning and the end, who explains the
+                    difference between the beginning and the end, who shows the path from
+                    the beginning to the end and leads one back from the end to the
+                    beginning—such a person is called a Sant.
                 </p>
+
                 <p>
-                    छोटी सी उम्र में ही स्वामी जी महाराज भगवान की सेवा में निकल पड़े। कई भटियों में जाह-जाह मछली व पुजारियों की सेवा बहुत लगन के साथ की, इसी आधार से कि शायद भगवान के दर्शन मछल व पुजारी करता हो। आपने जानी की सेवा करके प्राप्तिक धर्मों का पाठन किया। उनकी धर्मों के पाठ से यह संतोष हुआ कि ईश्वर है, परन्तु जैसे भिलियों यह पाठ नहीं जाने। जब बाबा जयगुरुदेव जी महाराज ने शिवाजी की संतान रखी हो। जब लोगों के कर्म ज्यादा खराब हुए तब सत्ययुग में अपने 16 पूर्वों में से जीवनी (कर्मियों जी) को पहली पर लेना। तब उन्होंने उस सन्त यानी सात्मिक को भेद बताया, जहाँ से शरीर को जानने वाली शक्ति (जीवात्मा) नीचे मुख्यलोक में उतारी गई है। उन्होंने सन्त भेद सोला दिया और हर तरह की जानकारी कराई। गुरु स्वरूप सोला पूर्वी पर रहते है, पूर्व धरती का भार उन्हीं पर रहता है। लेकिन गुरु सन्त जीवात्मा का उद्धार नहीं करते, न ही रक्षा करते है। प्राप्त सन्त ही जीवात्मा की मुक्ति-मोक्ष का रास्ता बताते है। प्राप्त सन्त और गुरु सन्त दोनों एक दूसरे को जानते हैं। इससे पहले नर्क, चौरासी, स्वर्ग, बैकुंठ का ज्ञान तो लोगों को था। यह भी मालूम था कि पाप करने से नर्क जाना पड़ता है और पुण्य करने से स्वर्ग और बैकुंठ, लेकिन उससे बचने का उपाय नहीं मालूम था। परंतु जब प्राप्त सन्त धरती पर आए, तब उन्होंने अछूत-छूर के ज्ञान करने के साथ ही स्वर्ग, बैकुंठ, नर्क और चौरासी से बचने व जन्म-मरण की पीड़ा से छुटकारा पाने के लिए नामदान देवर के ज्ञान कराया, अंतर में अपना परिचय दिया और जीवों को वापस निज पर सात्मिक पहुँचाया।
+                    Just as a tree does not eat its own fruit but gives it to others; a
+                    river does not drink its own water but gives it to others; it does not
+                    bathe itself but enables others to bathe and cleanses them—likewise are
+                    the Sants. They come for the sake of others. Therefore it is said:
                 </p>
+
+                <p style={{ fontStyle: "italic", marginLeft: "20px" }}>
+                    “A tree never eats its own fruit,
+                    <br />
+                    nor does a river store its water.
+                    <br />
+                    For the sake of the highest good,
+                    <br />
+                    the Sants have taken a human body.”
+                </p>
+
+                {/* Section 2 */}
+                <h3 style={{ color: "red", marginTop: "30px", marginBottom: "10px" }}>
+                    The status of Sants is the highest
+                </h3>
+
+                <p>
+                    The status of Sants is above rishis, munis, incarnate powers, yogis, and
+                    yogeshwars. There are two kinds of Sants: Hidden (Gupt) Sants and
+                    Manifest (Pragat) Sants.
+                </p>
+
+                <p>
+                    Before Sant Mat existed and before manifest Sants appeared on earth,
+                    hidden Sants lived on this earth and took care of all living beings.
+                    When human actions became extremely corrupt, Satpurush sent one of His
+                    sixteen sons, Jogjeet (Kabir Das Ji), to the earth.
+                </p>
+
+                <p>
+                    He revealed the secret of Satlok, from where the power that animates the
+                    body (the soul) descended into Mrityulok. He disclosed all spiritual
+                    secrets and provided complete knowledge.
+                </p>
+
+                <p>
+                    Hidden Sants always remain on earth and bear its burden, but they do
+                    not liberate souls nor show the path. Only manifest Sants reveal the
+                    path of liberation and salvation. Both hidden and manifest Sants know
+                    each other.
+                </p>
+
+                <p>
+                    Earlier, people were aware of hell, heaven, Vaikunth, and the cycle of
+                    84 lakh (8,400,000) births across different life forms—humans, animals,
+                    birds, trees, and other beings—through which the soul passes. However,
+                    they did not know how to escape this cycle. When manifest Sants appeared
+                    on Earth, they provided Naamdaan, taught devotion, revealed the inner divine
+                    identity, and guided souls back to their True Home—Satlok.
+                </p>
+
             </div>
         </section>
     );
 }
 
-export default AboutUs;
+export default SantAndSantMat;
