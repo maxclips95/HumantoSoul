@@ -73,6 +73,37 @@ logger.info(`Environment: ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'}`);
 
 const PORT = process.env.SERVER_PORT || 5000;
 
+// Centralized In-Memory Error Log (Last 50 errors)
+const globalErrorLog = [];
+const logToMemory = (type, message, stack = '') => {
+  const entry = {
+    timestamp: new Date().toISOString(),
+    type,
+    message,
+    stack
+  };
+  globalErrorLog.unshift(entry);
+  if (globalErrorLog.length > 50) globalErrorLog.pop();
+};
+
+// Secure Debug Endpoint to View Logs
+app.get('/api/debug/logs', (req, res) => {
+  const { key } = req.query;
+  const SECRET_DEBUG_KEY = 'JaiGuruDevDebug2026'; // Hardcoded for emergency access
+
+  if (key !== SECRET_DEBUG_KEY) {
+    return res.status(403).json({ message: 'Access Denied' });
+  }
+
+  res.json({
+    status: 'online',
+    environment: isProduction ? 'production' : 'development',
+    serverTime: new Date().toISOString(),
+    errorCount: globalErrorLog.length,
+    logs: globalErrorLog
+  });
+});
+
 app.set('trust proxy', 1); // Trust first proxy (needed for rate limiting behind proxy)
 
 // HTTPS Redirect in Production (Skip for localhost)
@@ -607,11 +638,14 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
     const { username, password } = req.body;
     const clientIP = req.ip;
 
+    logToMemory('LOGIN_ATTEMPT', `IP: ${clientIP} User: ${username}`);
+
     // Check if IP is locked out
     const attempts = failedLoginAttempts.get(clientIP) || { count: 0, lockedUntil: null };
     if (attempts.lockedUntil && attempts.lockedUntil > Date.now()) {
       const remainingMinutes = Math.ceil((attempts.lockedUntil - Date.now()) / 60000);
-      logSecurityEvent(clientIP, 'LOCKOUT_REJECTION', `Attempt while locked. Remaining: ${remainingMinutes}m`);
+      logSecurityEvent(clientIP, 'LOCKOUT_REJECTION', `Locked. Remaining: ${remainingMinutes}m`);
+      logToMemory('LOGIN_LOCKED', `IP Locked. Remaining: ${remainingMinutes}m`);
       return res.status(429).json({
         message: `Account locked. Try again in ${remainingMinutes} minutes.`
       });
@@ -623,6 +657,7 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
     const envPassPlain = process.env.ADMIN_PASSWORD; // Fallback for migration
 
     if (!envUser) {
+      logToMemory('LOGIN_ERROR', 'Missing ADMIN_USERNAME in .env');
       console.error('CRITICAL: ADMIN_USERNAME must be set in .env');
       return res.status(500).json({ message: 'Server configuration error' });
     }
@@ -632,22 +667,27 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
     // Check if password hash exists (preferred)
     if (envPassHash) {
       try {
+        logToMemory('LOGIN_STEP', 'Verifying hash with bcryptjs...');
         isPasswordValid = await bcrypt.compare(password, envPassHash);
+        logToMemory('LOGIN_STEP', `Hash Result: ${isPasswordValid}`);
       } catch (err) {
+        logToMemory('LOGIN_ERROR', `Bcrypt Error: ${err.message}`);
         console.error('bcrypt compare error:', err.message);
       }
     } else if (envPassPlain) {
-      // Fallback: plain text comparison (for migration)
+      logToMemory('LOGIN_WARN', 'Using Plain Text Password');
       isPasswordValid = (password === envPassPlain);
       if (isPasswordValid) {
         console.warn('WARNING: Using plain text password. Run password change to migrate to hash.');
       }
     } else {
+      logToMemory('LOGIN_ERROR', 'No Password Configured');
       console.error('CRITICAL: ADMIN_PASSWORD or ADMIN_PASSWORD_HASH must be set in .env');
       return res.status(500).json({ message: 'Server configuration error' });
     }
 
     if (username === envUser && isPasswordValid) {
+      logToMemory('LOGIN_SUCCESS', `User ${username} logged in.`);
       // Clear failed attempts on successful login
       failedLoginAttempts.delete(clientIP);
 
@@ -659,6 +699,7 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
       );
       res.json({ token, user: { username: envUser } });
     } else {
+      logToMemory('LOGIN_FAILED', `Invalid credentials for ${username}`);
       // Track failed attempt
       attempts.count += 1;
 
@@ -667,6 +708,7 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
         attempts.lockedUntil = Date.now() + (30 * 60 * 1000); // 30 minutes
         logger.warn(`IP ${clientIP} locked out after 5 failed login attempts`);
         logSecurityEvent(clientIP, 'ACCOUNT_LOCKOUT', '5 failed attempts reached');
+        logToMemory('LOGIN_LOCKOUT', `IP ${clientIP} locked out now.`);
       } else {
         logSecurityEvent(clientIP, 'LOGIN_FAILED', `Attempt ${attempts.count} for user: ${username}`);
       }
