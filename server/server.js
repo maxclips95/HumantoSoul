@@ -479,87 +479,79 @@ async function translateText(text, targetLang = 'en') {
 
   return chunkResults.join('') || null;
 }
-// Ethical Manual Scraper (Bypasses IP Blocks & Targets Hindi specifically)
+// Final Reliable Scraper (Uses Embed endpoint to bypass Bot Walls on Render)
 async function fetchTranscriptText(youtubeId) {
-  console.log(`[Transcript] Fetching for ID: ${youtubeId}`);
+  console.log(`[Transcript] Final Attempt for ID: ${youtubeId}`);
 
   const headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-    'Accept-Language': 'hi,en-US;q=0.9,en;q=0.8',
+    'Accept-Language': 'hi,en-IN;q=0.9,hi;q=0.8,en;q=0.7',
     'Referer': 'https://www.youtube.com/'
   };
 
   try {
-    // 1. Fetch the video watch page
-    const videoUrl = `https://www.youtube.com/watch?v=${youtubeId}`;
-    const response = await axios.get(videoUrl, { headers });
+    // 1. Fetch the EMBED page (Less guarded than the watch page)
+    const embedUrl = `https://www.youtube.com/embed/${youtubeId}?hl=hi`;
+    const response = await axios.get(embedUrl, { headers });
     const html = response.data;
 
-    // 2. Extract Transcript Metadata (ytInitialPlayerResponse)
-    const jsonMatch = html.match(/ytInitialPlayerResponse\s*=\s*({.+?})\s*;/);
-    if (!jsonMatch) {
-      throw new Error('Could not extract video metadata from YouTube.');
-    }
+    // 2. Extract Metadata from Embed Page
+    // Look for captionTracks in the configuration object
+    const jsonMatch = html.match(/"captionTracks":\s*(\[.+?\])/);
+    let captionTracks = [];
 
-    const playerResponse = JSON.parse(jsonMatch[1]);
-    const captions = playerResponse.captions?.playerCaptionsTracklistRenderer;
-    const captionTracks = captions?.captionTracks;
+    if (jsonMatch) {
+      captionTracks = JSON.parse(jsonMatch[1]);
+    } else {
+      // Fallback: Check config object
+      const playerMatch = html.match(/yt.setConfig\({'PLAYER_CONFIG':\s*({.+?})\}\);/);
+      if (playerMatch) {
+        const config = JSON.parse(playerMatch[1]);
+        captionTracks = config?.args?.player_response?.captions?.playerCaptionsTracklistRenderer?.captionTracks || [];
+      }
+    }
 
     if (!captionTracks || captionTracks.length === 0) {
-      const reason = playerResponse.playabilityStatus?.reason || 'No captions found in metadata.';
-      throw new Error(`YouTube returned no captions. Reason: ${reason}`);
+      throw new Error('YouTube blocked this environment or captions are disabled.');
     }
 
-    // Diagnostic: List all available tracks
-    const trackList = captionTracks.map(t => `${t.languageCode} (${t.vssId})`).join(', ');
-    console.log(`[Transcript] Available tracks for ${youtubeId}: ${trackList}`);
-
-    // 3. TARGET: Manual Hindi (hi) OR Automated Hindi (a.hi)
+    // 3. TARGET: Manual Hindi or Automated Hindi
     const hindiTrack = captionTracks.find(t => t.languageCode === 'hi' || t.vssId === 'a.hi' || t.vssId?.includes('hi'));
+    if (!hindiTrack) throw new Error(`Hindi captions not found in metadata.`);
 
-    if (!hindiTrack) {
-      throw new Error(`Hindi captions not found. Available: [${trackList}]`);
-    }
+    console.log(`[Transcript] Success! Fetching track: ${hindiTrack.vssId}`);
 
-    console.log(`[Transcript] Found track: ${hindiTrack.languageCode} (${hindiTrack.vssId})`);
-
-    // 4. Fetch the actual transcript data
+    // 4. Fetch the XML transcript
     const transcriptResponse = await axios.get(hindiTrack.baseUrl);
     const transcriptXml = transcriptResponse.data;
 
-    // 5. Clean XML and extract text
-    // Simplistic extraction: match everything between <text ...> and </text>
+    // 5. Parse segments
     const textSegments = transcriptXml.match(/<text[^>]*>([\s\S]*?)<\/text>/g);
-    if (!textSegments) {
-      throw new Error('Failed to parse transcript content.');
-    }
+    if (!textSegments) throw new Error('Transcript data is unexpectedly empty.');
 
     const rawContent = textSegments
-      .map(s => s.replace(/<text[^>]*>|<\/text>/g, '')) // Remove tags
-      .map(s => s.replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, '&')) // Decode entities
+      .map(s => s.replace(/<text[^>]*>|<\/text>/g, ''))
+      .map(s => s.replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, '&'))
       .join(' ')
       .replace(/\s+/g, ' ')
       .trim();
 
-    console.log(`[Transcript] Extracted ${rawContent.length} characters (Hindi)`);
-
-    // 6. Translate to English (Side-by-side view)
+    // 6. Side-by-Side English Translation
     let fullTranscript = rawContent;
     try {
-      console.log('[Transcript] Translating to English...');
       const translated = await translateText(rawContent, 'en');
       if (translated && translated !== rawContent) {
         fullTranscript = `${rawContent} ||| ${translated}`;
       }
-    } catch (err) {
-      console.error('[Transcript] Translation skipped:', err.message);
+    } catch (tErr) {
+      console.warn('[Transcript] Translation skipped.');
     }
 
     return fullTranscript;
 
   } catch (err) {
-    console.error(`[Transcript] Error:`, err.message);
-    throw new Error(`Failed to fetch Hindi captions. (Detailed: ${err.message})`);
+    console.error(`[Transcript] Failed:`, err.message);
+    throw new Error(`YouTube Blocked (Bot Detection). Details: ${err.message}`);
   }
 }
 
