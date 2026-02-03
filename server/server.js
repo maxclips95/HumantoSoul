@@ -73,36 +73,13 @@ logger.info(`Environment: ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'}`);
 
 const PORT = process.env.SERVER_PORT || 5000;
 
-// Centralized In-Memory Error Log (Last 50 errors)
-const globalErrorLog = [];
-const logToMemory = (type, message, stack = '') => {
-  const entry = {
-    timestamp: new Date().toISOString(),
-    type,
-    message,
-    stack
-  };
-  globalErrorLog.unshift(entry);
-  if (globalErrorLog.length > 50) globalErrorLog.pop();
+// Simplified logging to stdout for Render Dashboard
+const logToMemory = (type, message, details = '') => {
+  // Directly log to console so it appears in Render logs
+  console.log(`[${type}] ${message} ${details ? '| ' + details : ''}`);
 };
 
-// Secure Debug Endpoint to View Logs
-app.get('/api/debug/logs', (req, res) => {
-  const { key } = req.query;
-  const SECRET_DEBUG_KEY = 'JaiGuruDevDebug2026'; // Hardcoded for emergency access
 
-  if (key !== SECRET_DEBUG_KEY) {
-    return res.status(403).json({ message: 'Access Denied' });
-  }
-
-  res.json({
-    status: 'online',
-    environment: isProduction ? 'production' : 'development',
-    serverTime: new Date().toISOString(),
-    errorCount: globalErrorLog.length,
-    logs: globalErrorLog
-  });
-});
 
 app.set('trust proxy', 1); // Trust first proxy (needed for rate limiting behind proxy)
 
