@@ -3,3 +3,9 @@ dist/
 build/ 
 .env 
 .aider* 
+# Production Cleanup
+*.ps1
+server/backups/
+server/logs/
+.vscode/
+*.log
