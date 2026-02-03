@@ -814,25 +814,28 @@ app.get('/api/satvic/recipes', (req, res) => {
 });
 
 // 2. Submit Pledge
-// 2. Submit Pledge
-app.post('/api/satvic/pledge', (req, res) => {
+app.post('/api/satvic/pledge', async (req, res) => {
   const { name, email, item } = req.body;
+  logger.info(`[Pledge] Submission attempt: name=${name}, email=${email}, item=${item}`);
 
   if (!name || !item) {
+    logger.warn('[Pledge] Missing required fields');
     return res.status(400).json({ message: 'Name and pledge item are required.' });
   }
 
   try {
     const info = db.prepare('INSERT INTO pledges (name, email, item, date) VALUES (?, ?, ?, ?)').run(
       name,
-      email || 'Anonymous',
+      email || '',
       item,
       new Date().toISOString()
     );
+
+    logger.info(`[Pledge] Success! ID: ${info.lastInsertRowid}`);
     res.json({ success: true, id: info.lastInsertRowid, message: 'Pledge recorded successfully!' });
   } catch (err) {
-    logger.error('Pledge Error:', err);
-    res.status(500).json({ message: 'Failed to save pledge.' });
+    logger.error('[Pledge] Database Error:', err.message);
+    res.status(500).json({ message: `Database error: ${err.message}` });
   }
 });
 

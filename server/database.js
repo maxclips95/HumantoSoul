@@ -128,7 +128,6 @@ const initializeDatabase = () => {
     `).run();
 
     // Semantic Search - Content Chunks (V2 - Smart Metadata)
-    db.prepare(`DROP TABLE IF EXISTS content_chunks`).run(); // Reset table for upgrade
     db.prepare(`
         CREATE TABLE IF NOT EXISTS content_chunks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
