@@ -479,25 +479,28 @@ async function translateText(text, targetLang = 'en') {
 
   return chunkResults.join('') || null;
 }
-// Native Node.js Transcript Fetcher (High-Success "Plus" Version)
+// Native Node.js Transcript Fetcher (Bypasses "Sign In" walls)
 async function fetchTranscriptText(youtubeId) {
   console.log(`[Transcript] Fetching for ID: ${youtubeId}`);
-  const { YoutubeTranscript } = require('youtube-transcript-plus');
+  const { YoutubeTranscript } = require('youtube-transcript');
 
   try {
-    // 1. Fetch Hindi Transcript first
-    console.log(`[Transcript] Trying Hindi (hi)...`);
+    // 1. Fetch Transcript directly
     const transcriptItems = await YoutubeTranscript.fetchTranscript(youtubeId, { lang: 'hi' });
 
     if (!transcriptItems || transcriptItems.length === 0) {
-      throw new Error('No Hindi transcript available');
+      throw new Error('No transcript available found (checked Hindi/Auto)');
     }
 
     // 2. Combine text
     const rawContent = transcriptItems.map(t => t.text).join(' ').replace(/\s+/g, ' ').trim();
-    console.log(`[Transcript] Extracted ${rawContent.length} characters (Hindi)`);
+    console.log(`[Transcript] Extracted ${rawContent.length} characters`);
 
-    // 3. Translate to English
+    if (rawContent.length < 50) {
+      throw new Error('Transcript too short, likely invalid');
+    }
+
+    // 3. Translate (if needed)
     let fullTranscript = rawContent;
     try {
       console.log('[Transcript] Translating to English...');
@@ -512,18 +515,20 @@ async function fetchTranscriptText(youtubeId) {
     return fullTranscript;
 
   } catch (err) {
-    console.log(`[Transcript] Hindi fetch failed: ${err.message}`);
-
-    // Fallback: Try default/English if Hindi fails
-    try {
-      console.log(`[Transcript] Retrying with default/English...`);
-      const retryItems = await YoutubeTranscript.fetchTranscript(youtubeId);
-      const retryContent = retryItems.map(t => t.text).join(' ');
-      return retryContent;
-    } catch (retryErr) {
-      console.error('[Transcript] Retry also failed:', retryErr.message);
-      throw new Error(`Failed to fetch captions. (YouTube might have blocked this specific request)`);
+    console.error(`[Transcript] Error:`, err.message);
+    // Fallback: If Hindi specific fails, try default (often English or Auto)
+    if (err.message.includes('No transcript')) {
+      console.log('[Transcript] Retrying with default language...');
+      try {
+        const retryItems = await YoutubeTranscript.fetchTranscript(youtubeId);
+        const retryContent = retryItems.map(t => t.text).join(' ');
+        return retryContent; // Return just the content (English likely)
+      } catch (retryErr) {
+        console.error('[Transcript] Retry failed:', retryErr.message);
+        throw retryErr;
+      }
     }
+    throw err;
   }
 }
 
