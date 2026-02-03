@@ -54,7 +54,7 @@ export default function Footer() {
         Copyright © {new Date().getFullYear()} JaiGurudev. All Rights Reserved.
       </p>
       <p className="footer-note">
-        Note: To help keep this platform free, your first visit may take about 30 seconds to "wake up" the server. After that, everything will load instantly! Thank you for your patience. Jai Gurudev!
+        Note: The initial load may take up to 30 seconds. Thereafter, the site operates smoothly. Jai Gurudev!
       </p>
     </footer >
   );
