@@ -19,8 +19,7 @@ function AdminLogin() {
             localStorage.setItem('token', response.data.token);
             navigate('/admin-dashboard');
         } catch (err) {
-            const serverMessage = err.response?.data?.message || 'Something went wrong. Please try again.';
-            setError(serverMessage);
+            setError('Invalid username or password');
         }
     };
 

@@ -593,77 +593,82 @@ const verifyToken = (req, res, next) => {
 
 // Admin Auth - Secure Login with JWT, bcrypt, and Account Lockout
 app.post('/api/auth/login', loginLimiter, async (req, res) => {
-  const { username, password } = req.body;
-  const clientIP = req.ip;
+  try {
+    const { username, password } = req.body;
+    const clientIP = req.ip;
 
-  // Check if IP is locked out
-  const attempts = failedLoginAttempts.get(clientIP) || { count: 0, lockedUntil: null };
-  if (attempts.lockedUntil && attempts.lockedUntil > Date.now()) {
-    const remainingMinutes = Math.ceil((attempts.lockedUntil - Date.now()) / 60000);
-    logSecurityEvent(clientIP, 'LOCKOUT_REJECTION', `Attempt while locked. Remaining: ${remainingMinutes}m`);
-    return res.status(429).json({
-      message: `Account locked. Try again in ${remainingMinutes} minutes.`
-    });
-  }
-
-  // Credentials MUST be in .env file
-  const envUser = process.env.ADMIN_USERNAME;
-  const envPassHash = process.env.ADMIN_PASSWORD_HASH;
-  const envPassPlain = process.env.ADMIN_PASSWORD; // Fallback for migration
-
-  if (!envUser) {
-    console.error('CRITICAL: ADMIN_USERNAME must be set in .env');
-    return res.status(500).json({ message: 'Server configuration error' });
-  }
-
-  let isPasswordValid = false;
-
-  // Check if password hash exists (preferred)
-  if (envPassHash) {
-    try {
-      isPasswordValid = await bcrypt.compare(password, envPassHash);
-    } catch (err) {
-      console.error('bcrypt compare error:', err.message);
+    // Check if IP is locked out
+    const attempts = failedLoginAttempts.get(clientIP) || { count: 0, lockedUntil: null };
+    if (attempts.lockedUntil && attempts.lockedUntil > Date.now()) {
+      const remainingMinutes = Math.ceil((attempts.lockedUntil - Date.now()) / 60000);
+      logSecurityEvent(clientIP, 'LOCKOUT_REJECTION', `Attempt while locked. Remaining: ${remainingMinutes}m`);
+      return res.status(429).json({
+        message: `Account locked. Try again in ${remainingMinutes} minutes.`
+      });
     }
-  } else if (envPassPlain) {
-    // Fallback: plain text comparison (for migration)
-    isPasswordValid = (password === envPassPlain);
-    if (isPasswordValid) {
-      console.warn('WARNING: Using plain text password. Run password change to migrate to hash.');
+
+    // Credentials MUST be in .env file
+    const envUser = process.env.ADMIN_USERNAME;
+    const envPassHash = process.env.ADMIN_PASSWORD_HASH;
+    const envPassPlain = process.env.ADMIN_PASSWORD; // Fallback for migration
+
+    if (!envUser) {
+      console.error('CRITICAL: ADMIN_USERNAME must be set in .env');
+      return res.status(500).json({ message: 'Server configuration error' });
     }
-  } else {
-    console.error('CRITICAL: ADMIN_PASSWORD or ADMIN_PASSWORD_HASH must be set in .env');
-    return res.status(500).json({ message: 'Server configuration error' });
-  }
 
-  if (username === envUser && isPasswordValid) {
-    // Clear failed attempts on successful login
-    failedLoginAttempts.delete(clientIP);
+    let isPasswordValid = false;
 
-    // Generate secure JWT with 24-hour expiration
-    const token = jwt.sign(
-      { username: envUser, role: 'admin' },
-      JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-    res.json({ token, user: { username: envUser } });
-  } else {
-    // Track failed attempt
-    attempts.count += 1;
-
-    // Lock account after 5 failed attempts for 30 minutes
-    if (attempts.count >= 5) {
-      attempts.lockedUntil = Date.now() + (30 * 60 * 1000); // 30 minutes
-      logger.warn(`IP ${clientIP} locked out after 5 failed login attempts`);
-      logSecurityEvent(clientIP, 'ACCOUNT_LOCKOUT', '5 failed attempts reached');
+    // Check if password hash exists (preferred)
+    if (envPassHash) {
+      try {
+        isPasswordValid = await bcrypt.compare(password, envPassHash);
+      } catch (err) {
+        console.error('bcrypt compare error:', err.message);
+      }
+    } else if (envPassPlain) {
+      // Fallback: plain text comparison (for migration)
+      isPasswordValid = (password === envPassPlain);
+      if (isPasswordValid) {
+        console.warn('WARNING: Using plain text password. Run password change to migrate to hash.');
+      }
     } else {
-      logSecurityEvent(clientIP, 'LOGIN_FAILED', `Attempt ${attempts.count} for user: ${username}`);
+      console.error('CRITICAL: ADMIN_PASSWORD or ADMIN_PASSWORD_HASH must be set in .env');
+      return res.status(500).json({ message: 'Server configuration error' });
     }
 
-    failedLoginAttempts.set(clientIP, attempts);
+    if (username === envUser && isPasswordValid) {
+      // Clear failed attempts on successful login
+      failedLoginAttempts.delete(clientIP);
 
-    // Avoid timing attacks by using generic message
-    res.status(401).json({ message: 'Invalid credentials' });
+      // Generate secure JWT with 24-hour expiration
+      const token = jwt.sign(
+        { username: envUser, role: 'admin' },
+        JWT_SECRET,
+        { expiresIn: '24h' }
+      );
+      res.json({ token, user: { username: envUser } });
+    } else {
+      // Track failed attempt
+      attempts.count += 1;
+
+      // Lock account after 5 failed attempts for 30 minutes
+      if (attempts.count >= 5) {
+        attempts.lockedUntil = Date.now() + (30 * 60 * 1000); // 30 minutes
+        logger.warn(`IP ${clientIP} locked out after 5 failed login attempts`);
+        logSecurityEvent(clientIP, 'ACCOUNT_LOCKOUT', '5 failed attempts reached');
+      } else {
+        logSecurityEvent(clientIP, 'LOGIN_FAILED', `Attempt ${attempts.count} for user: ${username}`);
+      }
+
+      failedLoginAttempts.set(clientIP, attempts);
+
+      // Avoid timing attacks by using generic message
+      res.status(401).json({ message: 'Invalid credentials' });
+    }
+  } catch (err) {
+    console.error('FATAL LOGIN ERROR:', err.message, err.stack);
+    res.status(500).json({ message: 'Internal server error during authentication' });
   }
 });
 
