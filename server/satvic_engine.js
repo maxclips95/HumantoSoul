@@ -15,21 +15,33 @@ class SatvicMixer {
 
     generateVariation(baseRecipe, style) {
         // Create a new title
-        const newTitle = `${style} ${baseRecipe.title.replace('Classic', '').trim()}`;
+        const newTitle = `${style} ${baseRecipe.title.replace('Classic', '').replace('Traditional', '').replace('Satvic', '').trim()}`;
 
-        // Modify ingredients based on style
+        // Modify ingredients and steps based on style
         let newIngredients = [...(baseRecipe.ingredients || [])];
-        if (style === "Spicy") newIngredients.push("Green Chilies", "Red Chili Powder");
-        if (style === "Creamy") newIngredients.push("Fresh Cream", "Cashew Paste");
-        if (style === "Grilled") newIngredients.push("Smoked Paprika", "Olive Oil");
+        let newSteps = [...(baseRecipe.steps || [])];
+
+        if (style === "Spicy") {
+            newIngredients.push("2 Green Chilies, slit", "1/2 tsp Kashmiri Red Chili Powder");
+            newSteps.push(`At the final tempering stage, add the green chilies and chili powder for that signature ${style} kick.`);
+        }
+        if (style === "Creamy") {
+            newIngredients.push("2 tbsp Fresh Malai (Cream)", "5-6 Cashews, soaked and ground");
+            newSteps.splice(newSteps.length - 1, 0, `Stir in the cashew paste and fresh cream slowly to achieve a rich, ${style} texture.`);
+        }
+        if (style === "Royal") {
+            newIngredients.push("Pinch of Saffron (Kesar)", "Toasted Almond slivers");
+            newSteps.push(`Finish the dish with a ${style} garnish of saffron and toasted almonds to elevate the prana.`);
+        }
 
         return {
             ...baseRecipe,
             id: `${baseRecipe.id}_${style.toLowerCase()}`,
             title: newTitle,
             isGenerated: true,
-            desc: `${style} twist on the classic ${baseRecipe.title}. Pure vegetarian brilliance.`,
-            ingredients: newIngredients
+            desc: `A luxurious ${style} interpretation of ${baseRecipe.title}, crafted for deep nourishment.`,
+            ingredients: newIngredients,
+            steps: newSteps
         };
     }
 }
