@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import TranscriptModal from "../components/TranscriptModal";
+import { Helmet } from 'react-helmet-async';
 
 
 const ReadingModal = ({ title, content, onClose }) => {
@@ -70,7 +71,7 @@ const ReadingModal = ({ title, content, onClose }) => {
 
 
 
-import { Helmet } from 'react-helmet-async';
+
 
 export default function Prophecies() {
   const [items, setItems] = useState([]);
