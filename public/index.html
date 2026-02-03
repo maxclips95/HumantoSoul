@@ -77,8 +77,7 @@
           console.log("Found google_translate_element, initializing...");
           new google.translate.TranslateElement({
             pageLanguage: 'en',
-            autoDisplay: false,
-            layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+            autoDisplay: false
           }, 'google_translate_element');
           clearInterval(initInterval);
         } else {

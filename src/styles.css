@@ -138,26 +138,35 @@ body {
 
 /* Force visibility of the Google dropdown */
 .goog-te-gadget .goog-te-combo {
-    padding: 2px 4px !important;
-    /* Compact padding */
-    border-radius: 4px !important;
+    padding: 4px 8px !important;
+    border-radius: 6px !important;
     color: #333 !important;
     background: #fff !important;
-    border: 1px solid #ccc !important;
+    border: 2px solid #FFD700 !important;
+    /* Gold border to match theme */
     cursor: pointer !important;
-    font-size: 0.85rem !important;
-    /* Smaller text */
-    width: 140px !important;
-    /* Fixed compact width */
+    font-size: 14px !important;
+    width: auto !important;
+    min-width: 150px !important;
+    outline: none !important;
 }
 
 /* Hide 'Powered by' and logo to keep it clean */
 .goog-te-gadget {
     font-size: 0 !important;
     color: transparent !important;
+    display: flex !important;
+    align-items: center !important;
 }
 
-.goog-te-gadget img,
+.goog-te-gadget span {
+    display: none !important;
+}
+
+.goog-te-gadget img {
+    display: none !important;
+}
+
 .goog-te-banner-frame {
     display: none !important;
 }
