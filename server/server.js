@@ -84,6 +84,7 @@ app.set('trust proxy', 1); // Trust first proxy (needed for rate limiting behind
 // Security Middleware with Content Security Policy
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
+  crossOriginEmbedderPolicy: false,
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
@@ -93,6 +94,7 @@ app.use(helmet({
         "'unsafe-eval'",
         "https://translate.google.com",
         "https://translate.googleapis.com",
+        "https://www.google.com",
         "https://www.gstatic.com",
         "https://cdnjs.cloudflare.com"
       ],
@@ -100,6 +102,7 @@ app.use(helmet({
         "'self'",
         "https://translate.googleapis.com",
         "https://translate.google.com",
+        "https://www.google.com",
         "https://www.youtube.com"
       ],
       styleSrc: [
@@ -127,7 +130,8 @@ app.use(helmet({
         "https://translate.google.com",
         "https://translate.googleapis.com",
         "https://www.youtube.com",
-        "https://youtube.com"
+        "https://youtube.com",
+        "https://www.google.com"
       ],
       fontSrc: [
         "'self'",
