@@ -108,13 +108,14 @@
         margin-right: 50px;
     }
 }
+
 /* Customize Google Translate Dropdown */
 .goog-te-gadget {
     font-size: 0 !important;
 }
 
 .goog-te-combo {
-    padding: 2px 6px !important;
+    padding: 3px 6px !important;
     border-radius: 4px !important;
     border: 1px solid #ddd !important;
     font-family: 'Segoe UI', sans-serif !important;
@@ -123,9 +124,14 @@
     background-color: white !important;
     outline: none !important;
     cursor: pointer !important;
-    height: 28px !important;
+    height: 30px !important;
+    /* Increased to prevent cut-off */
     margin: 0 !important;
     vertical-align: middle !important;
+    width: auto !important;
+    /* Let text define width */
+    max-width: 150px !important;
+    /* Prevent huge width */
 }
 
 .goog-te-gadget .goog-te-combo {
@@ -140,4 +146,3 @@
 body {
     top: 0px !important;
 }
-
