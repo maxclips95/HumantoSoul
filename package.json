@@ -19,7 +19,7 @@
   },
   "scripts": {
     "start": "node server/server.js",
-    "render-build": "npm install && cd server && npm install && cd .. && GENERATE_SOURCEMAP=false npm run build",
+    "render-build": "npm install && cd server && npm install && cd .. && GENERATE_SOURCEMAP=false CI=false npm run build",
     "server": "cd server && node server.js",
     "prod": "npm run build && npm run server",
     "build": "react-scripts build",
