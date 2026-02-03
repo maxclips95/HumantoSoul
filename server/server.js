@@ -484,7 +484,7 @@ async function fetchTranscriptText(youtubeId) {
 
   try {
     const outputPath = path.join(__dirname, `transcript_${youtubeId}`);
-    const command = `yt-dlp --write-auto-subs --sub-lang "hi" --skip-download --output "${outputPath}" "https://www.youtube.com/watch?v=${youtubeId}"`;
+    const command = `yt-dlp --js-runtimes node --write-auto-subs --sub-lang "hi" --skip-download --output "${outputPath}" "https://www.youtube.com/watch?v=${youtubeId}"`;
 
     console.log(`[Transcript] Running yt-dlp...`);
     // Use promisified exec to avoid blocking the event loop
