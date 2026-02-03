@@ -186,8 +186,8 @@ const allowedOrigins = [
   'http://localhost:5000',
   'https://jaigurudevukm.in',
   'https://www.jaigurudevukm.in',
-  'https://jaigurudevukm.com',
-  'https://www.jaigurudevukm.com',
+  'https://humantosoul.com',
+  'https://www.humantosoul.com',
   process.env.PRODUCTION_URL
 ].filter(Boolean);
 app.use(cors({
