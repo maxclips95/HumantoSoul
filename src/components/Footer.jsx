@@ -53,6 +53,9 @@ export default function Footer() {
       <p className="footer-copyright">
         Copyright © {new Date().getFullYear()} JaiGurudev. All Rights Reserved.
       </p>
+      <p className="footer-note">
+        Note: To keep this platform free and accessible to all, the server may take a moment to "wake up" on the first visit of the hour. We appreciate your patience! Jai Gurudev!
+      </p>
     </footer >
   );
 }
