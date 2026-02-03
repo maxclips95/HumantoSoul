@@ -166,9 +166,9 @@ export default function Prophecies() {
   return (
     <>
       <Helmet>
-        <title>2026 Prophecies - Jai Gurudev & Baba Umakant Ji Maharaj | Future Warnings</title>
-        <meta name="description" content="Read the latest prophecies (Bhavishyavani) from Baba Jai Gurudev about 2026 and the coming Golden Age. Spiritual warnings and guidance for humanity." />
-        <meta name="keywords" content="prophecies 2026, bhavishyavani, jai gurudev predictions, baba umakant ji prophecies, satya yuga predicted year" />
+        <title>2026 Prophecies & Time Change (Parivartan) - Jai Gurudev | Satyug Coming</title>
+        <meta name="description" content="Baba Jai Gurudev's predictions on the coming Time Change (Yug Parivartan). Read about the cycle change from Kaliyug to Satyug and how to survive the transition." />
+        <meta name="keywords" content="Satyug, Time Change, Yug Cycle Changing, Parivartan, Kaliyug to Satyug, Prophecies 2026, Jai Gurudev Predictions, World War 3 Prophecy" />
       </Helmet>
       <section className="section" style={{ padding: "10px 20px" }}>
 
