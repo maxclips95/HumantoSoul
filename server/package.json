@@ -23,7 +23,7 @@
         "node-fetch": "^2.7.0",
         "nodemailer": "^7.0.12",
         "xml2js": "^0.6.2",
-        "youtube-transcript": "^1.2.1"
+        "youtube-captions-scraper": "^2.0.3"
     },
     "devDependencies": {
         "nodemon": "^3.0.1"

@@ -479,28 +479,28 @@ async function translateText(text, targetLang = 'en') {
 
   return chunkResults.join('') || null;
 }
-// Native Node.js Transcript Fetcher (Bypasses "Sign In" walls)
+// Native Node.js Transcript Fetcher (Bypasses "Sign In" walls & robust with Hindi)
 async function fetchTranscriptText(youtubeId) {
   console.log(`[Transcript] Fetching for ID: ${youtubeId}`);
-  const { YoutubeTranscript } = require('youtube-transcript');
+  const { getSubtitles } = require('youtube-captions-scraper');
 
   try {
-    // 1. Fetch Transcript directly
-    const transcriptItems = await YoutubeTranscript.fetchTranscript(youtubeId, { lang: 'hi' });
+    // 1. Fetch Hindi Transcript first (User confirmed all videos are Hindi)
+    console.log(`[Transcript] Trying Hindi (hi)...`);
+    const transcriptItems = await getSubtitles({
+      videoID: youtubeId,
+      lang: 'hi' // Explicitly targeting Hindi
+    });
 
     if (!transcriptItems || transcriptItems.length === 0) {
-      throw new Error('No transcript available found (checked Hindi/Auto)');
+      throw new Error('No Hindi transcript available');
     }
 
     // 2. Combine text
     const rawContent = transcriptItems.map(t => t.text).join(' ').replace(/\s+/g, ' ').trim();
-    console.log(`[Transcript] Extracted ${rawContent.length} characters`);
+    console.log(`[Transcript] Extracted ${rawContent.length} characters (Hindi)`);
 
-    if (rawContent.length < 50) {
-      throw new Error('Transcript too short, likely invalid');
-    }
-
-    // 3. Translate (if needed)
+    // 3. Translate to English
     let fullTranscript = rawContent;
     try {
       console.log('[Transcript] Translating to English...');
@@ -515,20 +515,21 @@ async function fetchTranscriptText(youtubeId) {
     return fullTranscript;
 
   } catch (err) {
-    console.error(`[Transcript] Error:`, err.message);
-    // Fallback: If Hindi specific fails, try default (often English or Auto)
-    if (err.message.includes('No transcript')) {
-      console.log('[Transcript] Retrying with default language...');
-      try {
-        const retryItems = await YoutubeTranscript.fetchTranscript(youtubeId);
-        const retryContent = retryItems.map(t => t.text).join(' ');
-        return retryContent; // Return just the content (English likely)
-      } catch (retryErr) {
-        console.error('[Transcript] Retry failed:', retryErr.message);
-        throw retryErr;
-      }
+    console.log(`[Transcript] Hindi fetch failed or unavailable: ${err.message}`);
+
+    // Fallback: Try default/English if Hindi fails
+    try {
+      console.log(`[Transcript] Retrying with default/English...`);
+      const retryItems = await getSubtitles({
+        videoID: youtubeId,
+        lang: 'en'
+      });
+      const retryContent = retryItems.map(t => t.text).join(' ');
+      return retryContent;
+    } catch (retryErr) {
+      console.error('[Transcript] Retry also failed:', retryErr.message);
+      throw new Error(`Failed to fetch captions in Hindi or English. (ID: ${youtubeId})`);
     }
-    throw err;
   }
 }
 
