@@ -92,29 +92,25 @@ app.use(helmet({
         "'self'",
         "'unsafe-inline'",
         "'unsafe-eval'",
-        "https://translate.google.com",
-        "https://translate.googleapis.com",
-        "https://www.google.com",
-        "https://maps.google.com",
-        "https://www.gstatic.com",
+        "https://*.google.com",
+        "https://*.googleapis.com",
+        "https://*.gstatic.com",
         "https://cdnjs.cloudflare.com"
       ],
       connectSrc: [
         "'self'",
-        "https://translate.googleapis.com",
-        "https://translate.google.com",
-        "https://www.google.com",
-        "https://maps.google.com",
-        "https://www.youtube.com"
+        "https://*.google.com",
+        "https://*.googleapis.com",
+        "https://*.youtube.com"
       ],
       styleSrc: [
         "'self'",
         "'unsafe-inline'",
-        "https://translate.googleapis.com",
+        "https://*.google.com",
+        "https://*.googleapis.com",
+        "https://*.gstatic.com",
         "https://fonts.googleapis.com",
-        "https://maps.google.com",
-        "https://cdnjs.cloudflare.com",
-        "https://www.gstatic.com"
+        "https://cdnjs.cloudflare.com"
       ],
       imgSrc: [
         "'self'",
@@ -123,19 +119,14 @@ app.use(helmet({
         "https:",
         "http://i.ytimg.com",
         "https://i.ytimg.com",
-        "https://www.google.com",
-        "https://maps.google.com",
-        "https://translate.google.com",
-        "https://translate.googleapis.com",
-        "https://www.gstatic.com"
+        "https://*.google.com",
+        "https://*.gstatic.com"
       ],
       frameSrc: [
         "'self'",
-        "https://translate.google.com",
-        "https://translate.googleapis.com",
-        "https://www.google.com",
-        "https://maps.google.com",
-        "https://www.youtube.com",
+        "https://*.google.com",
+        "https://*.googleapis.com",
+        "https://*.youtube.com",
         "https://youtube.com"
       ],
       fontSrc: [
