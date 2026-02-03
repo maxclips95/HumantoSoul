@@ -38,11 +38,21 @@ const logger = {
 // Security Logger Helper
 const securityLogPath = path.join(__dirname, 'security.log');
 const logSecurityEvent = (ip, event, details = '') => {
-  const timestamp = new Date().toISOString();
-  const logEntry = `[${timestamp}] IP: ${ip} | EVENT: ${event} | DETAILS: ${details}\n`;
-  fs.appendFile(securityLogPath, logEntry, (err) => {
-    if (err) logger.error('Failed to write to security log:', err.message);
-  });
+  try {
+    const timestamp = new Date().toISOString();
+    const logEntry = `[${timestamp}] IP: ${ip} | EVENT: ${event} | DETAILS: ${details}\n`;
+    // Only attempt to write if we are NOT in production (Render disk is ephemeral/read-only often)
+    // OR if we specifically want to log to console in production
+    if (isProduction) {
+      console.log(`[SECURITY] IP: ${ip} | EVENT: ${event} | DETAILS: ${details}`);
+    } else {
+      fs.appendFile(securityLogPath, logEntry, (err) => {
+        if (err) logger.error('Failed to write to security log:', err.message);
+      });
+    }
+  } catch (err) {
+    console.error('Security Logger Failed:', err.message);
+  }
 };
 
 const app = express();
