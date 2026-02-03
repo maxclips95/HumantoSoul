@@ -87,8 +87,8 @@ function Header() {
       </nav>
 
       {/* GOOGLE TRANSLATE - ONLY DROPDOWN */}
-      <div className="language-selector" style={{ color: '#fff', fontSize: '18px', minWidth: '130px' }}>
-        <i className="fas fa-globe" style={{ marginRight: '8px' }}></i>
+      <div className="language-selector" style={{ color: '#fff', fontSize: '14px', minWidth: '100px', display: 'flex', alignItems: 'center' }}>
+        <i className="fas fa-globe" style={{ marginRight: '6px', fontSize: '14px' }}></i>
         <div id="google_translate_element" style={{ display: 'inline-block' }}></div>
       </div>
     </header>
