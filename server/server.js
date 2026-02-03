@@ -480,36 +480,58 @@ async function translateText(text, targetLang = 'en') {
   return chunkResults.join('') || null;
 }
 
-// Reliable Library-Based Fetcher (Reverted and Fixed)
+// Direct Captions API Fetcher (Resilient & No-Library)
 async function fetchTranscriptText(youtubeId) {
-  console.log(`[Transcript] Fetching for ID: ${youtubeId} via library...`);
-  const { YoutubeTranscript } = require('youtube-transcript-plus');
+  console.log(`[Transcript] Fetching for ID: ${youtubeId} via Captions API...`);
+
+  const headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+    'Accept-Language': 'hi,en;q=0.9',
+    'Referer': 'https://www.youtube.com/'
+  };
 
   try {
-    const languages = [
-      { lang: 'hi', label: 'Manual Hindi' },
-      { lang: 'a.hi', label: 'Automated Hindi' }
-    ];
+    // 1. Get List of available tracks from the timedtext API
+    const listUrl = `https://www.youtube.com/api/timedtext?v=${youtubeId}&type=list`;
+    const response = await axios.get(listUrl, { headers });
+    const xmlList = response.data;
 
-    let transcriptItems = null;
+    // 2. Parse the tracks to find Hindi (Manual or Automated)
+    // We look for 'hi' or 'a.hi'
+    const tracksMatch = xmlList.match(/<track[^>]*\/>/g);
+    if (!tracksMatch) throw new Error('No caption tracks found for this video.');
 
-    for (const { lang, label } of languages) {
-      try {
-        console.log(`[Transcript] Attempting ${label} (${lang})...`);
-        transcriptItems = await YoutubeTranscript.fetchTranscript(youtubeId, { lang });
-        if (transcriptItems && transcriptItems.length > 5) {
-          console.log(`[Transcript] SUCCESS with ${label}`);
-          break;
-        }
-      } catch (err) { }
-    }
+    let targetTrack = tracksMatch.find(t => t.includes('lang_code="hi"')) ||
+      tracksMatch.find(t => t.includes('vss_id="a.hi"')) ||
+      tracksMatch.find(t => t.includes('hi'));
 
-    if (!transcriptItems || transcriptItems.length === 0) {
-      throw new Error('No Hindi captions (Manual or Automated) found.');
-    }
+    if (!targetTrack) throw new Error('Hindi captions not available.');
 
-    const rawContent = transcriptItems.map(t => t.text).join(' ').replace(/\s+/g, ' ').trim();
+    // Extract attributes manually to avoid extra XML dependencies
+    const langCode = targetTrack.match(/lang_code="([^"]+)"/)?.[1] || 'hi';
+    const name = targetTrack.match(/name="([^"]+)"/)?.[1] || '';
+    const vssId = targetTrack.match(/vss_id="([^"]+)"/)?.[1] || '';
 
+    console.log(`[Transcript] Found: ${langCode} (${vssId})`);
+
+    // 3. Fetch the actual transcript
+    const fetchUrl = `https://www.youtube.com/api/timedtext?v=${youtubeId}&lang=${langCode}${name ? `&name=${encodeURIComponent(name)}` : ''}&fmt=srv3`;
+    const transcriptRes = await axios.get(fetchUrl, { headers });
+    const transcript = transcriptRes.data;
+
+    // 4. Extract text from SRV format
+    // Matches anything between tags in the SRV3/XML response
+    const segments = transcript.match(/<s[^>]*>([\s\S]*?)<\/s>/g) || transcript.match(/<text[^>]*>([\s\S]*?)<\/text>/g);
+    if (!segments) throw new Error('Transcript content is empty.');
+
+    const rawContent = segments
+      .map(s => s.replace(/<[^>]+>/g, ''))
+      .map(s => s.replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, '&'))
+      .join(' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    // Side-by-Side English Translation
     let fullTranscript = rawContent;
     try {
       const translated = await translateText(rawContent, 'en');
@@ -521,8 +543,8 @@ async function fetchTranscriptText(youtubeId) {
     return fullTranscript;
 
   } catch (err) {
-    console.error(`[Transcript] Library Fetch Failed:`, err.message);
-    throw new Error(`Transcript unavailable for this video.`);
+    console.error(`[Transcript] Captions API error:`, err.message);
+    throw new Error(`Failed to fetch Hindi captions.`);
   }
 }
 
