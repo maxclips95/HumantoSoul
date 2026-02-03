@@ -32,8 +32,8 @@ A spiritual website platform featuring:
 │  http://localhost:5000 (Node.js + Express)                  │
 │                                                              │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
-│  │ REST API     │  │ yt-dlp       │  │ Google       │     │
-│  │ Endpoints    │  │ (Transcripts)│  │ Translate    │     │
+│  │ REST API     │  │ Captions API │  │ Google       │     │
+│  │ Endpoints    │  │ (Direct)     │  │ Translate    │     │
 │  └──────────────┘  └──────────────┘  └──────────────┘     │
 └────────────────────┬────────────────────────────────────────┘
                      │ SQL Queries
@@ -111,22 +111,25 @@ app.post('/api/videos/:id/transcript', verifyToken, async (req, res) => {
 
 **Step 3: yt-dlp Extracts Captions**
 ```javascript
-// server.js line ~465
+// server.js line ~500
 async function fetchTranscriptText(youtubeId) {
-  // 1. Run yt-dlp command (non-blocking)
-  const command = `yt-dlp --write-auto-subs --sub-lang "hi" --skip-download ...`;
-  await execPromise(command);
+  // 1. Fetch available tracks from YouTube's timedtext API
+  const listUrl = `https://www.youtube.com/api/timedtext?v=${youtubeId}&type=list`;
+  const tracks = await axios.get(listUrl);
   
-  // 2. Read generated .vtt file
-  const subtitleContent = fs.readFileSync(`transcript_${youtubeId}.hi.vtt`);
+  // 2. Locate Hindi (Manual or Automated)
+  const targetTrack = tracks.find(t => t.lang === 'hi' || t.vssId === 'a.hi');
   
-  // 3. Parse VTT to extract text
-  const hindiText = parseVTT(subtitleContent);
+  // 3. Fetch actual timed text XML
+  const transcriptXml = await axios.get(targetTrack.baseUrl);
   
-  // 4. Translate to English
+  // 4. Parse text segments and clean XML tags
+  const hindiText = cleanFormat(transcriptXml);
+  
+  // 5. Translate to English
   const englishText = await translateText(hindiText, 'en');
   
-  // 5. Return bilingual format
+  // 6. Return bilingual format
   return `${hindiText} ||| ${englishText}`;
 }
 ```
@@ -242,55 +245,40 @@ db.prepare('INSERT INTO recipes (title, ingredients, steps, type) VALUES (?, ?, 
 
 ## 7. How Transcript System Works (Current Implementation)
 
-### Technology: yt-dlp (Python) + Node.js
+### Technology: Direct YouTube Captions API (Axios + Node.js)
 
-**Why yt-dlp?**
-- YouTube blocked Node.js libraries on Jan 25, 2026
-- yt-dlp mimics official YouTube app (cannot be blocked)
-- Extracts ALL caption types (manual, auto-generated)
+**Why This Approach?**
+- **Library-Free**: Removes dependency on third-party scrapers that often break.
+- **Dependency-Free**: No need for Python or `yt-dlp` on the server (critical for Render Free Tier).
+- **Fast & Reliable**: Fetches XML metadata directly from YouTube's internal `timedtext` service.
+- **Hindi-First**: Specifically configured to find Manual Hindi and Automated Hindi tracks.
 
 **Process Flow**:
 
 ```
 1. User clicks "Get Transcript"
    ↓
-2. Backend receives request with YouTube video ID
+2. Backend queries YouTube API for available language tracks:
+   GET https://www.youtube.com/api/timedtext?v=ID&type=list
    ↓
-3. Execute yt-dlp command (asynchronously):
-   yt-dlp --write-auto-subs --sub-lang "hi" --skip-download --output "transcript_ID" "VIDEO_URL"
+3. Filter tracks for Manual Hindi ("hi") or Automated Hindi ("a.hi")
    ↓
-4. yt-dlp downloads .vtt subtitle file (2-3 seconds)
+4. Fetch full transcript XML in SRV3 format:
+   GET https://www.youtube.com/api/timedtext?v=ID&lang=hi&fmt=srv3
    ↓
-5. Parse VTT file:
-   - Remove timestamps (00:00:01.234 --> 00:00:05.678)
-   - Remove metadata (WEBVTT, Kind:, Language:)
-   - Extract clean Hindi text
+5. Parse XML segments and strip HTML/XML tags
    ↓
-6. Translate to English using Google Translate API (2-4 seconds)
+6. Translate to English using Google Translate API (Side-by-side view)
    ↓
 7. Combine: "Hindi text ||| English text"
    ↓
-8. Save to database
-   ↓
-9. Return to frontend
-   ↓
-10. Display in admin dashboard
+8. Save to database & Return to frontend
 ```
 
 **Critical: Non-Blocking Execution**
 ```javascript
 // Uses async exec to prevent server freeze
-const { exec } = require('child_process');
-const util = require('util');
-const execPromise = util.promisify(exec);
-
-await execPromise(command); // Server remains responsive
 ```
-
-**Performance**:
-- Small transcript (5,000 chars): ~5 seconds
-- Large transcript (46,000 chars): ~8 seconds
-- Server handles other requests during processing
 
 ---
 
@@ -479,7 +467,8 @@ EMAIL_PASS=your-app-password
 
 ✅ **Fully Operational**
 
-- **Transcript System**: Working with yt-dlp (extracting 5,000-46,000 chars)
+- **Transcript System**: Working via **Direct Captions API** (Axios-based, zero-library).
+- **Hindi Priority**: Successfully fetching both Manual and Automated Hindi captions.
 - **Server**: Non-blocking (async exec prevents freezing)
 - **Frontend**: All pages loading correctly
 - **Database**: 11 tables with 300+ recipes, 21 prophecies
