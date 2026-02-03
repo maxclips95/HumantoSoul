@@ -14,7 +14,7 @@ export default function Home() {
       <Helmet>
         <title>Human to Soul - Jai Gurudev Spiritual Teachings & Prophecies</title>
         <meta name="description" content="Human to Soul: The official platform for Baba Jai Gurudev's teachings on the Time Change (Yug Parivartan) and the arrival of Satyug." />
-        <meta name="keywords" content="Satyug, Yug Cycle, Time Change, Human to Soul, Jai Gurudev, Baba Umakant Ji Maharaj, Prophecies 2026, Spiritual Awakening" />
+        <meta name="keywords" content="Satsang, Spiritual, Master of Time, Owner of Time, Baba Jaigurudev, Baba Umakant Ji, Prophecies, Prophecy, Satyug, Time Change, Yug Cycle, Human to Soul" />
       </Helmet>
       <Carousel />
       <HeroSection />
