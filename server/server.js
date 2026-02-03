@@ -92,6 +92,8 @@ app.use(helmet({
         "'self'",
         "'unsafe-inline'",
         "'unsafe-eval'",
+        "blob:",
+        "data:",
         "https://*.google.com",
         "https://*.googleapis.com",
         "https://*.gstatic.com",
@@ -101,7 +103,8 @@ app.use(helmet({
         "'self'",
         "https://*.google.com",
         "https://*.googleapis.com",
-        "https://*.youtube.com"
+        "https://*.youtube.com",
+        "https://*.gstatic.com"
       ],
       styleSrc: [
         "'self'",

@@ -131,7 +131,9 @@ body {
 }
 
 #google_translate_element {
-    display: inline-block;
+    display: inline-block !important;
+    min-width: 150px;
+    min-height: 30px;
 }
 
 /* Force visibility of the Google dropdown */

@@ -64,17 +64,35 @@
       ]
     }
     </script>
-  <!-- Google Translate Initialization -->
+  <!-- Google Translate Initialization with Smart Retry -->
   <script type="text/javascript">
     function googleTranslateElementInit() {
-      new google.translate.TranslateElement({
-        pageLanguage: 'en',
-        autoDisplay: false,
-        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-      }, 'google_translate_element');
+      console.log("Google Translate Init Triggered");
+      var retryCount = 0;
+      var maxRetries = 50; // Try for 5 seconds
+
+      var initInterval = setInterval(function () {
+        var el = document.getElementById('google_translate_element');
+        if (el) {
+          console.log("Found google_translate_element, initializing...");
+          new google.translate.TranslateElement({
+            pageLanguage: 'en',
+            autoDisplay: false,
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+          }, 'google_translate_element');
+          clearInterval(initInterval);
+        } else {
+          retryCount++;
+          if (retryCount >= maxRetries) {
+            console.error("Could not find google_translate_element after 5 seconds.");
+            clearInterval(initInterval);
+          }
+        }
+      }, 100);
     }
   </script>
-  <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
+  <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+    async></script>
 
 </head>
 
