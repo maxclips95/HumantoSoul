@@ -479,20 +479,28 @@ async function translateText(text, targetLang = 'en') {
 
   return chunkResults.join('') || null;
 }
-// Native Node.js Transcript Fetcher (Bypasses "Sign In" walls)
+// Native Node.js Transcript Fetcher (High-Success "Plus" Version)
 async function fetchTranscriptText(youtubeId) {
   console.log(`[Transcript] Fetching for ID: ${youtubeId}`);
-  const { YoutubeTranscript } = require('youtube-transcript');
+  const { YoutubeTranscript } = require('youtube-transcript-plus');
 
   try {
-    // 1. Fetch Transcript directly
-    const transcriptItems = await YoutubeTranscript.fetchTranscript(youtubeId, { lang: 'hi' });
-
-    if (!transcriptItems || transcriptItems.length === 0) {
-      throw new Error('No transcript available found (checked Hindi/Auto)');
+    // 1. Try Manual Hindi (hi) first
+    console.log(`[Transcript] Trying Manual Hindi (hi)...`);
+    let transcriptItems;
+    try {
+      transcriptItems = await YoutubeTranscript.fetchTranscript(youtubeId, { lang: 'hi' });
+    } catch (manualErr) {
+      console.log(`[Transcript] Manual Hindi failed: ${manualErr.message}. Trying Automated Hindi (a.hi)...`);
+      // 2. Surgical Fallback: Automated Hindi (a.hi)
+      transcriptItems = await YoutubeTranscript.fetchTranscript(youtubeId, { lang: 'a.hi' });
     }
 
-    // 2. Combine text
+    if (!transcriptItems || transcriptItems.length === 0) {
+      throw new Error('No transcript available found (checked Hindi/Automated)');
+    }
+
+    // 3. Combine text
     const rawContent = transcriptItems.map(t => t.text).join(' ').replace(/\s+/g, ' ').trim();
     console.log(`[Transcript] Extracted ${rawContent.length} characters`);
 
@@ -500,7 +508,7 @@ async function fetchTranscriptText(youtubeId) {
       throw new Error('Transcript too short, likely invalid');
     }
 
-    // 3. Translate (if needed)
+    // 4. Translate to English
     let fullTranscript = rawContent;
     try {
       console.log('[Transcript] Translating to English...');
@@ -516,19 +524,16 @@ async function fetchTranscriptText(youtubeId) {
 
   } catch (err) {
     console.error(`[Transcript] Error:`, err.message);
-    // Fallback: If Hindi specific fails, try default (often English or Auto)
-    if (err.message.includes('No transcript')) {
-      console.log('[Transcript] Retrying with default language...');
-      try {
-        const retryItems = await YoutubeTranscript.fetchTranscript(youtubeId);
-        const retryContent = retryItems.map(t => t.text).join(' ');
-        return retryContent; // Return just the content (English likely)
-      } catch (retryErr) {
-        console.error('[Transcript] Retry failed:', retryErr.message);
-        throw retryErr;
-      }
+    // Fallback: Try default language (often English or Auto-generated English)
+    try {
+      console.log('[Transcript] Final fallback to default language...');
+      const retryItems = await YoutubeTranscript.fetchTranscript(youtubeId);
+      const retryContent = retryItems.map(t => t.text).join(' ');
+      return retryContent;
+    } catch (retryErr) {
+      console.error('[Transcript] All fetch attempts failed:', retryErr.message);
+      throw new Error(`Failed to fetch captions. (YouTube might have blocked this specific request or captions are fully disabled)`);
     }
-    throw err;
   }
 }
 
