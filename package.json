@@ -19,7 +19,7 @@
   },
   "scripts": {
     "start": "node server/server.js",
-    "render-build": "npm install && cd server && npm install && cd .. && GENERATE_SOURCEMAP=false CI=false npm run build",
+    "render-build": "npm ci --no-audit && cd server && npm ci --no-audit && cd .. && env GENERATE_SOURCEMAP=false CI=false npm run build",
     "server": "cd server && node server.js",
     "prod": "npm run build && npm run server",
     "build": "react-scripts build",
@@ -46,11 +46,8 @@
   },
   "proxy": "http://localhost:5000",
   "devDependencies": {
-    "@sentry/react": "^10.26.0",
-    "@sentry/tracing": "^7.120.4",
     "concurrently": "^9.2.1",
-    "react-axe": "^3.5.4",
-    "webp-converter": "^2.3.3"
+    "react-axe": "^3.5.4"
   },
   "engines": {
     "node": ">=18.17.0",
