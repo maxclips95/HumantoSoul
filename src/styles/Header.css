@@ -124,14 +124,19 @@
     background-color: white !important;
     outline: none !important;
     cursor: pointer !important;
-    height: 30px !important;
-    /* Increased to prevent cut-off */
+    height: 34px !important;
+    /* Increased height to prevent text clipping */
     margin: 0 !important;
     vertical-align: middle !important;
     width: auto !important;
     /* Let text define width */
     max-width: 150px !important;
     /* Prevent huge width */
+    line-height: normal !important;
+    /* Ensure text centers */
+    position: relative !important;
+    top: -1px !important;
+    /* Nudge up slightly */
 }
 
 .goog-te-gadget .goog-te-combo {
