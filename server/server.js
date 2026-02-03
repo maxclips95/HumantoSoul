@@ -479,18 +479,15 @@ async function translateText(text, targetLang = 'en') {
 
   return chunkResults.join('') || null;
 }
-// Native Node.js Transcript Fetcher (Bypasses "Sign In" walls & robust with Hindi)
+// Native Node.js Transcript Fetcher (High-Success "Plus" Version)
 async function fetchTranscriptText(youtubeId) {
   console.log(`[Transcript] Fetching for ID: ${youtubeId}`);
-  const { getSubtitles } = require('youtube-captions-scraper');
+  const { YoutubeTranscript } = require('youtube-transcript-plus');
 
   try {
-    // 1. Fetch Hindi Transcript first (User confirmed all videos are Hindi)
+    // 1. Fetch Hindi Transcript first
     console.log(`[Transcript] Trying Hindi (hi)...`);
-    const transcriptItems = await getSubtitles({
-      videoID: youtubeId,
-      lang: 'hi' // Explicitly targeting Hindi
-    });
+    const transcriptItems = await YoutubeTranscript.fetchTranscript(youtubeId, { lang: 'hi' });
 
     if (!transcriptItems || transcriptItems.length === 0) {
       throw new Error('No Hindi transcript available');
@@ -515,20 +512,17 @@ async function fetchTranscriptText(youtubeId) {
     return fullTranscript;
 
   } catch (err) {
-    console.log(`[Transcript] Hindi fetch failed or unavailable: ${err.message}`);
+    console.log(`[Transcript] Hindi fetch failed: ${err.message}`);
 
     // Fallback: Try default/English if Hindi fails
     try {
       console.log(`[Transcript] Retrying with default/English...`);
-      const retryItems = await getSubtitles({
-        videoID: youtubeId,
-        lang: 'en'
-      });
+      const retryItems = await YoutubeTranscript.fetchTranscript(youtubeId);
       const retryContent = retryItems.map(t => t.text).join(' ');
       return retryContent;
     } catch (retryErr) {
       console.error('[Transcript] Retry also failed:', retryErr.message);
-      throw new Error(`Failed to fetch captions in Hindi or English. (ID: ${youtubeId})`);
+      throw new Error(`Failed to fetch captions. (YouTube might have blocked this specific request)`);
     }
   }
 }
