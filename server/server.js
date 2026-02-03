@@ -502,17 +502,23 @@ async function fetchTranscriptText(youtubeId) {
     }
 
     const playerResponse = JSON.parse(jsonMatch[1]);
-    const captionTracks = playerResponse.captions?.playerCaptionsTracklistRenderer?.captionTracks;
+    const captions = playerResponse.captions?.playerCaptionsTracklistRenderer;
+    const captionTracks = captions?.captionTracks;
 
     if (!captionTracks || captionTracks.length === 0) {
-      throw new Error('Captions are not available for this video.');
+      const reason = playerResponse.playabilityStatus?.reason || 'No captions found in metadata.';
+      throw new Error(`YouTube returned no captions. Reason: ${reason}`);
     }
+
+    // Diagnostic: List all available tracks
+    const trackList = captionTracks.map(t => `${t.languageCode} (${t.vssId})`).join(', ');
+    console.log(`[Transcript] Available tracks for ${youtubeId}: ${trackList}`);
 
     // 3. TARGET: Manual Hindi (hi) OR Automated Hindi (a.hi)
     const hindiTrack = captionTracks.find(t => t.languageCode === 'hi' || t.vssId === 'a.hi' || t.vssId?.includes('hi'));
 
     if (!hindiTrack) {
-      throw new Error('Hindi captions (Manual or Automated) not found for this video.');
+      throw new Error(`Hindi captions not found. Available: [${trackList}]`);
     }
 
     console.log(`[Transcript] Found track: ${hindiTrack.languageCode} (${hindiTrack.vssId})`);
