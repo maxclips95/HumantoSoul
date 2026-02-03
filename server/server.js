@@ -474,857 +474,911 @@ async function translateText(text, targetLang = 'en') {
 
     if (i + BATCH_SIZE < chunks.length) {
       await new Promise(r => setTimeout(r, 100));
-      const item = db.prepare('SELECT * FROM automated_prophecies WHERE id = ?').get(id);
-      if (item) {
-        try {
-          const text = await fetchTranscriptText(id);
-          db.prepare('UPDATE automated_prophecies SET transcript = ?, transcriptStatus = ? WHERE id = ?')
-            .run(text, 'Draft', id);
-          return { ...item, transcript: text, transcriptStatus: 'Draft' };
-        } catch (e) {
-          console.error(`Failed automated fetch for ${id}: ${e.message}`);
-          return null;
+    }
+  }
+
+  return chunkResults.join('') || null;
+}
+
+// Reliable Library-Based Fetcher (Reverted and Fixed)
+async function fetchTranscriptText(youtubeId) {
+  console.log(`[Transcript] Fetching for ID: ${youtubeId} via library...`);
+  const { YoutubeTranscript } = require('youtube-transcript-plus');
+
+  try {
+    const languages = [
+      { lang: 'hi', label: 'Manual Hindi' },
+      { lang: 'a.hi', label: 'Automated Hindi' }
+    ];
+
+    let transcriptItems = null;
+
+    for (const { lang, label } of languages) {
+      try {
+        console.log(`[Transcript] Attempting ${label} (${lang})...`);
+        transcriptItems = await YoutubeTranscript.fetchTranscript(youtubeId, { lang });
+        if (transcriptItems && transcriptItems.length > 5) {
+          console.log(`[Transcript] SUCCESS with ${label}`);
+          break;
         }
-      }
-      return null;
+      } catch (err) { }
     }
 
+    if (!transcriptItems || transcriptItems.length === 0) {
+      throw new Error('No Hindi captions (Manual or Automated) found.');
+    }
 
-    cron.schedule('0 0 */2 * *', () => fetchYouTubeProphecies());
-    fetchYouTubeProphecies();
+    const rawContent = transcriptItems.map(t => t.text).join(' ').replace(/\s+/g, ' ').trim();
 
-    // --- API ENDPOINTS ---
-
-    // Auth Middleware - Secure JWT verification
-    const verifyToken = (req, res, next) => {
-      const authHeader = req.headers['authorization'];
-      if (!authHeader) return res.status(403).json({ message: 'No token provided' });
-
-      const token = authHeader.split(' ')[1];
-
-      try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        req.user = decoded; // Attach user info to request
-        next();
-      } catch (err) {
-        console.warn('Token verification failed:', err.message);
-        res.status(401).json({ message: 'Invalid or expired token' });
+    let fullTranscript = rawContent;
+    try {
+      const translated = await translateText(rawContent, 'en');
+      if (translated && translated !== rawContent) {
+        fullTranscript = `${rawContent} ||| ${translated}`;
       }
-    };
+    } catch (err) { }
 
-    // Admin Auth - Secure Login with JWT, bcrypt, and Account Lockout
-    app.post('/api/auth/login', loginLimiter, async (req, res) => {
+    return fullTranscript;
+
+  } catch (err) {
+    console.error(`[Transcript] Library Fetch Failed:`, err.message);
+    throw new Error(`Transcript unavailable for this video.`);
+  }
+}
+
+// Legacy wrapper for Cron (handles saving automatically for automated items)
+async function fetchTranscript(id) {
+  const item = db.prepare('SELECT * FROM automated_prophecies WHERE id = ?').get(id);
+  if (item) {
+    try {
+      const text = await fetchTranscriptText(id);
+      db.prepare('UPDATE automated_prophecies SET transcript = ?, transcriptStatus = ? WHERE id = ?')
+        .run(text, 'Draft', id);
+      return { ...item, transcript: text, transcriptStatus: 'Draft' };
+    } catch (e) {
+      console.error(`Failed automated fetch for ${id}: ${e.message}`);
+      return null;
+    }
+  }
+  return null;
+}
+
+// Background Tasks
+cron.schedule('0 0 */2 * *', () => fetchYouTubeProphecies());
+// fetchYouTubeProphecies(); // Disable initial fetch to avoid startup overhead on Render if desired
+
+// --- API ENDPOINTS ---
+
+// Auth Middleware - Secure JWT verification
+const verifyToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  if (!authHeader) return res.status(403).json({ message: 'No token provided' });
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded; // Attach user info to request
+    next();
+  } catch (err) {
+    console.warn('Token verification failed:', err.message);
+    res.status(401).json({ message: 'Invalid or expired token' });
+  }
+};
+
+// Admin Auth - Secure Login with JWT, bcrypt, and Account Lockout
+app.post('/api/auth/login', loginLimiter, async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const clientIP = req.ip;
+
+    logToMemory('LOGIN_ATTEMPT', `IP: ${clientIP} User: ${username}`);
+
+    // Check if IP is locked out
+    const attempts = failedLoginAttempts.get(clientIP) || { count: 0, lockedUntil: null };
+    if (attempts.lockedUntil && attempts.lockedUntil > Date.now()) {
+      const remainingMinutes = Math.ceil((attempts.lockedUntil - Date.now()) / 60000);
+      logSecurityEvent(clientIP, 'LOCKOUT_REJECTION', `Locked. Remaining: ${remainingMinutes}m`);
+      logToMemory('LOGIN_LOCKED', `IP Locked. Remaining: ${remainingMinutes}m`);
+      return res.status(429).json({
+        message: `Account locked. Try again in ${remainingMinutes} minutes.`
+      });
+    }
+
+    // Credentials MUST be in .env file
+    const envUser = process.env.ADMIN_USERNAME;
+    const envPassHash = process.env.ADMIN_PASSWORD_HASH;
+    const envPassPlain = process.env.ADMIN_PASSWORD; // Fallback for migration
+
+    if (!envUser) {
+      logToMemory('LOGIN_ERROR', 'Missing ADMIN_USERNAME in .env');
+      console.error('CRITICAL: ADMIN_USERNAME must be set in .env');
+      return res.status(500).json({ message: 'Server configuration error' });
+    }
+
+    let isPasswordValid = false;
+
+    // Check if password hash exists (preferred)
+    if (envPassHash) {
       try {
-        const { username, password } = req.body;
-        const clientIP = req.ip;
-
-        logToMemory('LOGIN_ATTEMPT', `IP: ${clientIP} User: ${username}`);
-
-        // Check if IP is locked out
-        const attempts = failedLoginAttempts.get(clientIP) || { count: 0, lockedUntil: null };
-        if (attempts.lockedUntil && attempts.lockedUntil > Date.now()) {
-          const remainingMinutes = Math.ceil((attempts.lockedUntil - Date.now()) / 60000);
-          logSecurityEvent(clientIP, 'LOCKOUT_REJECTION', `Locked. Remaining: ${remainingMinutes}m`);
-          logToMemory('LOGIN_LOCKED', `IP Locked. Remaining: ${remainingMinutes}m`);
-          return res.status(429).json({
-            message: `Account locked. Try again in ${remainingMinutes} minutes.`
-          });
-        }
-
-        // Credentials MUST be in .env file
-        const envUser = process.env.ADMIN_USERNAME;
-        const envPassHash = process.env.ADMIN_PASSWORD_HASH;
-        const envPassPlain = process.env.ADMIN_PASSWORD; // Fallback for migration
-
-        if (!envUser) {
-          logToMemory('LOGIN_ERROR', 'Missing ADMIN_USERNAME in .env');
-          console.error('CRITICAL: ADMIN_USERNAME must be set in .env');
-          return res.status(500).json({ message: 'Server configuration error' });
-        }
-
-        let isPasswordValid = false;
-
-        // Check if password hash exists (preferred)
-        if (envPassHash) {
-          try {
-            logToMemory('LOGIN_STEP', 'Verifying hash with bcryptjs...');
-            isPasswordValid = await bcrypt.compare(password, envPassHash);
-            logToMemory('LOGIN_STEP', `Hash Result: ${isPasswordValid}`);
-          } catch (err) {
-            logToMemory('LOGIN_ERROR', `Bcrypt Error: ${err.message}`);
-            console.error('bcrypt compare error:', err.message);
-          }
-        } else if (envPassPlain) {
-          logToMemory('LOGIN_WARN', 'Using Plain Text Password');
-          isPasswordValid = (password === envPassPlain);
-          if (isPasswordValid) {
-            console.warn('WARNING: Using plain text password. Run password change to migrate to hash.');
-          }
-        } else {
-          logToMemory('LOGIN_ERROR', 'No Password Configured');
-          console.error('CRITICAL: ADMIN_PASSWORD or ADMIN_PASSWORD_HASH must be set in .env');
-          return res.status(500).json({ message: 'Server configuration error' });
-        }
-
-        if (username === envUser && isPasswordValid) {
-          logToMemory('LOGIN_SUCCESS', `User ${username} logged in.`);
-          // Clear failed attempts on successful login
-          failedLoginAttempts.delete(clientIP);
-
-          // Generate secure JWT with 24-hour expiration
-          const token = jwt.sign(
-            { username: envUser, role: 'admin' },
-            JWT_SECRET,
-            { expiresIn: '24h' }
-          );
-          res.json({ token, user: { username: envUser } });
-        } else {
-          logToMemory('LOGIN_FAILED', `Invalid credentials for ${username}`);
-          // Track failed attempt
-          attempts.count += 1;
-
-          // Lock account after 5 failed attempts for 30 minutes
-          if (attempts.count >= 5) {
-            attempts.lockedUntil = Date.now() + (30 * 60 * 1000); // 30 minutes
-            logger.warn(`IP ${clientIP} locked out after 5 failed login attempts`);
-            logSecurityEvent(clientIP, 'ACCOUNT_LOCKOUT', '5 failed attempts reached');
-            logToMemory('LOGIN_LOCKOUT', `IP ${clientIP} locked out now.`);
-          } else {
-            logSecurityEvent(clientIP, 'LOGIN_FAILED', `Attempt ${attempts.count} for user: ${username}`);
-          }
-
-          failedLoginAttempts.set(clientIP, attempts);
-
-          // Avoid timing attacks by using generic message
-          res.status(401).json({ message: 'Invalid credentials' });
-        }
+        logToMemory('LOGIN_STEP', 'Verifying hash with bcryptjs...');
+        isPasswordValid = await bcrypt.compare(password, envPassHash);
+        logToMemory('LOGIN_STEP', `Hash Result: ${isPasswordValid}`);
       } catch (err) {
-        console.error('FATAL LOGIN ERROR:', err.message, err.stack);
-        res.status(500).json({ message: 'Internal server error during authentication' });
+        logToMemory('LOGIN_ERROR', `Bcrypt Error: ${err.message}`);
+        console.error('bcrypt compare error:', err.message);
       }
+    } else if (envPassPlain) {
+      logToMemory('LOGIN_WARN', 'Using Plain Text Password');
+      isPasswordValid = (password === envPassPlain);
+      if (isPasswordValid) {
+        console.warn('WARNING: Using plain text password. Run password change to migrate to hash.');
+      }
+    } else {
+      logToMemory('LOGIN_ERROR', 'No Password Configured');
+      console.error('CRITICAL: ADMIN_PASSWORD or ADMIN_PASSWORD_HASH must be set in .env');
+      return res.status(500).json({ message: 'Server configuration error' });
+    }
+
+    if (username === envUser && isPasswordValid) {
+      logToMemory('LOGIN_SUCCESS', `User ${username} logged in.`);
+      // Clear failed attempts on successful login
+      failedLoginAttempts.delete(clientIP);
+
+      // Generate secure JWT with 24-hour expiration
+      const token = jwt.sign(
+        { username: envUser, role: 'admin' },
+        JWT_SECRET,
+        { expiresIn: '24h' }
+      );
+      res.json({ token, user: { username: envUser } });
+    } else {
+      logToMemory('LOGIN_FAILED', `Invalid credentials for ${username}`);
+      // Track failed attempt
+      attempts.count += 1;
+
+      // Lock account after 5 failed attempts for 30 minutes
+      if (attempts.count >= 5) {
+        attempts.lockedUntil = Date.now() + (30 * 60 * 1000); // 30 minutes
+        logger.warn(`IP ${clientIP} locked out after 5 failed login attempts`);
+        logSecurityEvent(clientIP, 'ACCOUNT_LOCKOUT', '5 failed attempts reached');
+        logToMemory('LOGIN_LOCKOUT', `IP ${clientIP} locked out now.`);
+      } else {
+        logSecurityEvent(clientIP, 'LOGIN_FAILED', `Attempt ${attempts.count} for user: ${username}`);
+      }
+
+      failedLoginAttempts.set(clientIP, attempts);
+
+      // Avoid timing attacks by using generic message
+      res.status(401).json({ message: 'Invalid credentials' });
+    }
+  } catch (err) {
+    console.error('FATAL LOGIN ERROR:', err.message, err.stack);
+    res.status(500).json({ message: 'Internal server error during authentication' });
+  }
+});
+
+// Admin Password Change - Secure endpoint with bcrypt hashing
+app.post('/api/auth/change-password', verifyToken, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  // Validate input
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ message: 'Current and new password are required' });
+  }
+
+  if (newPassword.length < 8) {
+    return res.status(400).json({ message: 'New password must be at least 8 characters' });
+  }
+
+  // Verify current password
+  const envPassHash = process.env.ADMIN_PASSWORD_HASH;
+  const envPassPlain = process.env.ADMIN_PASSWORD;
+
+  let isCurrentPasswordValid = false;
+
+  if (envPassHash) {
+    try {
+      isCurrentPasswordValid = await bcrypt.compare(currentPassword, envPassHash);
+    } catch (err) {
+      console.error('bcrypt compare error:', err.message);
+    }
+  } else if (envPassPlain) {
+    isCurrentPasswordValid = (currentPassword === envPassPlain);
+  }
+
+  if (!isCurrentPasswordValid) {
+    return res.status(401).json({ message: 'Current password is incorrect' });
+  }
+
+  // Hash the new password and update .env file
+  try {
+    const saltRounds = 12;
+    const newPasswordHash = await bcrypt.hash(newPassword, saltRounds);
+
+    const envPath = path.join(__dirname, '../.env');
+    let envContent = fs.readFileSync(envPath, 'utf8');
+
+    // Replace or add ADMIN_PASSWORD_HASH
+    if (envContent.includes('ADMIN_PASSWORD_HASH=')) {
+      envContent = envContent.replace(
+        /ADMIN_PASSWORD_HASH=.*/,
+        `ADMIN_PASSWORD_HASH=${newPasswordHash}`
+      );
+    } else {
+      envContent += `\nADMIN_PASSWORD_HASH=${newPasswordHash}`;
+    }
+
+    // Remove plain text password if it exists (migration)
+    envContent = envContent.replace(/\nADMIN_PASSWORD=.*/, '');
+    envContent = envContent.replace(/^ADMIN_PASSWORD=.*\n?/m, '');
+
+    fs.writeFileSync(envPath, envContent.trim() + '\n');
+
+    // Update in-memory values
+    process.env.ADMIN_PASSWORD_HASH = newPasswordHash;
+    delete process.env.ADMIN_PASSWORD;
+
+    console.log('Admin password changed and hashed successfully');
+    res.json({ message: 'Password changed successfully. Please login again.' });
+  } catch (err) {
+    console.error('Failed to update password:', err);
+    res.status(500).json({ message: 'Failed to update password' });
+  }
+});
+
+// Helper for CRUD operations using SQLite
+const handleSqliteCrud = (tableName, req, res) => {
+  console.log(`${req.method} request for ${tableName}`);
+
+  if (req.method === 'GET') {
+    const items = db.prepare(`SELECT * FROM ${tableName}`).all();
+    res.json(items);
+  } else if (req.method === 'POST') {
+    const columns = Object.keys(req.body);
+    const placeholders = columns.map(() => '?').join(', ');
+    const values = columns.map(col => {
+      const val = req.body[col];
+      return (typeof val === 'object') ? JSON.stringify(val) : val;
     });
 
-    // Admin Password Change - Secure endpoint with bcrypt hashing
-    app.post('/api/auth/change-password', verifyToken, async (req, res) => {
-      const { currentPassword, newPassword } = req.body;
+    // Add fileUrl if provided
+    let finalColumns = [...columns];
+    let finalValues = [...values];
+    if (req.file) {
+      finalColumns.push('src'); // For gallery/etc
+      finalValues.push(`/uploads/${req.file.filename}`);
+    }
 
-      // Validate input
-      if (!currentPassword || !newPassword) {
-        return res.status(400).json({ message: 'Current and new password are required' });
-      }
+    const sql = `INSERT INTO ${tableName} (${finalColumns.join(', ')}) VALUES (${finalColumns.map(() => '?').join(', ')})`;
+    const info = db.prepare(sql).run(...finalValues);
 
-      if (newPassword.length < 8) {
-        return res.status(400).json({ message: 'New password must be at least 8 characters' });
-      }
-
-      // Verify current password
-      const envPassHash = process.env.ADMIN_PASSWORD_HASH;
-      const envPassPlain = process.env.ADMIN_PASSWORD;
-
-      let isCurrentPasswordValid = false;
-
-      if (envPassHash) {
-        try {
-          isCurrentPasswordValid = await bcrypt.compare(currentPassword, envPassHash);
-        } catch (err) {
-          console.error('bcrypt compare error:', err.message);
-        }
-      } else if (envPassPlain) {
-        isCurrentPasswordValid = (currentPassword === envPassPlain);
-      }
-
-      if (!isCurrentPasswordValid) {
-        return res.status(401).json({ message: 'Current password is incorrect' });
-      }
-
-      // Hash the new password and update .env file
-      try {
-        const saltRounds = 12;
-        const newPasswordHash = await bcrypt.hash(newPassword, saltRounds);
-
-        const envPath = path.join(__dirname, '../.env');
-        let envContent = fs.readFileSync(envPath, 'utf8');
-
-        // Replace or add ADMIN_PASSWORD_HASH
-        if (envContent.includes('ADMIN_PASSWORD_HASH=')) {
-          envContent = envContent.replace(
-            /ADMIN_PASSWORD_HASH=.*/,
-            `ADMIN_PASSWORD_HASH=${newPasswordHash}`
-          );
-        } else {
-          envContent += `\nADMIN_PASSWORD_HASH=${newPasswordHash}`;
-        }
-
-        // Remove plain text password if it exists (migration)
-        envContent = envContent.replace(/\nADMIN_PASSWORD=.*/, '');
-        envContent = envContent.replace(/^ADMIN_PASSWORD=.*\n?/m, '');
-
-        fs.writeFileSync(envPath, envContent.trim() + '\n');
-
-        // Update in-memory values
-        process.env.ADMIN_PASSWORD_HASH = newPasswordHash;
-        delete process.env.ADMIN_PASSWORD;
-
-        console.log('Admin password changed and hashed successfully');
-        res.json({ message: 'Password changed successfully. Please login again.' });
-      } catch (err) {
-        console.error('Failed to update password:', err);
-        res.status(500).json({ message: 'Failed to update password' });
-      }
+    // Fetch and return the new item
+    const newItem = db.prepare(`SELECT * FROM ${tableName} WHERE id = ?`).get(info.lastInsertRowid);
+    res.json(newItem);
+  } else if (req.method === 'PUT') {
+    const { id } = req.params;
+    const columns = Object.keys(req.body);
+    const setClause = columns.map(col => `${col} = ?`).join(', ');
+    const values = columns.map(col => {
+      const val = req.body[col];
+      return (typeof val === 'object') ? JSON.stringify(val) : val;
     });
 
-    // Helper for CRUD operations using SQLite
-    const handleSqliteCrud = (tableName, req, res) => {
-      console.log(`${req.method} request for ${tableName}`);
+    if (req.file) {
+      // Need specialized handling for different tables src/pdf/image
+      // For now, let's assume 'src' or 'image' or 'pdf' based on table
+      // Actually, better to explicitly handle these in specific routes or make this helper smarter
+    }
 
-      if (req.method === 'GET') {
-        const items = db.prepare(`SELECT * FROM ${tableName}`).all();
-        res.json(items);
-      } else if (req.method === 'POST') {
-        const columns = Object.keys(req.body);
-        const placeholders = columns.map(() => '?').join(', ');
-        const values = columns.map(col => {
-          const val = req.body[col];
-          return (typeof val === 'object') ? JSON.stringify(val) : val;
-        });
+    const sql = `UPDATE ${tableName} SET ${setClause} WHERE id = ?`;
+    db.prepare(sql).run(...values, id);
 
-        // Add fileUrl if provided
-        let finalColumns = [...columns];
-        let finalValues = [...values];
-        if (req.file) {
-          finalColumns.push('src'); // For gallery/etc
-          finalValues.push(`/uploads/${req.file.filename}`);
-        }
-
-        const sql = `INSERT INTO ${tableName} (${finalColumns.join(', ')}) VALUES (${finalColumns.map(() => '?').join(', ')})`;
-        const info = db.prepare(sql).run(...finalValues);
-
-        // Fetch and return the new item
-        const newItem = db.prepare(`SELECT * FROM ${tableName} WHERE id = ?`).get(info.lastInsertRowid);
-        res.json(newItem);
-      } else if (req.method === 'PUT') {
-        const { id } = req.params;
-        const columns = Object.keys(req.body);
-        const setClause = columns.map(col => `${col} = ?`).join(', ');
-        const values = columns.map(col => {
-          const val = req.body[col];
-          return (typeof val === 'object') ? JSON.stringify(val) : val;
-        });
-
-        if (req.file) {
-          // Need specialized handling for different tables src/pdf/image
-          // For now, let's assume 'src' or 'image' or 'pdf' based on table
-          // Actually, better to explicitly handle these in specific routes or make this helper smarter
-        }
-
-        const sql = `UPDATE ${tableName} SET ${setClause} WHERE id = ?`;
-        db.prepare(sql).run(...values, id);
-
-        const updatedItem = db.prepare(`SELECT * FROM ${tableName} WHERE id = ?`).get(id);
-        res.json(updatedItem);
-      } else if (req.method === 'DELETE') {
-        const { id } = req.params;
-        db.prepare(`DELETE FROM ${tableName} WHERE id = ?`).run(id);
-        res.json({ success: true });
-      }
-    };
+    const updatedItem = db.prepare(`SELECT * FROM ${tableName} WHERE id = ?`).get(id);
+    res.json(updatedItem);
+  } else if (req.method === 'DELETE') {
+    const { id } = req.params;
+    db.prepare(`DELETE FROM ${tableName} WHERE id = ?`).run(id);
+    res.json({ success: true });
+  }
+};
 
 
 
-    // --- SATVIC LIFESTYLE ENGINE ---
-    const { getRecipes } = require('./satvic_engine');
+// --- SATVIC LIFESTYLE ENGINE ---
+const { getRecipes } = require('./satvic_engine');
 
-    // 1. Get Recipes (World Explorer)
-    app.get('/api/satvic/recipes', (req, res) => {
-      try {
-        getRecipes(req, res);
-      } catch (err) {
-        logger.error('Satvic Engine Error:', err);
-        res.status(500).json({ message: 'Failed to load recipes' });
-      }
+// 1. Get Recipes (World Explorer)
+app.get('/api/satvic/recipes', (req, res) => {
+  try {
+    getRecipes(req, res);
+  } catch (err) {
+    logger.error('Satvic Engine Error:', err);
+    res.status(500).json({ message: 'Failed to load recipes' });
+  }
+});
+
+// 2. Submit Pledge
+app.post('/api/satvic/pledge', async (req, res) => {
+  const { name, email, item } = req.body;
+  logger.info(`[Pledge] Submission attempt: name=${name}, email=${email}, item=${item}`);
+
+  if (!name || !item) {
+    logger.warn('[Pledge] Missing required fields');
+    return res.status(400).json({ message: 'Name and pledge item are required.' });
+  }
+
+  try {
+    const info = db.prepare('INSERT INTO pledges (name, email, item, date) VALUES (?, ?, ?, ?)').run(
+      name,
+      email || '',
+      item,
+      new Date().toISOString()
+    );
+
+    logger.info(`[Pledge] Success! ID: ${info.lastInsertRowid}`);
+    res.json({ success: true, id: info.lastInsertRowid, message: 'Pledge recorded successfully!' });
+  } catch (err) {
+    logger.error('[Pledge] Database Error:', err.message);
+    res.status(500).json({ message: `Database error: ${err.message}` });
+  }
+});
+
+// 3. Get Pledge Stats (Social Proof)
+app.get('/api/satvic/stats', (req, res) => {
+  try {
+    const total = db.prepare('SELECT COUNT(*) as count FROM pledges').get().count;
+
+    // Get count for today (local time match)
+    const todayStr = new Date().toISOString().split('T')[0];
+    const today = db.prepare('SELECT COUNT(*) as count FROM pledges WHERE date LIKE ?').get(`${todayStr}%`).count;
+
+    const recent = db.prepare('SELECT name, item FROM pledges ORDER BY id DESC LIMIT 5').all();
+    res.json({ total, today, recent });
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching stats' });
+  }
+});
+
+// Video Review (Alias for prophecies list but focused on transcript editing)
+app.get('/api/videoreview', verifyToken, (req, res) => {
+  const manual = db.prepare('SELECT * FROM prophecies').all();
+  const automated = db.prepare('SELECT * FROM automated_prophecies').all();
+  res.json({ manual, automated });
+});
+
+
+// Prophecies
+app.route('/api/prophecies')
+  .get((req, res) => {
+    const manual = db.prepare('SELECT * FROM prophecies').all();
+    const automated = db.prepare('SELECT * FROM automated_prophecies').all();
+
+    const manualYouTubeIds = new Set();
+    manual.forEach(item => {
+      const yId = getYouTubeId(item.link);
+      if (yId) manualYouTubeIds.add(yId);
     });
 
-    // 2. Submit Pledge
-    app.post('/api/satvic/pledge', async (req, res) => {
-      const { name, email, item } = req.body;
-      logger.info(`[Pledge] Submission attempt: name=${name}, email=${email}, item=${item}`);
+    const filteredAutomated = automated.filter(item => !manualYouTubeIds.has(item.id));
+    res.json({ manual, automated: filteredAutomated });
+  })
+  .post(verifyToken, upload.single('file'), (req, res) => {
+    const { title, link, thumbnail, description, year, type, summary, summaryStatus, transcript, transcriptStatus } = req.body;
+    let finalThumbnail = thumbnail;
+    if (req.file) finalThumbnail = `/uploads/${req.file.filename}`;
 
-      if (!name || !item) {
-        logger.warn('[Pledge] Missing required fields');
-        return res.status(400).json({ message: 'Name and pledge item are required.' });
-      }
-
-      try {
-        const info = db.prepare('INSERT INTO pledges (name, email, item, date) VALUES (?, ?, ?, ?)').run(
-          name,
-          email || '',
-          item,
-          new Date().toISOString()
-        );
-
-        logger.info(`[Pledge] Success! ID: ${info.lastInsertRowid}`);
-        res.json({ success: true, id: info.lastInsertRowid, message: 'Pledge recorded successfully!' });
-      } catch (err) {
-        logger.error('[Pledge] Database Error:', err.message);
-        res.status(500).json({ message: `Database error: ${err.message}` });
-      }
-    });
-
-    // 3. Get Pledge Stats (Social Proof)
-    app.get('/api/satvic/stats', (req, res) => {
-      try {
-        const total = db.prepare('SELECT COUNT(*) as count FROM pledges').get().count;
-
-        // Get count for today (local time match)
-        const todayStr = new Date().toISOString().split('T')[0];
-        const today = db.prepare('SELECT COUNT(*) as count FROM pledges WHERE date LIKE ?').get(`${todayStr}%`).count;
-
-        const recent = db.prepare('SELECT name, item FROM pledges ORDER BY id DESC LIMIT 5').all();
-        res.json({ total, today, recent });
-      } catch (err) {
-        res.status(500).json({ message: 'Error fetching stats' });
-      }
-    });
-
-    // Video Review (Alias for prophecies list but focused on transcript editing)
-    app.get('/api/videoreview', verifyToken, (req, res) => {
-      const manual = db.prepare('SELECT * FROM prophecies').all();
-      const automated = db.prepare('SELECT * FROM automated_prophecies').all();
-      res.json({ manual, automated });
-    });
-
-
-    // Prophecies
-    app.route('/api/prophecies')
-      .get((req, res) => {
-        const manual = db.prepare('SELECT * FROM prophecies').all();
-        const automated = db.prepare('SELECT * FROM automated_prophecies').all();
-
-        const manualYouTubeIds = new Set();
-        manual.forEach(item => {
-          const yId = getYouTubeId(item.link);
-          if (yId) manualYouTubeIds.add(yId);
-        });
-
-        const filteredAutomated = automated.filter(item => !manualYouTubeIds.has(item.id));
-        res.json({ manual, automated: filteredAutomated });
-      })
-      .post(verifyToken, upload.single('file'), (req, res) => {
-        const { title, link, thumbnail, description, year, type, summary, summaryStatus, transcript, transcriptStatus } = req.body;
-        let finalThumbnail = thumbnail;
-        if (req.file) finalThumbnail = `/uploads/${req.file.filename}`;
-
-        const info = db.prepare(`
+    const info = db.prepare(`
       INSERT INTO prophecies (title, link, thumbnail, description, year, type, summary, summaryStatus, transcript, transcriptStatus)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(title, link, finalThumbnail, description, year, type || 'manual', summary, summaryStatus, transcript, transcriptStatus);
 
-        const newItem = db.prepare('SELECT * FROM prophecies WHERE id = ?').get(info.lastInsertRowid);
-        res.json(newItem);
-      });
+    const newItem = db.prepare('SELECT * FROM prophecies WHERE id = ?').get(info.lastInsertRowid);
+    res.json(newItem);
+  });
 
-    app.route('/api/prophecies/:id')
-      .get((req, res) => {
-        const { id } = req.params;
-        let item = db.prepare('SELECT * FROM prophecies WHERE id = ?').get(id);
-        if (!item) {
-          item = db.prepare('SELECT * FROM automated_prophecies WHERE id = ?').get(id);
-        }
-        if (item) res.json(item);
-        else res.status(404).json({ message: 'Prophecy not found' });
-      })
-      .put(verifyToken, upload.single('file'), (req, res) => {
-        const { id } = req.params;
-        const { title, link, thumbnail, description, year, type, summary, summaryStatus, transcript, transcriptStatus } = req.body;
+app.route('/api/prophecies/:id')
+  .get((req, res) => {
+    const { id } = req.params;
+    let item = db.prepare('SELECT * FROM prophecies WHERE id = ?').get(id);
+    if (!item) {
+      item = db.prepare('SELECT * FROM automated_prophecies WHERE id = ?').get(id);
+    }
+    if (item) res.json(item);
+    else res.status(404).json({ message: 'Prophecy not found' });
+  })
+  .put(verifyToken, upload.single('file'), (req, res) => {
+    const { id } = req.params;
+    const { title, link, thumbnail, description, year, type, summary, summaryStatus, transcript, transcriptStatus } = req.body;
 
-        let finalThumbnail = thumbnail;
-        if (req.file) finalThumbnail = `/uploads/${req.file.filename}`;
+    let finalThumbnail = thumbnail;
+    if (req.file) finalThumbnail = `/uploads/${req.file.filename}`;
 
-        db.prepare(`
+    db.prepare(`
       UPDATE prophecies 
       SET title = ?, link = ?, thumbnail = ?, description = ?, year = ?, type = ?, summary = ?, summaryStatus = ?, transcript = ?, transcriptStatus = ?
       WHERE id = ?
     `).run(title, link, finalThumbnail, description, year, type, summary, summaryStatus, transcript, transcriptStatus, id);
 
-        const updatedItem = db.prepare('SELECT * FROM prophecies WHERE id = ?').get(id);
-        res.json(updatedItem);
-      })
-      .delete(verifyToken, (req, res) => {
-        db.prepare('DELETE FROM prophecies WHERE id = ?').run(req.params.id);
-        res.json({ success: true });
-      });
-
-
-    // Prophecy Highlight (Multiple Text Cards)
-    app.route('/api/prophecy-highlight')
-      .get((req, res) => {
-        const data = db.prepare('SELECT * FROM highlights ORDER BY id DESC').all();
-        res.json(data);
-      })
-      .post(verifyToken, (req, res) => {
-        const { title, year, content } = req.body;
-        const info = db.prepare('INSERT INTO highlights (title, year, content) VALUES (?, ?, ?)').run(title, year || new Date().getFullYear().toString(), content);
-        const newItem = db.prepare('SELECT * FROM highlights WHERE id = ?').get(info.lastInsertRowid);
-        res.json(newItem);
-      });
-
-    app.route('/api/prophecy-highlight/:id')
-      .put(verifyToken, (req, res) => {
-        const { title, year, content } = req.body;
-        db.prepare('UPDATE highlights SET title = ?, year = ?, content = ? WHERE id = ?').run(title, year, content, req.params.id);
-        const updated = db.prepare('SELECT * FROM highlights WHERE id = ?').get(req.params.id);
-        res.json(updated);
-      })
-      .delete(verifyToken, (req, res) => {
-        db.prepare('DELETE FROM highlights WHERE id = ?').run(req.params.id);
-        res.json({ success: true });
-      });
-
-
-
-    // Unified Video Routes (for Transcripts across both types)
-    app.post('/api/videos/:id/transcript', verifyToken, async (req, res) => {
-      const { id } = req.params;
-      try {
-        // 1. Try Automated First
-        const autoItem = db.prepare('SELECT * FROM automated_prophecies WHERE id = ?').get(id);
-        if (autoItem) {
-          const text = await fetchTranscriptText(id);
-          db.prepare('UPDATE automated_prophecies SET transcript = ?, transcriptStatus = ? WHERE id = ?')
-            .run(text, 'Draft', id);
-          return res.json({ ...autoItem, transcript: text, transcriptStatus: 'Draft' });
-        }
-
-        // 2. Try Manual
-        const manualItem = db.prepare('SELECT * FROM prophecies WHERE id = ?').get(id);
-        if (manualItem) {
-          const youtubeId = getYouTubeId(manualItem.link);
-          if (!youtubeId) return res.status(400).json({ message: 'Invalid YouTube URL' });
-          const text = await fetchTranscriptText(youtubeId);
-          db.prepare('UPDATE prophecies SET transcript = ?, transcriptStatus = ? WHERE id = ?')
-            .run(text, 'Draft', id);
-          return res.json({ ...manualItem, transcript: text, transcriptStatus: 'Draft' });
-        }
-
-        res.status(404).json({ message: 'Video not found' });
-      } catch (error) {
-        console.error(`Transcript endpoint error:`, error.message);
-        res.status(500).json({ message: `Failed: ${error.message}` });
-      }
-    });
-
-    app.put('/api/videos/:id', verifyToken, (req, res) => {
-      const { id } = req.params;
-      const { transcript, transcriptStatus } = req.body;
-
-      let table = null;
-      const isAuto = db.prepare('SELECT id FROM automated_prophecies WHERE id = ?').get(id);
-      if (isAuto) table = 'automated_prophecies';
-      else {
-        const isManual = db.prepare('SELECT id FROM prophecies WHERE id = ?').get(id);
-        if (isManual) table = 'prophecies';
-      }
-
-      if (!table) return res.status(404).json({ message: 'Video not found' });
-
-      // Build dynamic SQL for partial update
-      let updates = [];
-      let params = [];
-
-      if (transcript !== undefined) {
-        updates.push('transcript = ?');
-        params.push(transcript);
-      }
-      if (transcriptStatus !== undefined) {
-        updates.push('transcriptStatus = ?');
-        params.push(transcriptStatus);
-      }
-
-      if (updates.length > 0) {
-        const sql = `UPDATE ${table} SET ${updates.join(', ')} WHERE id = ?`;
-        params.push(id);
-        db.prepare(sql).run(...params);
-      }
-
-      res.json({ success: true });
-    });
-
-
-    // Announcements
-    app.route('/api/announcements')
-      .get((req, res) => {
-        const items = db.prepare('SELECT * FROM announcements').all();
-        res.json(items);
-      })
-      .post(verifyToken, upload.single('file'), (req, res) => {
-        const { title, description, year } = req.body;
-        const fileUrl = req.file ? `/uploads/${req.file.filename}` : null;
-        const info = db.prepare('INSERT INTO announcements (title, description, year, fileUrl) VALUES (?, ?, ?, ?)').run(title, description, year, fileUrl);
-        res.json(db.prepare('SELECT * FROM announcements WHERE id = ?').get(info.lastInsertRowid));
-      });
-    app.route('/api/announcements/:id')
-      .get((req, res) => {
-        const item = db.prepare('SELECT * FROM announcements WHERE id = ?').get(req.params.id);
-        if (item) res.json(item);
-        else res.status(404).json({ message: 'Announcement not found' });
-      })
-      .put(verifyToken, upload.single('file'), (req, res) => {
-        const { id } = req.params;
-        const { title, description, year } = req.body;
-
-        let sql = 'UPDATE announcements SET title = ?, description = ?, year = ?';
-        let params = [title, description, year];
-
-        if (req.file) {
-          sql += ', fileUrl = ?';
-          params.push(`/uploads/${req.file.filename}`);
-        }
-
-        sql += ' WHERE id = ?';
-        params.push(id);
-
-        db.prepare(sql).run(...params);
-        res.json(db.prepare('SELECT * FROM announcements WHERE id = ?').get(id));
-      })
-      .delete(verifyToken, (req, res) => {
-        db.prepare('DELETE FROM announcements WHERE id = ?').run(req.params.id);
-        res.json({ success: true });
-      });
-
-    // YouTube Feed
-    app.get('/api/youtube', (req, res) => {
-      try {
-        const allVideos = db.prepare('SELECT * FROM automated_prophecies ORDER BY published DESC LIMIT 50').all();
-
-        // Split into shorts and full videos based on type or title
-        const shorts = allVideos.filter(v => v.type === 'short' || v.title.toLowerCase().includes('#shorts'));
-        const full = allVideos.filter(v => v.type !== 'short' && !v.title.toLowerCase().includes('#shorts'));
-
-        res.json({ shorts, full });
-      } catch (err) {
-        console.error('Error fetching YouTube feed:', err);
-        res.status(500).json({ error: 'Failed to fetch YouTube feed' });
-      }
-    });
-
-    // Gallery
-    app.route('/api/gallery')
-      .get((req, res) => {
-        res.json(db.prepare('SELECT * FROM gallery').all());
-      })
-      .post(verifyToken, upload.single('image'), (req, res) => {
-        const { alt } = req.body;
-        const src = `/uploads/${req.file.filename}`;
-        const info = db.prepare('INSERT INTO gallery (alt, src) VALUES (?, ?)').run(alt, src);
-        res.json(db.prepare('SELECT * FROM gallery WHERE id = ?').get(info.lastInsertRowid));
-      });
-    app.route('/api/gallery/:id')
-      .put(verifyToken, upload.single('image'), (req, res) => {
-        const { id } = req.params;
-        const { alt } = req.body;
-        let sql = 'UPDATE gallery SET alt = ? WHERE id = ?';
-        let params = [alt, id];
-        if (req.file) {
-          sql = 'UPDATE gallery SET alt = ?, src = ? WHERE id = ?';
-          params = [alt, `/uploads/${req.file.filename}`, id];
-        }
-        db.prepare(sql).run(...params);
-        res.json(db.prepare('SELECT * FROM gallery WHERE id = ?').get(id));
-      })
-      .delete(verifyToken, (req, res) => {
-        db.prepare('DELETE FROM gallery WHERE id = ?').run(req.params.id);
-        res.json({ success: true });
-      });
-
-    // Literature
-    app.route('/api/literature')
-      .get((req, res) => {
-        const data = db.prepare('SELECT * FROM literature').all().map(item => {
-          try { item.type = JSON.parse(item.type); } catch (e) { }
-          return item;
-        });
-        res.json(data);
-      })
-      .post(verifyToken, upload.fields([{ name: 'image', maxCount: 1 }, { name: 'pdf', maxCount: 1 }]), (req, res) => {
-        const { title, author, description, type } = req.body;
-        const image = req.files['image'] ? `/uploads/${req.files['image'][0].filename}` : null;
-        const pdf = req.files['pdf'] ? `/uploads/${req.files['pdf'][0].filename}` : null;
-        const info = db.prepare('INSERT INTO literature (title, author, description, image, pdf, type) VALUES (?, ?, ?, ?, ?, ?)').run(title, author, description, image, pdf, type);
-        res.json(db.prepare('SELECT * FROM literature WHERE id = ?').get(info.lastInsertRowid));
-      });
-    app.route('/api/literature/:id')
-      .put(verifyToken, upload.fields([{ name: 'image', maxCount: 1 }, { name: 'pdf', maxCount: 1 }]), (req, res) => {
-        const { id } = req.params;
-        const { title, author, description, type } = req.body;
-
-        let sql = 'UPDATE literature SET title = ?, author = ?, description = ?, type = ?';
-        let params = [title, author, description, type];
-
-        if (req.files['image']) {
-          sql += ', image = ?';
-          params.push(`/uploads/${req.files['image'][0].filename}`);
-        }
-        if (req.files['pdf']) {
-          sql += ', pdf = ?';
-          params.push(`/uploads/${req.files['pdf'][0].filename}`);
-        }
-
-        sql += ' WHERE id = ?';
-        params.push(id);
-
-        db.prepare(sql).run(...params);
-        res.json(db.prepare('SELECT * FROM literature WHERE id = ?').get(id));
-      })
-      .delete(verifyToken, (req, res) => {
-        db.prepare('DELETE FROM literature WHERE id = ?').run(req.params.id);
-        res.json({ success: true });
-      });
-
-    // Prarthana
-    app.route('/api/prarthana')
-      .get((req, res) => res.json(db.prepare('SELECT * FROM prarthana').all()))
-      .post(verifyToken, (req, res) => {
-        console.log('POST /api/prarthana', req.body);
-        const { title, content, description } = req.body;
-        const info = db.prepare('INSERT INTO prarthana (title, content, description) VALUES (?, ?, ?)').run(title, content, description);
-        res.json(db.prepare('SELECT * FROM prarthana WHERE id = ?').get(info.lastInsertRowid));
-      });
-    app.route('/api/prarthana/:id')
-      .put(verifyToken, (req, res) => {
-        const { id } = req.params;
-        console.log(`PUT /api/prarthana/${id}`, req.body);
-        const { title, content, description } = req.body;
-        db.prepare('UPDATE prarthana SET title = ?, content = ?, description = ? WHERE id = ?')
-          .run(title, content, description, id);
-        res.json(db.prepare('SELECT * FROM prarthana WHERE id = ?').get(id));
-      })
-      .delete(verifyToken, (req, res) => {
-        db.prepare('DELETE FROM prarthana WHERE id = ?').run(req.params.id);
-        res.json({ success: true });
-      });
-
-    // Profiles
-    app.get('/api/profiles', (req, res) => res.json(db.prepare('SELECT * FROM profiles').all()));
-    app.post('/api/profiles', verifyToken, upload.single('image'), (req, res) => {
-      const { id, title, description } = req.body;
-      let image = null;
-      if (req.file) image = `/uploads/${req.file.filename}`;
-
-      db.prepare('INSERT OR REPLACE INTO profiles (id, title, description, image) VALUES (?, ?, ?, COALESCE(?, (SELECT image FROM profiles WHERE id = ?)))')
-        .run(id, title, description, image, id);
-
-      res.json(db.prepare('SELECT * FROM profiles WHERE id = ?').get(id));
-    });
-
-    app.route('/api/profiles/:id')
-      .put(verifyToken, upload.single('image'), (req, res) => {
-        const { id } = req.params;
-        const { title, description } = req.body;
-        let image = null;
-        if (req.file) image = `/uploads/${req.file.filename}`;
-
-        let sql = 'UPDATE profiles SET title = ?, description = ?';
-        let params = [title, description];
-
-        if (image) {
-          sql += ', image = ?';
-          params.push(image);
-        }
-
-        sql += ' WHERE id = ?';
-        params.push(id);
-
-        db.prepare(sql).run(...params);
-        res.json(db.prepare('SELECT * FROM profiles WHERE id = ?').get(id));
-      });
-
-    // Downloads
-    app.route('/api/downloads')
-      .get((req, res) => res.json(db.prepare('SELECT * FROM downloads').all()))
-      .post(verifyToken, upload.fields([{ name: 'pdfFile', maxCount: 1 }, { name: 'cdrFile', maxCount: 1 }]), (req, res) => {
-        const { title, description, type, location, year } = req.body;
-        const pdf = req.files['pdfFile'] ? `/uploads/${req.files['pdfFile'][0].filename}` : null;
-        const cdrFile = req.files['cdrFile'] ? `/uploads/${req.files['cdrFile'][0].filename}` : null;
-        const info = db.prepare('INSERT INTO downloads (title, description, pdf, cdrFile, type, location, year) VALUES (?, ?, ?, ?, ?, ?, ?)').run(title, description, pdf, cdrFile, type, location, year);
-        res.json(db.prepare('SELECT * FROM downloads WHERE id = ?').get(info.lastInsertRowid));
-      });
-    app.route('/api/downloads/:id')
-      .put(verifyToken, upload.fields([{ name: 'pdfFile', maxCount: 1 }, { name: 'cdrFile', maxCount: 1 }]), (req, res) => {
-        const { id } = req.params;
-        const { title, description, type, location, year } = req.body;
-
-        let sql = 'UPDATE downloads SET title = ?, description = ?, type = ?, location = ?, year = ?';
-        let params = [title, description, type, location, year];
-
-        if (req.files['pdfFile']) {
-          sql += ', pdf = ?';
-          params.push(`/uploads/${req.files['pdfFile'][0].filename}`);
-        }
-        if (req.files['cdrFile']) {
-          sql += ', cdrFile = ?';
-          params.push(`/uploads/${req.files['cdrFile'][0].filename}`);
-        }
-
-        sql += ' WHERE id = ?';
-        params.push(id);
-
-        db.prepare(sql).run(...params);
-        res.json(db.prepare('SELECT * FROM downloads WHERE id = ?').get(id));
-      })
-      .delete(verifyToken, (req, res) => {
-        db.prepare('DELETE FROM downloads WHERE id = ?').run(req.params.id);
-        res.json({ success: true });
-      });
-
-
-    // Newsletter Subscription
-    app.post('/api/newsletter/subscribe', async (req, res) => {
-      const { email } = req.body;
-
-      if (!email || !email.includes('@')) {
-        return res.status(400).json({ message: 'Invalid email address' });
-      }
-
-      try {
-        // 1. Save to Database
-        const info = db.prepare('INSERT INTO newsletter_subscribers (email, subscribed_at) VALUES (?, ?)').run(
-          email,
-          new Date().toISOString()
-        );
-
-        // 2. Send Welcome Email (Simulated OTP/Notification style)
-        const subject = 'Welcome to the Jai Gurudev Community! 🙏';
-
-        // Read the email template from file
-        const templatePath = path.join(__dirname, 'templates', 'welcome_email.html');
-        let html = '';
-
-        try {
-          html = fs.readFileSync(templatePath, 'utf8');
-        } catch (readErr) {
-          console.error('Error reading email template:', readErr);
-          // Fallback if file is missing
-          html = '<p>Thank you for subscribing to Jai Gurudev Newsletter.</p>';
-        }
-
-        // Uses the "Waterfall" logic: Brevo -> SendGrid -> Gmail
-        await emailService.sendEmail(email, subject, html);
-
-        res.json({ success: true, message: 'Subscribed successfully!' });
-      } catch (err) {
-        if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
-          return res.status(409).json({ message: 'This email is already subscribed.' });
-        }
-        console.error('Newsletter Error:', err);
-        res.status(500).json({ message: 'Failed to subscribe.' });
-      }
-    });
-
-    // Newsletter Subscription
-    app.get('/api/newsletter/subscribers', verifyToken, (req, res) => {
-      try {
-        const subscribers = db.prepare('SELECT * FROM newsletter_subscribers ORDER BY subscribed_at DESC').all();
-        const count = subscribers.length;
-        res.json({ count, subscribers });
-      } catch (err) {
-        console.error('Error fetching subscribers:', err);
-        res.status(500).json({ message: 'Failed to fetch subscribers' });
-      }
-    });
-
-    app.post('/api/newsletter/broadcast', verifyToken, async (req, res) => {
-      const { subject, message } = req.body;
-
-      if (!subject || !message) {
-        return res.status(400).json({ message: 'Subject and message are required' });
-      }
-
-      try {
-        // 1. Fetch all subscribers
-        const subscribers = db.prepare('SELECT email FROM newsletter_subscribers').all();
-
-        if (subscribers.length === 0) {
-          return res.status(400).json({ message: 'No subscribers found.' });
-        }
-
-        // 2. Read Broadcast Template
-        const templatePath = path.join(__dirname, 'templates', 'broadcast_email.html');
-        let templateHtml = '';
-
-        try {
-          templateHtml = fs.readFileSync(templatePath, 'utf8');
-        } catch (readErr) {
-          console.error('Error reading broadcast template:', readErr);
-          return res.status(500).json({ message: 'Broadcast template missing.' });
-        }
-
-        // 3. Prepare Email Content
-        // Replace newlines with <br> for HTML email
-        const formattedMessage = message.replace(/\n/g, '<br>');
-        const htmlInfo = templateHtml
-          .replaceAll('{{subject}}', subject)
-          .replaceAll('{{message}}', formattedMessage);
-
-        // 4. Send Emails (Iterate)
-        // In production, use a bulk sending API or queue. For now, we loop.
-        let successCount = 0;
-        for (const sub of subscribers) {
-          const sent = await emailService.sendEmail(sub.email, subject, htmlInfo);
-          if (sent) successCount++;
-        }
-
-        res.json({
-          success: true,
-          message: `Broadcast sent to ${successCount} out of ${subscribers.length} subscribers.`
-        });
-
-      } catch (err) {
-        console.error('Broadcast Error:', err);
-        res.status(500).json({ message: 'Failed to send broadcast.' });
-      }
-    });
-
-    // Production Serve
-    if (isProduction) {
-      app.use(express.static(path.join(__dirname, '../build')));
-      app.get('*', (req, res) => res.sendFile(path.join(__dirname, '../build', 'index.html')));
+    const updatedItem = db.prepare('SELECT * FROM prophecies WHERE id = ?').get(id);
+    res.json(updatedItem);
+  })
+  .delete(verifyToken, (req, res) => {
+    db.prepare('DELETE FROM prophecies WHERE id = ?').run(req.params.id);
+    res.json({ success: true });
+  });
+
+
+// Prophecy Highlight (Multiple Text Cards)
+app.route('/api/prophecy-highlight')
+  .get((req, res) => {
+    const data = db.prepare('SELECT * FROM highlights ORDER BY id DESC').all();
+    res.json(data);
+  })
+  .post(verifyToken, (req, res) => {
+    const { title, year, content } = req.body;
+    const info = db.prepare('INSERT INTO highlights (title, year, content) VALUES (?, ?, ?)').run(title, year || new Date().getFullYear().toString(), content);
+    const newItem = db.prepare('SELECT * FROM highlights WHERE id = ?').get(info.lastInsertRowid);
+    res.json(newItem);
+  });
+
+app.route('/api/prophecy-highlight/:id')
+  .put(verifyToken, (req, res) => {
+    const { title, year, content } = req.body;
+    db.prepare('UPDATE highlights SET title = ?, year = ?, content = ? WHERE id = ?').run(title, year, content, req.params.id);
+    const updated = db.prepare('SELECT * FROM highlights WHERE id = ?').get(req.params.id);
+    res.json(updated);
+  })
+  .delete(verifyToken, (req, res) => {
+    db.prepare('DELETE FROM highlights WHERE id = ?').run(req.params.id);
+    res.json({ success: true });
+  });
+
+
+
+// Unified Video Routes (for Transcripts across both types)
+app.post('/api/videos/:id/transcript', verifyToken, async (req, res) => {
+  const { id } = req.params;
+  try {
+    // 1. Try Automated First
+    const autoItem = db.prepare('SELECT * FROM automated_prophecies WHERE id = ?').get(id);
+    if (autoItem) {
+      const text = await fetchTranscriptText(id);
+      db.prepare('UPDATE automated_prophecies SET transcript = ?, transcriptStatus = ? WHERE id = ?')
+        .run(text, 'Draft', id);
+      return res.json({ ...autoItem, transcript: text, transcriptStatus: 'Draft' });
     }
 
-    // Global Error Handler
-    app.use((err, req, res, next) => {
-      logger.error('Unhandled error:', err.message);
-      res.status(500).json({ message: 'Internal server error' });
+    // 2. Try Manual
+    const manualItem = db.prepare('SELECT * FROM prophecies WHERE id = ?').get(id);
+    if (manualItem) {
+      const youtubeId = getYouTubeId(manualItem.link);
+      if (!youtubeId) return res.status(400).json({ message: 'Invalid YouTube URL' });
+      const text = await fetchTranscriptText(youtubeId);
+      db.prepare('UPDATE prophecies SET transcript = ?, transcriptStatus = ? WHERE id = ?')
+        .run(text, 'Draft', id);
+      return res.json({ ...manualItem, transcript: text, transcriptStatus: 'Draft' });
+    }
+
+    res.status(404).json({ message: 'Video not found' });
+  } catch (error) {
+    console.error(`Transcript endpoint error:`, error.message);
+    res.status(500).json({ message: `Failed: ${error.message}` });
+  }
+});
+
+app.put('/api/videos/:id', verifyToken, (req, res) => {
+  const { id } = req.params;
+  const { transcript, transcriptStatus } = req.body;
+
+  let table = null;
+  const isAuto = db.prepare('SELECT id FROM automated_prophecies WHERE id = ?').get(id);
+  if (isAuto) table = 'automated_prophecies';
+  else {
+    const isManual = db.prepare('SELECT id FROM prophecies WHERE id = ?').get(id);
+    if (isManual) table = 'prophecies';
+  }
+
+  if (!table) return res.status(404).json({ message: 'Video not found' });
+
+  // Build dynamic SQL for partial update
+  let updates = [];
+  let params = [];
+
+  if (transcript !== undefined) {
+    updates.push('transcript = ?');
+    params.push(transcript);
+  }
+  if (transcriptStatus !== undefined) {
+    updates.push('transcriptStatus = ?');
+    params.push(transcriptStatus);
+  }
+
+  if (updates.length > 0) {
+    const sql = `UPDATE ${table} SET ${updates.join(', ')} WHERE id = ?`;
+    params.push(id);
+    db.prepare(sql).run(...params);
+  }
+
+  res.json({ success: true });
+});
+
+
+// Announcements
+app.route('/api/announcements')
+  .get((req, res) => {
+    const items = db.prepare('SELECT * FROM announcements').all();
+    res.json(items);
+  })
+  .post(verifyToken, upload.single('file'), (req, res) => {
+    const { title, description, year } = req.body;
+    const fileUrl = req.file ? `/uploads/${req.file.filename}` : null;
+    const info = db.prepare('INSERT INTO announcements (title, description, year, fileUrl) VALUES (?, ?, ?, ?)').run(title, description, year, fileUrl);
+    res.json(db.prepare('SELECT * FROM announcements WHERE id = ?').get(info.lastInsertRowid));
+  });
+app.route('/api/announcements/:id')
+  .get((req, res) => {
+    const item = db.prepare('SELECT * FROM announcements WHERE id = ?').get(req.params.id);
+    if (item) res.json(item);
+    else res.status(404).json({ message: 'Announcement not found' });
+  })
+  .put(verifyToken, upload.single('file'), (req, res) => {
+    const { id } = req.params;
+    const { title, description, year } = req.body;
+
+    let sql = 'UPDATE announcements SET title = ?, description = ?, year = ?';
+    let params = [title, description, year];
+
+    if (req.file) {
+      sql += ', fileUrl = ?';
+      params.push(`/uploads/${req.file.filename}`);
+    }
+
+    sql += ' WHERE id = ?';
+    params.push(id);
+
+    db.prepare(sql).run(...params);
+    res.json(db.prepare('SELECT * FROM announcements WHERE id = ?').get(id));
+  })
+  .delete(verifyToken, (req, res) => {
+    db.prepare('DELETE FROM announcements WHERE id = ?').run(req.params.id);
+    res.json({ success: true });
+  });
+
+// YouTube Feed
+app.get('/api/youtube', (req, res) => {
+  try {
+    const allVideos = db.prepare('SELECT * FROM automated_prophecies ORDER BY published DESC LIMIT 50').all();
+
+    // Split into shorts and full videos based on type or title
+    const shorts = allVideos.filter(v => v.type === 'short' || v.title.toLowerCase().includes('#shorts'));
+    const full = allVideos.filter(v => v.type !== 'short' && !v.title.toLowerCase().includes('#shorts'));
+
+    res.json({ shorts, full });
+  } catch (err) {
+    console.error('Error fetching YouTube feed:', err);
+    res.status(500).json({ error: 'Failed to fetch YouTube feed' });
+  }
+});
+
+// Gallery
+app.route('/api/gallery')
+  .get((req, res) => {
+    res.json(db.prepare('SELECT * FROM gallery').all());
+  })
+  .post(verifyToken, upload.single('image'), (req, res) => {
+    const { alt } = req.body;
+    const src = `/uploads/${req.file.filename}`;
+    const info = db.prepare('INSERT INTO gallery (alt, src) VALUES (?, ?)').run(alt, src);
+    res.json(db.prepare('SELECT * FROM gallery WHERE id = ?').get(info.lastInsertRowid));
+  });
+app.route('/api/gallery/:id')
+  .put(verifyToken, upload.single('image'), (req, res) => {
+    const { id } = req.params;
+    const { alt } = req.body;
+    let sql = 'UPDATE gallery SET alt = ? WHERE id = ?';
+    let params = [alt, id];
+    if (req.file) {
+      sql = 'UPDATE gallery SET alt = ?, src = ? WHERE id = ?';
+      params = [alt, `/uploads/${req.file.filename}`, id];
+    }
+    db.prepare(sql).run(...params);
+    res.json(db.prepare('SELECT * FROM gallery WHERE id = ?').get(id));
+  })
+  .delete(verifyToken, (req, res) => {
+    db.prepare('DELETE FROM gallery WHERE id = ?').run(req.params.id);
+    res.json({ success: true });
+  });
+
+// Literature
+app.route('/api/literature')
+  .get((req, res) => {
+    const data = db.prepare('SELECT * FROM literature').all().map(item => {
+      try { item.type = JSON.parse(item.type); } catch (e) { }
+      return item;
+    });
+    res.json(data);
+  })
+  .post(verifyToken, upload.fields([{ name: 'image', maxCount: 1 }, { name: 'pdf', maxCount: 1 }]), (req, res) => {
+    const { title, author, description, type } = req.body;
+    const image = req.files['image'] ? `/uploads/${req.files['image'][0].filename}` : null;
+    const pdf = req.files['pdf'] ? `/uploads/${req.files['pdf'][0].filename}` : null;
+    const info = db.prepare('INSERT INTO literature (title, author, description, image, pdf, type) VALUES (?, ?, ?, ?, ?, ?)').run(title, author, description, image, pdf, type);
+    res.json(db.prepare('SELECT * FROM literature WHERE id = ?').get(info.lastInsertRowid));
+  });
+app.route('/api/literature/:id')
+  .put(verifyToken, upload.fields([{ name: 'image', maxCount: 1 }, { name: 'pdf', maxCount: 1 }]), (req, res) => {
+    const { id } = req.params;
+    const { title, author, description, type } = req.body;
+
+    let sql = 'UPDATE literature SET title = ?, author = ?, description = ?, type = ?';
+    let params = [title, author, description, type];
+
+    if (req.files['image']) {
+      sql += ', image = ?';
+      params.push(`/uploads/${req.files['image'][0].filename}`);
+    }
+    if (req.files['pdf']) {
+      sql += ', pdf = ?';
+      params.push(`/uploads/${req.files['pdf'][0].filename}`);
+    }
+
+    sql += ' WHERE id = ?';
+    params.push(id);
+
+    db.prepare(sql).run(...params);
+    res.json(db.prepare('SELECT * FROM literature WHERE id = ?').get(id));
+  })
+  .delete(verifyToken, (req, res) => {
+    db.prepare('DELETE FROM literature WHERE id = ?').run(req.params.id);
+    res.json({ success: true });
+  });
+
+// Prarthana
+app.route('/api/prarthana')
+  .get((req, res) => res.json(db.prepare('SELECT * FROM prarthana').all()))
+  .post(verifyToken, (req, res) => {
+    console.log('POST /api/prarthana', req.body);
+    const { title, content, description } = req.body;
+    const info = db.prepare('INSERT INTO prarthana (title, content, description) VALUES (?, ?, ?)').run(title, content, description);
+    res.json(db.prepare('SELECT * FROM prarthana WHERE id = ?').get(info.lastInsertRowid));
+  });
+app.route('/api/prarthana/:id')
+  .put(verifyToken, (req, res) => {
+    const { id } = req.params;
+    console.log(`PUT /api/prarthana/${id}`, req.body);
+    const { title, content, description } = req.body;
+    db.prepare('UPDATE prarthana SET title = ?, content = ?, description = ? WHERE id = ?')
+      .run(title, content, description, id);
+    res.json(db.prepare('SELECT * FROM prarthana WHERE id = ?').get(id));
+  })
+  .delete(verifyToken, (req, res) => {
+    db.prepare('DELETE FROM prarthana WHERE id = ?').run(req.params.id);
+    res.json({ success: true });
+  });
+
+// Profiles
+app.get('/api/profiles', (req, res) => res.json(db.prepare('SELECT * FROM profiles').all()));
+app.post('/api/profiles', verifyToken, upload.single('image'), (req, res) => {
+  const { id, title, description } = req.body;
+  let image = null;
+  if (req.file) image = `/uploads/${req.file.filename}`;
+
+  db.prepare('INSERT OR REPLACE INTO profiles (id, title, description, image) VALUES (?, ?, ?, COALESCE(?, (SELECT image FROM profiles WHERE id = ?)))')
+    .run(id, title, description, image, id);
+
+  res.json(db.prepare('SELECT * FROM profiles WHERE id = ?').get(id));
+});
+
+app.route('/api/profiles/:id')
+  .put(verifyToken, upload.single('image'), (req, res) => {
+    const { id } = req.params;
+    const { title, description } = req.body;
+    let image = null;
+    if (req.file) image = `/uploads/${req.file.filename}`;
+
+    let sql = 'UPDATE profiles SET title = ?, description = ?';
+    let params = [title, description];
+
+    if (image) {
+      sql += ', image = ?';
+      params.push(image);
+    }
+
+    sql += ' WHERE id = ?';
+    params.push(id);
+
+    db.prepare(sql).run(...params);
+    res.json(db.prepare('SELECT * FROM profiles WHERE id = ?').get(id));
+  });
+
+// Downloads
+app.route('/api/downloads')
+  .get((req, res) => res.json(db.prepare('SELECT * FROM downloads').all()))
+  .post(verifyToken, upload.fields([{ name: 'pdfFile', maxCount: 1 }, { name: 'cdrFile', maxCount: 1 }]), (req, res) => {
+    const { title, description, type, location, year } = req.body;
+    const pdf = req.files['pdfFile'] ? `/uploads/${req.files['pdfFile'][0].filename}` : null;
+    const cdrFile = req.files['cdrFile'] ? `/uploads/${req.files['cdrFile'][0].filename}` : null;
+    const info = db.prepare('INSERT INTO downloads (title, description, pdf, cdrFile, type, location, year) VALUES (?, ?, ?, ?, ?, ?, ?)').run(title, description, pdf, cdrFile, type, location, year);
+    res.json(db.prepare('SELECT * FROM downloads WHERE id = ?').get(info.lastInsertRowid));
+  });
+app.route('/api/downloads/:id')
+  .put(verifyToken, upload.fields([{ name: 'pdfFile', maxCount: 1 }, { name: 'cdrFile', maxCount: 1 }]), (req, res) => {
+    const { id } = req.params;
+    const { title, description, type, location, year } = req.body;
+
+    let sql = 'UPDATE downloads SET title = ?, description = ?, type = ?, location = ?, year = ?';
+    let params = [title, description, type, location, year];
+
+    if (req.files['pdfFile']) {
+      sql += ', pdf = ?';
+      params.push(`/uploads/${req.files['pdfFile'][0].filename}`);
+    }
+    if (req.files['cdrFile']) {
+      sql += ', cdrFile = ?';
+      params.push(`/uploads/${req.files['cdrFile'][0].filename}`);
+    }
+
+    sql += ' WHERE id = ?';
+    params.push(id);
+
+    db.prepare(sql).run(...params);
+    res.json(db.prepare('SELECT * FROM downloads WHERE id = ?').get(id));
+  })
+  .delete(verifyToken, (req, res) => {
+    db.prepare('DELETE FROM downloads WHERE id = ?').run(req.params.id);
+    res.json({ success: true });
+  });
+
+
+// Newsletter Subscription
+app.post('/api/newsletter/subscribe', async (req, res) => {
+  const { email } = req.body;
+
+  if (!email || !email.includes('@')) {
+    return res.status(400).json({ message: 'Invalid email address' });
+  }
+
+  try {
+    // 1. Save to Database
+    const info = db.prepare('INSERT INTO newsletter_subscribers (email, subscribed_at) VALUES (?, ?)').run(
+      email,
+      new Date().toISOString()
+    );
+
+    // 2. Send Welcome Email (Simulated OTP/Notification style)
+    const subject = 'Welcome to the Jai Gurudev Community! 🙏';
+
+    // Read the email template from file
+    const templatePath = path.join(__dirname, 'templates', 'welcome_email.html');
+    let html = '';
+
+    try {
+      html = fs.readFileSync(templatePath, 'utf8');
+    } catch (readErr) {
+      console.error('Error reading email template:', readErr);
+      // Fallback if file is missing
+      html = '<p>Thank you for subscribing to Jai Gurudev Newsletter.</p>';
+    }
+
+    // Uses the "Waterfall" logic: Brevo -> SendGrid -> Gmail
+    await emailService.sendEmail(email, subject, html);
+
+    res.json({ success: true, message: 'Subscribed successfully!' });
+  } catch (err) {
+    if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+      return res.status(409).json({ message: 'This email is already subscribed.' });
+    }
+    console.error('Newsletter Error:', err);
+    res.status(500).json({ message: 'Failed to subscribe.' });
+  }
+});
+
+// Newsletter Subscription
+app.get('/api/newsletter/subscribers', verifyToken, (req, res) => {
+  try {
+    const subscribers = db.prepare('SELECT * FROM newsletter_subscribers ORDER BY subscribed_at DESC').all();
+    const count = subscribers.length;
+    res.json({ count, subscribers });
+  } catch (err) {
+    console.error('Error fetching subscribers:', err);
+    res.status(500).json({ message: 'Failed to fetch subscribers' });
+  }
+});
+
+app.post('/api/newsletter/broadcast', verifyToken, async (req, res) => {
+  const { subject, message } = req.body;
+
+  if (!subject || !message) {
+    return res.status(400).json({ message: 'Subject and message are required' });
+  }
+
+  try {
+    // 1. Fetch all subscribers
+    const subscribers = db.prepare('SELECT email FROM newsletter_subscribers').all();
+
+    if (subscribers.length === 0) {
+      return res.status(400).json({ message: 'No subscribers found.' });
+    }
+
+    // 2. Read Broadcast Template
+    const templatePath = path.join(__dirname, 'templates', 'broadcast_email.html');
+    let templateHtml = '';
+
+    try {
+      templateHtml = fs.readFileSync(templatePath, 'utf8');
+    } catch (readErr) {
+      console.error('Error reading broadcast template:', readErr);
+      return res.status(500).json({ message: 'Broadcast template missing.' });
+    }
+
+    // 3. Prepare Email Content
+    // Replace newlines with <br> for HTML email
+    const formattedMessage = message.replace(/\n/g, '<br>');
+    const htmlInfo = templateHtml
+      .replaceAll('{{subject}}', subject)
+      .replaceAll('{{message}}', formattedMessage);
+
+    // 4. Send Emails (Iterate)
+    // In production, use a bulk sending API or queue. For now, we loop.
+    let successCount = 0;
+    for (const sub of subscribers) {
+      const sent = await emailService.sendEmail(sub.email, subject, htmlInfo);
+      if (sent) successCount++;
+    }
+
+    res.json({
+      success: true,
+      message: `Broadcast sent to ${successCount} out of ${subscribers.length} subscribers.`
     });
 
-    // Start Server
-    const server = app.listen(PORT, () => {
-      logger.info(`Server running on port ${PORT}`);
-    });
+  } catch (err) {
+    console.error('Broadcast Error:', err);
+    res.status(500).json({ message: 'Failed to send broadcast.' });
+  }
+});
 
-    // Graceful Shutdown Handler
-    const gracefulShutdown = (signal) => {
-      logger.warn(`${signal} received. Shutting down gracefully...`);
-      server.close(() => {
-        logger.info('Server closed. Process terminated.');
-        process.exit(0);
-      });
+// Production Serve
+if (isProduction) {
+  app.use(express.static(path.join(__dirname, '../build')));
+  app.get('*', (req, res) => res.sendFile(path.join(__dirname, '../build', 'index.html')));
+}
 
-      // Force close after 10 seconds
-      setTimeout(() => {
-        logger.error('Forced shutdown after timeout.');
-        process.exit(1);
-      }, 10000);
-    };
+// Global Error Handler
+app.use((err, req, res, next) => {
+  logger.error('Unhandled error:', err.message);
+  res.status(500).json({ message: 'Internal server error' });
+});
 
-    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+// Start Server
+const server = app.listen(PORT, () => {
+  logger.info(`Server running on port ${PORT}`);
+});
 
-    // Uncaught Exception Handler
-    process.on('uncaughtException', (err) => {
-      logger.error('Uncaught Exception:', err.message);
-      process.exit(1);
-    });
+// Graceful Shutdown Handler
+const gracefulShutdown = (signal) => {
+  logger.warn(`${signal} received. Shutting down gracefully...`);
+  server.close(() => {
+    logger.info('Server closed. Process terminated.');
+    process.exit(0);
+  });
 
-    process.on('unhandledRejection', (reason, promise) => {
-      logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
-    });
+  // Force close after 10 seconds
+  setTimeout(() => {
+    logger.error('Forced shutdown after timeout.');
+    process.exit(1);
+  }, 10000);
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// Uncaught Exception Handler
+process.on('uncaughtException', (err) => {
+  logger.error('Uncaught Exception:', err.message);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
