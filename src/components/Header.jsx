@@ -4,6 +4,7 @@ import "../styles/Header.css";
 
 function Header() {
   const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     // googleTranslateElementInit is handled in index.html
@@ -13,21 +14,25 @@ function Header() {
     setDropdownVisible(!dropdownVisible);
   };
 
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
+
   return (
     <header className="header">
 
 
 
       {/* HAMBURGER ICON (MOBILE) */}
-      <div className="hamburger" onClick={() => document.querySelector('.nav-menu').classList.toggle('active')}>
+      <div className="hamburger" onClick={() => setIsMenuOpen(!isMenuOpen)}>
         <div></div>
         <div></div>
         <div></div>
       </div>
 
       {/* NAVIGATION MENU */}
-      <nav className="nav-menu">
-        <Link to="/" className="nav-item">Home</Link>
+      <nav className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
+        <Link to="/" className="nav-item" onClick={closeMenu}>Home</Link>
 
         {/* ABOUT US DROPDOWN */}
         <div className="dropdown-parent" style={{ position: 'relative' }}>
@@ -63,22 +68,22 @@ function Header() {
                 padding: '10px 0'
               }}
             >
-              <Link to="/about" className="dropdown-link" style={{ display: 'block', padding: '8px 16px', color: '#333', textDecoration: 'none' }}>Santmat</Link>
-              <Link to="/baba-umakant" className="dropdown-link" style={{ display: 'block', padding: '8px 16px', color: '#333', textDecoration: 'none' }}>Baba Umakant Ji Maharaj</Link>
-              <Link to="/baba-jaigurudev" className="dropdown-link" style={{ display: 'block', padding: '8px 16px', color: '#333', textDecoration: 'none' }}>Baba Jaigurudev Ji Maharaj</Link>
+              <Link to="/about" className="dropdown-link" style={{ display: 'block', padding: '8px 16px', color: '#333', textDecoration: 'none' }} onClick={closeMenu}>Santmat</Link>
+              <Link to="/baba-umakant" className="dropdown-link" style={{ display: 'block', padding: '8px 16px', color: '#333', textDecoration: 'none' }} onClick={closeMenu}>Baba Umakant Ji Maharaj</Link>
+              <Link to="/baba-jaigurudev" className="dropdown-link" style={{ display: 'block', padding: '8px 16px', color: '#333', textDecoration: 'none' }} onClick={closeMenu}>Baba Jaigurudev Ji Maharaj</Link>
             </div>
           )}
         </div>
 
-        <Link to="/satvic-lifestyle" className="nav-item shine-effect">Healthy Living 🌿</Link>
-        <Link to="/blog" className="nav-item shine-effect">Blog 📝</Link>
-        <Link to="/announcements" className="nav-item shine-effect">Announcements 📢</Link>
-        <Link to="/gallery" className="nav-item">Gallery</Link>
-        <Link to="/literature" className="nav-item">Literature/FAQs</Link>
-        <Link to="/prarthana" className="nav-item">Prarthana</Link>
-        <Link to="/prophecies" className="nav-item shine-effect">Prophecies 🔮</Link>
-        <Link to="/downloads" className="nav-item">Downloads</Link>
-        <Link to="/contact" className="nav-item">Contact</Link>
+        <Link to="/satvic-lifestyle" className="nav-item shine-effect" onClick={closeMenu}>Healthy Living 🌿</Link>
+        <Link to="/blog" className="nav-item shine-effect" onClick={closeMenu}>Blog 📝</Link>
+        <Link to="/announcements" className="nav-item shine-effect" onClick={closeMenu}>Announcements 📢</Link>
+        <Link to="/gallery" className="nav-item" onClick={closeMenu}>Gallery</Link>
+        <Link to="/literature" className="nav-item" onClick={closeMenu}>Literature/FAQs</Link>
+        <Link to="/prarthana" className="nav-item" onClick={closeMenu}>Prarthana</Link>
+        <Link to="/prophecies" className="nav-item shine-effect" onClick={closeMenu}>Prophecies 🔮</Link>
+        <Link to="/downloads" className="nav-item" onClick={closeMenu}>Downloads</Link>
+        <Link to="/contact" className="nav-item" onClick={closeMenu}>Contact</Link>
       </nav>
 
       {/* GOOGLE TRANSLATE - ONLY DROPDOWN */}
