@@ -29,6 +29,11 @@ function AdminDashboard() {
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (!token) navigate('/admin-login');
+
+        // RESET DATA to avoid type mismatch crashes during transition (Object vs Array)
+        setData([]);
+        setAutomatedData([]);
+
         fetchData(activeTab);
     }, [activeTab, navigate]);
 
