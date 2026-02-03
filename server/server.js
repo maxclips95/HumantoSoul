@@ -479,36 +479,44 @@ async function translateText(text, targetLang = 'en') {
 
   return chunkResults.join('') || null;
 }
-// Native Node.js Transcript Fetcher (High-Success "Plus" Version)
+// Native Node.js Transcript Fetcher (High-Resilience Version)
 async function fetchTranscriptText(youtubeId) {
   console.log(`[Transcript] Fetching for ID: ${youtubeId}`);
   const { YoutubeTranscript } = require('youtube-transcript-plus');
 
   try {
-    // 1. Try Manual Hindi (hi) first
-    console.log(`[Transcript] Trying Manual Hindi (hi)...`);
-    let transcriptItems;
-    try {
-      transcriptItems = await YoutubeTranscript.fetchTranscript(youtubeId, { lang: 'hi' });
-    } catch (manualErr) {
-      console.log(`[Transcript] Manual Hindi failed: ${manualErr.message}. Trying Automated Hindi (a.hi)...`);
-      // 2. Surgical Fallback: Automated Hindi (a.hi)
-      transcriptItems = await YoutubeTranscript.fetchTranscript(youtubeId, { lang: 'a.hi' });
+    // 1. Surgical Attempt: Try 'hi' then 'a.hi' then 'en'
+    const languages = [
+      { lang: 'hi', label: 'Manual Hindi' },
+      { lang: 'a.hi', label: 'Automated Hindi' },
+      { lang: 'en', label: 'English Fallback' }
+    ];
+
+    let transcriptItems = null;
+
+    for (const { lang, label } of languages) {
+      try {
+        console.log(`[Transcript] Attempting ${label} (${lang})...`);
+        transcriptItems = await YoutubeTranscript.fetchTranscript(youtubeId, { lang });
+        if (transcriptItems && transcriptItems.length > 5) {
+          console.log(`[Transcript] SUCCESS with ${label}`);
+          break;
+        }
+      } catch (err) {
+        console.log(`[Transcript] ${label} failed: ${err.message}`);
+      }
     }
 
     if (!transcriptItems || transcriptItems.length === 0) {
-      throw new Error('No transcript available found (checked Hindi/Automated)');
+      throw new Error('No transcript available found after trying Hindi (Manual/Auto) and English.');
     }
 
-    // 3. Combine text
+    // 2. Combine text
     const rawContent = transcriptItems.map(t => t.text).join(' ').replace(/\s+/g, ' ').trim();
     console.log(`[Transcript] Extracted ${rawContent.length} characters`);
 
-    if (rawContent.length < 50) {
-      throw new Error('Transcript too short, likely invalid');
-    }
-
-    // 4. Translate to English
+    // 3. Translate to English (if Hindi)
+    // We only translate if the original looks like Hindi (has Devanagari or was a Hindi attempt)
     let fullTranscript = rawContent;
     try {
       console.log('[Transcript] Translating to English...');
@@ -517,23 +525,14 @@ async function fetchTranscriptText(youtubeId) {
         fullTranscript = `${rawContent} ||| ${translated}`;
       }
     } catch (err) {
-      console.error('[Transcript] Translation failed:', err.message);
+      console.error('[Transcript] Translation skipped or failed:', err.message);
     }
 
     return fullTranscript;
 
   } catch (err) {
-    console.error(`[Transcript] Error:`, err.message);
-    // Fallback: Try default language (often English or Auto-generated English)
-    try {
-      console.log('[Transcript] Final fallback to default language...');
-      const retryItems = await YoutubeTranscript.fetchTranscript(youtubeId);
-      const retryContent = retryItems.map(t => t.text).join(' ');
-      return retryContent;
-    } catch (retryErr) {
-      console.error('[Transcript] All fetch attempts failed:', retryErr.message);
-      throw new Error(`Failed to fetch captions. (YouTube might have blocked this specific request or captions are fully disabled)`);
-    }
+    console.error(`[Transcript] Final Error:`, err.message);
+    throw new Error(`Failed to fetch captions. (This video may not have captions enabled or YouTube is rate-limiting the request)`);
   }
 }
 
