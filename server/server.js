@@ -184,8 +184,8 @@ const failedLoginAttempts = new Map();
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5000',
-  'https://jaigurudevukm.in',
-  'https://www.jaigurudevukm.in',
+  'https://www.humantosoul.com',
+  'https://humantosoul.com',
   'https://humantosoul.com',
   'https://www.humantosoul.com',
   process.env.PRODUCTION_URL
