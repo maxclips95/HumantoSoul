@@ -6,8 +6,19 @@ const VoiceAssistant = () => {
     const [paused, setPaused] = useState(false);
 
     useEffect(() => {
-        if ('speechSynthesis' in window) {
-            setAvailable(true);
+        const loadVoices = () => {
+            const availableVoices = window.speechSynthesis.getVoices();
+            setVoices(availableVoices);
+            if (availableVoices.length > 0) {
+                setAvailable(true);
+            }
+        };
+
+        loadVoices();
+
+        // Chrome loads voices asynchronously
+        if (window.speechSynthesis.onvoiceschanged !== undefined) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
         }
     }, []);
 
@@ -53,10 +64,24 @@ const VoiceAssistant = () => {
 
             const utterance = new SpeechSynthesisUtterance(text);
 
-            // Attempt to detect language or default to Hindi/English based on text content
-            // Simple heuristic: check if text contains Hindi chars
+            // Detect Language
             const hasHindi = /[\u0900-\u097F]/.test(text);
             utterance.lang = hasHindi ? 'hi-IN' : 'en-US';
+
+            // IMPORTANT: Explicitly select a Hindi voice if needed
+            if (hasHindi) {
+                const hindiVoice = voices.find(v => v.lang.includes('hi') || v.name.toLowerCase().includes('hindi'));
+                if (hindiVoice) {
+                    utterance.voice = hindiVoice;
+                    console.log("Selected Hindi Voice:", hindiVoice.name);
+                }
+            } else {
+                // Try to pick a clear English voice if available (e.g., Google US English)
+                const englishVoice = voices.find(v => v.name.includes('Google US English') || v.lang === 'en-US');
+                if (englishVoice) {
+                    utterance.voice = englishVoice;
+                }
+            }
 
             // Adjust rate and pitch for a more natural feel
             utterance.rate = 0.9;
