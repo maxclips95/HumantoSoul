@@ -4,6 +4,7 @@ const VoiceAssistant = () => {
     const [speaking, setSpeaking] = useState(false);
     const [available, setAvailable] = useState(false);
     const [paused, setPaused] = useState(false);
+    const [voices, setVoices] = useState([]);
 
     useEffect(() => {
         const loadVoices = () => {
