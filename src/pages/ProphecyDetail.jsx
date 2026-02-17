@@ -83,8 +83,8 @@ export default function ProphecyDetail() {
                         <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" style={{ color: '#1877F2', fontSize: '1.5rem' }} title="Share on Facebook">
                             <i className="fab fa-facebook"></i>
                         </a>
-                        <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" style={{ color: '#1DA1F2', fontSize: '1.5rem' }} title="Share on Twitter">
-                            <i className="fab fa-twitter"></i>
+                        <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" style={{ color: '#000000', fontSize: '1.5rem' }} title="Share on X">
+                            <i className="fa-brands fa-x-twitter"></i>
                         </a>
                         <a href={`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`} target="_blank" rel="noopener noreferrer" style={{ color: '#0088cc', fontSize: '1.5rem' }} title="Share on Telegram">
                             <i className="fab fa-telegram"></i>
