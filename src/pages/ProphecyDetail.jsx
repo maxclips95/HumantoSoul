@@ -34,6 +34,9 @@ export default function ProphecyDetail() {
     const hindiText = hasTranscript ? item.transcript.split('|||')[0] : item.transcript;
     const englishText = hasTranscript ? item.transcript.split('|||')[1] : null;
 
+    const shareUrl = window.location.href;
+    const shareText = `Check out this prophecy: ${item.title}`;
+
     return (
         <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 20px', fontFamily: "'Segoe UI', sans-serif" }}>
 
@@ -71,6 +74,22 @@ export default function ProphecyDetail() {
                     }}>
                         {item.title}
                     </h1>
+
+                    {/* Social Share Buttons */}
+                    <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
+                        <a href={`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`} target="_blank" rel="noopener noreferrer" style={{ color: '#25D366', fontSize: '1.5rem' }} title="Share on WhatsApp">
+                            <i className="fab fa-whatsapp"></i>
+                        </a>
+                        <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" style={{ color: '#1877F2', fontSize: '1.5rem' }} title="Share on Facebook">
+                            <i className="fab fa-facebook"></i>
+                        </a>
+                        <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" style={{ color: '#1DA1F2', fontSize: '1.5rem' }} title="Share on Twitter">
+                            <i className="fab fa-twitter"></i>
+                        </a>
+                        <a href={`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`} target="_blank" rel="noopener noreferrer" style={{ color: '#0088cc', fontSize: '1.5rem' }} title="Share on Telegram">
+                            <i className="fab fa-telegram"></i>
+                        </a>
+                    </div>
                 </header>
 
 
