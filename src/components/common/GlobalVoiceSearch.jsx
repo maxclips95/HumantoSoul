@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { processVoiceCommand } from '../../utils/AdvancedVoiceLogic';
 
 const GlobalVoiceSearch = () => {
     const [isListening, setIsListening] = useState(false);
@@ -50,28 +51,29 @@ const GlobalVoiceSearch = () => {
     };
 
     const processSearch = (query) => {
+        // 1. Get Intelligent Routing Decision
+        const { route, searchParam, speechReponse } = processVoiceCommand(query);
+
+        // 2. Voice Feedback (Talk back to user)
+        if (speechReponse) {
+            const synth = window.speechSynthesis;
+            const utter = new SpeechSynthesisUtterance(speechReponse);
+            // Try to match the voice used in VoiceAssistant if possible, or just default
+            // For speed, let's use default.
+            synth.cancel(); // Clear queue
+            synth.speak(utter);
+        }
+
         setTimeout(() => {
             setModalOpen(false); // Close modal before navigating
-            const lowerQuery = query.toLowerCase();
 
-            // Intelligent Routing Logic
-            if (lowerQuery.includes('prophecy') || lowerQuery.includes('bhavishya') || lowerQuery.includes('video')) {
-                navigate('/prophecies?search=' + encodeURIComponent(query));
-            } else if (lowerQuery.includes('book') || lowerQuery.includes('sahitya') || lowerQuery.includes('read') || lowerQuery.includes('pdf')) {
-                navigate('/literature?search=' + encodeURIComponent(query));
-            } else if (lowerQuery.includes('recipe') || lowerQuery.includes('food') || lowerQuery.includes('satvic') || lowerQuery.includes('khana')) {
-                navigate('/satvic-lifestyle');
-            } else if (lowerQuery.includes('about') || lowerQuery.includes('who is') || lowerQuery.includes('parichay')) {
-                navigate('/about');
-            } else if (lowerQuery.includes('contact') || lowerQuery.includes('phone') || lowerQuery.includes('email') || lowerQuery.includes('sampark')) {
-                navigate('/contact');
-            } else if (lowerQuery.includes('gallery') || lowerQuery.includes('photo') || lowerQuery.includes('image')) {
-                navigate('/gallery');
+            // 3. Navigate
+            if (searchParam) {
+                navigate(`${route}?search=${encodeURIComponent(searchParam)}`);
             } else {
-                // Default fallback: Search Prophecies
-                navigate('/prophecies?search=' + encodeURIComponent(query));
+                navigate(route);
             }
-        }, 1000); // Small delay to let user see what they said
+        }, 1500); // Allow time to hear feedback
     };
 
     if (!isSupported) return null;
