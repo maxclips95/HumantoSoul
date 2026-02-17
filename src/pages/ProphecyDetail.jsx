@@ -102,7 +102,6 @@ export default function ProphecyDetail() {
                 {/* Full Transcript Section */}
                 {item.transcript && (
                     <div style={{ backgroundColor: '#f9f9f9', padding: '30px', borderRadius: '8px', borderLeft: '4px solid #c41e3a' }}>
-                        <h2 style={{ marginTop: 0, fontSize: '1.5rem', color: '#c41e3a' }}>Full Transcript</h2>
 
                         {hasTranscript ? (
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginTop: '20px' }}>
