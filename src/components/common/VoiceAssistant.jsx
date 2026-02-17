@@ -29,7 +29,29 @@ const VoiceAssistant = () => {
         interval = setInterval(loadVoices, 500);
         setTimeout(() => clearInterval(interval), 5000);
 
-        return () => clearInterval(interval);
+        // --- NEW: Listen for Google Translate Language Changes ---
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'lang') {
+                    console.log("Language changed to:", document.documentElement.lang);
+                    // Reload voices to ensure we have the right one for the new lang
+                    loadVoices();
+                    // Stop speaking if language changes mid-speech to avoid confused accents
+                    window.speechSynthesis.cancel();
+                    setSpeaking(false);
+                }
+            });
+        });
+
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['lang']
+        });
+
+        return () => {
+            clearInterval(interval);
+            observer.disconnect();
+        };
     }, []);
 
     const getTextToRead = () => {

@@ -36,8 +36,10 @@ const GlobalVoiceSearch = () => {
         setSearchText('');
         if (recognitionRef.current) {
             try {
-                // Auto-detect language from HTML tag for consistency
-                recognitionRef.current.lang = document.documentElement.lang || 'en-US';
+                // Auto-detect language from HTML tag (updated by Google Translate)
+                const currentLang = document.documentElement.lang || 'en-US';
+                recognitionRef.current.lang = currentLang;
+                console.log("Voice Search listening in:", currentLang);
                 recognitionRef.current.start();
             } catch (e) {
                 console.error("Speech start error", e);
@@ -58,8 +60,11 @@ const GlobalVoiceSearch = () => {
         if (speechReponse) {
             const synth = window.speechSynthesis;
             const utter = new SpeechSynthesisUtterance(speechReponse);
-            // Try to match the voice used in VoiceAssistant if possible, or just default
-            // For speed, let's use default.
+
+            // Match the voice response to the current language
+            const currentLang = document.documentElement.lang || 'en-US';
+            utter.lang = currentLang;
+
             synth.cancel(); // Clear queue
             synth.speak(utter);
         }
