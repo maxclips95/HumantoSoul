@@ -45,6 +45,14 @@ const VoiceAssistant = () => {
     const handleSpeak = () => {
         const synth = window.speechSynthesis;
 
+        // Safety: If voices are empty, try to load them again (fix for some browsers)
+        if (voices.length === 0) {
+            const availableVoices = synth.getVoices();
+            if (availableVoices.length > 0) {
+                setVoices(availableVoices);
+            }
+        }
+
         if (speaking) {
             if (paused) {
                 synth.resume();
@@ -68,35 +76,59 @@ const VoiceAssistant = () => {
             // 1. Detect Language from HTML tag (updated by Google Translate)
             let pageLang = document.documentElement.lang || 'en-US';
 
-            // Google Translate sometimes sets lang="fr" or "auto". 
-            // If it is "auto", we might need to fallback to detection or default.
-            if (pageLang === 'auto') pageLang = 'en-US';
+            // Normalize "auto" or empty to English
+            if (!pageLang || pageLang === 'auto') pageLang = 'en-US';
 
+            // Google Translate uses 2-letter codes (e.g. "hi", "es"), but voices often use 4-letter (e.g. "hi-IN", "es-ES")
             // Special check for Hindi characters if lang is ambiguous
             if (pageLang.startsWith('en') && /[\u0900-\u097F]/.test(text)) {
                 pageLang = 'hi-IN';
             }
 
             utterance.lang = pageLang;
-            console.log("Detected Language:", pageLang);
 
             // 2. Find Best Matching Voice
-            // First try exact match (e.g., "hi-IN" == "hi-IN")
+            // Strategy: Exact Match -> Loose Match (Language only) -> Microsoft/Google specific -> Default
             let bestVoice = voices.find(v => v.lang === pageLang);
 
-            // If no exact match, try partial match on language code (e.g., "fr" inside "fr-FR")
             if (!bestVoice) {
-                const shortLang = pageLang.split('-')[0]; // "fr" from "fr-FR"
+                // Try matching just the language code (e.g. "fr" matches "fr-FR" or "fr-CA")
+                const shortLang = pageLang.split('-')[0];
                 bestVoice = voices.find(v => v.lang.startsWith(shortLang));
             }
 
-            // If found, assign it. Otherwise, browser uses default for that lang.
-            if (bestVoice) {
-                utterance.voice = bestVoice;
-                console.log("Selected Voice:", bestVoice.name);
+            // If still no voice, and we are on Mobile/Android, sometimes "Google [Lang]" exists
+            if (!bestVoice) {
+                // Try to find a voice that has the language name in its name (e.g. name="Google Hindi")
+                // This is a fuzzy fallback for some systems
+                const langNameMap = {
+                    'hi': 'Hindi',
+                    'es': 'Spanish',
+                    'fr': 'French',
+                    'de': 'German',
+                    'it': 'Italian',
+                    'ru': 'Russian',
+                    'ja': 'Japanese',
+                    'zh': 'Chinese',
+                };
+                const shortLang = pageLang.split('-')[0];
+                const langName = langNameMap[shortLang];
+                if (langName) {
+                    bestVoice = voices.find(v => v.name.includes(langName));
+                }
             }
 
-            // Adjust rate and pitch for a more natural feel
+            // If found, assign it.
+            if (bestVoice) {
+                utterance.voice = bestVoice;
+                console.log(`Voice Selected: ${bestVoice.name} (${bestVoice.lang}) for Page Lang: ${pageLang}`);
+            } else {
+                console.warn(`No voice found for ${pageLang}. Using browser default.`);
+            }
+
+            // Critical: Cancel again right before speaking to prevent "queue stuck" issues
+            window.speechSynthesis.cancel();
+
             utterance.rate = 0.9;
             utterance.pitch = 1.0;
 
