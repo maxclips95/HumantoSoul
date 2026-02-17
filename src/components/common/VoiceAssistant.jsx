@@ -64,23 +64,35 @@ const VoiceAssistant = () => {
 
             const utterance = new SpeechSynthesisUtterance(text);
 
-            // Detect Language
-            const hasHindi = /[\u0900-\u097F]/.test(text) || document.documentElement.lang === 'hi';
-            utterance.lang = hasHindi ? 'hi-IN' : 'en-US';
+            // 1. Detect Language from HTML tag (updated by Google Translate)
+            let pageLang = document.documentElement.lang || 'en-US';
 
-            // IMPORTANT: Explicitly select a Hindi voice if needed
-            if (hasHindi) {
-                const hindiVoice = voices.find(v => v.lang.includes('hi') || v.name.toLowerCase().includes('hindi'));
-                if (hindiVoice) {
-                    utterance.voice = hindiVoice;
-                    console.log("Selected Hindi Voice:", hindiVoice.name);
-                }
-            } else {
-                // Try to pick a clear English voice if available (e.g., Google US English)
-                const englishVoice = voices.find(v => v.name.includes('Google US English') || v.lang === 'en-US');
-                if (englishVoice) {
-                    utterance.voice = englishVoice;
-                }
+            // Google Translate sometimes sets lang="fr" or "auto". 
+            // If it is "auto", we might need to fallback to detection or default.
+            if (pageLang === 'auto') pageLang = 'en-US';
+
+            // Special check for Hindi characters if lang is ambiguous
+            if (pageLang.startsWith('en') && /[\u0900-\u097F]/.test(text)) {
+                pageLang = 'hi-IN';
+            }
+
+            utterance.lang = pageLang;
+            console.log("Detected Language:", pageLang);
+
+            // 2. Find Best Matching Voice
+            // First try exact match (e.g., "hi-IN" == "hi-IN")
+            let bestVoice = voices.find(v => v.lang === pageLang);
+
+            // If no exact match, try partial match on language code (e.g., "fr" inside "fr-FR")
+            if (!bestVoice) {
+                const shortLang = pageLang.split('-')[0]; // "fr" from "fr-FR"
+                bestVoice = voices.find(v => v.lang.startsWith(shortLang));
+            }
+
+            // If found, assign it. Otherwise, browser uses default for that lang.
+            if (bestVoice) {
+                utterance.voice = bestVoice;
+                console.log("Selected Voice:", bestVoice.name);
             }
 
             // Adjust rate and pitch for a more natural feel
