@@ -65,7 +65,7 @@ const VoiceAssistant = () => {
             const utterance = new SpeechSynthesisUtterance(text);
 
             // Detect Language
-            const hasHindi = /[\u0900-\u097F]/.test(text);
+            const hasHindi = /[\u0900-\u097F]/.test(text) || document.documentElement.lang === 'hi';
             utterance.lang = hasHindi ? 'hi-IN' : 'en-US';
 
             // IMPORTANT: Explicitly select a Hindi voice if needed
