@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import TranscriptModal from "../components/TranscriptModal";
-import { Helmet } from 'react-helmet-async';
+import SEO from '../components/common/SEO';
 
 
 const ReadingModal = ({ title, content, onClose }) => {
@@ -166,11 +166,11 @@ export default function Prophecies() {
 
   return (
     <>
-      <Helmet>
-        <title>2026 Prophecies & Time Change (Parivartan) - Jai Gurudev | Satyug Coming</title>
-        <meta name="description" content="Baba Jai Gurudev's predictions on the coming Time Change (Yug Parivartan). Read about the cycle change from Kaliyug to Satyug and how to survive the transition." />
-        <meta name="keywords" content="Satyug, Time Change, Yug Cycle Changing, Parivartan, Kaliyug to Satyug, Prophecies 2026, Jai Gurudev Predictions, World War 3 Prophecy" />
-      </Helmet>
+      <SEO
+        title="2026 Prophecies & Time Change (Parivartan)"
+        description="Baba Jai Gurudev's predictions on the coming Time Change (Yug Parivartan). Read about the cycle change from Kaliyug to Satyug and how to survive the transition."
+        keywords="Satyug, Time Change, Yug Cycle Changing, Parivartan, Kaliyug to Satyug, Prophecies 2026, Jai Gurudev Predictions, World War 3 Prophecy"
+      />
       <section className="section" style={{ padding: "10px 20px" }}>
 
         {/* SEO Header Section */}

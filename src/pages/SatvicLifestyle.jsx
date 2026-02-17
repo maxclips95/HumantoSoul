@@ -3,6 +3,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import '../styles/SatvicLifestyle.css'; // We will create this
 import SatvicExplorer from '../components/SatvicExplorer'; // We will create this
+import SEO from '../components/common/SEO';
 
 function SatvicLifestyle() {
     const [pledgeStats, setPledgeStats] = useState({ total: 0, recent: [] });
@@ -17,6 +18,11 @@ function SatvicLifestyle() {
 
     return (
         <div className="satvic-page">
+            <SEO
+                title="Satvic Lifestyle & Pure Living"
+                description="Adopt a Satvic lifestyle for spiritual growth, health, and mental clarity. Learn about vegetarianism, non-violence, and pure living according to Jai Gurudev's teachings."
+                keywords="satvic lifestyle, vegetarianism, pure living, spiritual diet, non-violence, ahimsa"
+            />
             <div className="satvic-hero">
                 <div className="hero-overlay">
                     <div className="hero-content">

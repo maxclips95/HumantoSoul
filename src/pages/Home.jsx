@@ -6,16 +6,16 @@ import AshramTour from "../components/AshramTour";
 import YouTubeFeed from "../components/YouTubeFeed";
 import Testimonials from "../components/Testimonials";
 
-import { Helmet } from 'react-helmet-async';
+import SEO from "../components/common/SEO";
 
 export default function Home() {
   return (
     <>
-      <Helmet>
-        <title>Human to Soul - Jai Gurudev Spiritual Teachings & Prophecies</title>
-        <meta name="description" content="Human to Soul: The official platform for Baba Jai Gurudev's teachings on the Time Change (Yug Parivartan) and the arrival of Satyug." />
-        <meta name="keywords" content="Satsang, Spiritual, Master of Time, Owner of Time, Baba Jaigurudev, Baba Umakant Ji, Prophecies, Prophecy, Satyug, Time Change, Yug Cycle, Human to Soul" />
-      </Helmet>
+      <SEO
+        title="Home"
+        description="Join the global movement for peace and spiritual unity. Discover powerful peace meditation for the world, spiritual diplomacy, and interfaith wisdom through Baba Jai Gurudev."
+        keywords="peace meditation for world, spiritual unity message, global harmony prayer, interfaith wisdom, spiritual diplomacy, Baba Jaigurudev, Satyug"
+      />
       <Carousel />
       <HeroSection />
       <AshramTour />

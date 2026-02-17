@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
+import SEO from '../components/common/SEO';
+import ReactMarkdown from 'react-markdown';
 
 export default function ProphecyDetail() {
     const { id } = useParams();
@@ -13,14 +15,6 @@ export default function ProphecyDetail() {
             try {
                 const res = await axios.get(`/api/prophecies/${id}`);
                 setItem(res.data);
-
-                // --- SEO DYNAMIC UPDATE ---
-                if (res.data.title) {
-                    document.title = `${res.data.title} - Prophecy & Warning | Jai Gurudev`;
-
-                    // Optional: Update meta description if you had a helper for it
-                    // updateMetaDescription(res.data.description);
-                }
             } catch (err) {
                 console.error("Error loading prophecy:", err);
                 setError("Prophecy not found or server error.");
@@ -29,11 +23,6 @@ export default function ProphecyDetail() {
             }
         };
         fetchProphecy();
-
-        // Cleanup title on unmount
-        return () => {
-            document.title = "Jai Gurudev - Spiritual Teachings";
-        };
     }, [id]);
 
     if (loading) return <div style={{ textAlign: "center", padding: "50px" }}>Loading...</div>;
@@ -47,6 +36,14 @@ export default function ProphecyDetail() {
 
     return (
         <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 20px', fontFamily: "'Segoe UI', sans-serif" }}>
+
+            <SEO
+                title={item.title}
+                description={item.description || item.summary || "Spiritual prophecy and warning from Baba Jai Gurudev."}
+                keywords={`prophecy, ${item.year || 'future'}, spiritual warning, jai gurudev`}
+                image={item.thumbnail || item.image}
+                type="article"
+            />
 
             <Link to="/blog" style={{ textDecoration: 'none', color: '#666', marginBottom: '20px', display: 'inline-block' }}>
                 &larr; Back to Blog
@@ -92,16 +89,20 @@ export default function ProphecyDetail() {
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginTop: '20px' }}>
                                 <div>
                                     <h3 style={{ borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>Hindi</h3>
-                                    <div style={{ whiteSpace: 'pre-wrap', lineHeight: '1.8' }}>{hindiText}</div>
+                                    <div style={{ lineHeight: '1.8', fontSize: '1.1rem' }}>
+                                        <ReactMarkdown>{hindiText}</ReactMarkdown>
+                                    </div>
                                 </div>
                                 <div>
                                     <h3 style={{ borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>English</h3>
-                                    <div style={{ whiteSpace: 'pre-wrap', lineHeight: '1.8' }}>{englishText}</div>
+                                    <div style={{ lineHeight: '1.8', fontSize: '1.1rem' }}>
+                                        <ReactMarkdown>{englishText}</ReactMarkdown>
+                                    </div>
                                 </div>
                             </div>
                         ) : (
-                            <div style={{ whiteSpace: 'pre-wrap', lineHeight: '1.8', marginTop: '20px' }}>
-                                {item.transcript}
+                            <div style={{ lineHeight: '1.8', marginTop: '20px', fontSize: '1.1rem' }}>
+                                <ReactMarkdown>{item.transcript}</ReactMarkdown>
                             </div>
                         )}
                     </div>

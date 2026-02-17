@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import SEO from '../components/common/SEO';
 
 export default function BlogPage() {
     const [posts, setPosts] = useState([]);
@@ -65,13 +66,18 @@ export default function BlogPage() {
         };
 
         fetchData();
-        document.title = "Spiritual Insights Blog | Jai Gurudev";
+        fetchData();
     }, []);
 
     if (loading) return <div className="loader">Loading Insights...</div>;
 
     return (
         <div className="blog-container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 20px' }}>
+            <SEO
+                title="Spiritual Insights Blog"
+                description="Latest prophecies, announcements, and spiritual wisdom from the Jai Gurudev mission. Stay updated on the time change and Satvic lifestyle."
+                keywords="spiritual blog, prophecies, jai gurudev news, satyug updates, spiritual insights"
+            />
             <header style={{ textAlign: 'center', marginBottom: '60px' }}>
                 <h1 style={{ fontSize: '3rem', color: '#c41e3a', marginBottom: '10px' }}>Spiritual Insights</h1>
                 <p style={{ fontSize: '1.2rem', color: '#666' }}>Latest prophecies, announcements, and wisdom from the mission.</p>
