@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 
 const BASE_URL = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000';
@@ -176,10 +177,18 @@ const BookModal = ({ book, onClose }) => {
 };
 
 function Literature() {
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const initialSearch = searchParams.get('search') || "";
+
     const [activeTab, setActiveTab] = useState('books');
     const [books, setBooks] = useState([]);
     const [selectedBook, setSelectedBook] = useState(null);
-    const [searchTerm, setSearchTerm] = useState(""); // Search state
+    const [searchTerm, setSearchTerm] = useState(initialSearch); // Initialize from URL
+
+    useEffect(() => {
+        setSearchTerm(initialSearch);
+    }, [initialSearch]);
 
     useEffect(() => {
         const fetchBooks = async () => {
@@ -234,7 +243,7 @@ function Literature() {
 
     // Filter Logic
     const filteredBooks = books.filter(book =>
-        book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        book.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         book.author?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "../styles/Header.css";
+import GlobalVoiceSearch from "./common/GlobalVoiceSearch";
 
 function Header() {
   const [dropdownVisible, setDropdownVisible] = useState(false);
@@ -90,6 +91,9 @@ function Header() {
       <div className="language-selector" style={{ color: '#fff', fontSize: '14px', display: 'flex', alignItems: 'center' }}>
         <i className="fas fa-globe" style={{ marginRight: '6px', fontSize: '14px' }}></i>
         <div id="google_translate_element" style={{ display: 'inline-block' }}></div>
+
+        {/* GLOBAL VOICE SEARCH */}
+        <GlobalVoiceSearch />
       </div>
     </header>
   );

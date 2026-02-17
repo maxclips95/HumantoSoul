@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
 import TranscriptModal from "../components/TranscriptModal";
 import SEO from '../components/common/SEO';
@@ -136,6 +137,24 @@ export default function Prophecies() {
     return () => { document.body.style.overflow = 'unset'; };
   }, [showModal, selectedTranscript]);
 
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const searchQuery = searchParams.get('search') || '';
+
+  // Filtered lists
+  const filteredItems = items.filter(item =>
+    !searchQuery ||
+    item.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.transcript?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredTextProphecies = textProphecies.filter(item =>
+    !searchQuery ||
+    item.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.content?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   if (loading) {
     return (
       <div style={{
@@ -168,7 +187,7 @@ export default function Prophecies() {
   return (
     <>
       <SEO
-        title="2026 Prophecies & Time Change (Parivartan)"
+        title={searchQuery ? `Search Results: ${searchQuery}` : "2026 Prophecies & Time Change (Parivartan)"}
         description="Baba Jai Gurudev's predictions on the coming Time Change (Yug Parivartan). Read about the cycle change from Kaliyug to Satyug and how to survive the transition."
         keywords="Satyug, Time Change, Yug Cycle Changing, Parivartan, Kaliyug to Satyug, Prophecies 2026, Jai Gurudev Predictions, World War 3 Prophecy"
       />
@@ -177,17 +196,19 @@ export default function Prophecies() {
         {/* SEO Header Section */}
         <div style={{ textAlign: 'center', marginBottom: '30px' }}>
           <h1 style={{ color: '#c41e3a', fontSize: '2.5rem', marginBottom: '15px' }}>
-            Jai Gurudev Prophecies & Future Predictions (Bhavishyavani)
+            {searchQuery ? `Search Results for "${searchQuery}"` : "Jai Gurudev Prophecies & Future Predictions (Bhavishyavani)"}
           </h1>
-          <p style={{ fontSize: '1.1rem', color: '#555', maxWidth: '800px', margin: '0 auto', lineHeight: '1.6' }}>
-            Explore the profound <strong>spiritual warnings</strong> and <strong>future predictions</strong> of Baba Jai Gurudev.
-            Understand the upcoming changes (Parivartan) and how to prepare for the <strong>Golden Age (Satya Yuga)</strong> through spiritual awakening and a Satvic lifestyle.
-          </p>
+          {!searchQuery && (
+            <p style={{ fontSize: '1.1rem', color: '#555', maxWidth: '800px', margin: '0 auto', lineHeight: '1.6' }}>
+              Explore the profound <strong>spiritual warnings</strong> and <strong>future predictions</strong> of Baba Jai Gurudev.
+              Understand the upcoming changes (Parivartan) and how to prepare for the <strong>Golden Age (Satya Yuga)</strong> through spiritual awakening and a Satvic lifestyle.
+            </p>
+          )}
         </div>
 
         {/* GLOBAL PROPHECY TEXT */}
         {/* TEXT PROPHECY GRID - 5 cards per row */}
-        {textProphecies.length > 0 && (
+        {filteredTextProphecies.length > 0 && (
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(5, 1fr)',
@@ -196,7 +217,7 @@ export default function Prophecies() {
             margin: '0 auto 30px auto',
             padding: '0 10px'
           }}>
-            {textProphecies.map(item => {
+            {filteredTextProphecies.map(item => {
               const limit = 150;
               const isLong = item.content.length > limit;
               return (
@@ -269,7 +290,7 @@ export default function Prophecies() {
 
         {/* JSON BASED PROPHECY CARDS */}
         <div className="card-grid" style={{ marginTop: "0px" }}>
-          {items.map((item, index) => (
+          {filteredItems.map((item, index) => (
             <div key={index} className="card" style={{ position: "relative" }}>
               {item.year && (
                 <div

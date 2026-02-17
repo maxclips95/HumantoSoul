@@ -573,4 +573,42 @@ EMAIL_PASS=your-app-password
 ---
 
 *This document explains HOW the application works, WHERE each component lives, and WHAT each system does.*
-*Last Updated: January 28, 2026 - 7:05 PM IST*
+*last update: February 17, 2026*
+
+---
+
+## 15. Major Updates (Phase 5) - February 17, 2026
+
+### A. Accessibility: Universal Voice Assistant 🗣️
+**What**: A global floating action button (FAB) that reads page content aloud.
+**Technology**: **Web Speech API** (Zero-cost, browser-native).
+**Key Features**:
+1. **Global Integration**: Available on every page (`App.js`).
+2. **Smart Language Detection**:
+   - Detects if user translates page via Google Translate.
+   - Automatically switches voice (e.g., Hindi text -> Hindi Voice, French -> French Voice).
+   - **Fallback Logic**: If exact voice is missing, fuzzy-matches (e.g., "Google Hindi").
+3. **Robustness**:
+   - **Aggressive Loading**: "Force checks" voices every 500ms on load to prevent silence.
+   - **Queue Management**: Clears speech queue before speaking to prevent "stuck" audio.
+   - **User Feedback**: Alerts user if voice is legally unavailable on their device.
+
+### B. Social Sharing System 🔗
+**What**: Reusable `ShareButtons` component.
+**Design**: Matches site navigation (Red background, white text, hover effects).
+**Placement**:
+- **Prophecy Detail Page**: Below the header.
+- **Prophecies List Page**: On every card (allows sharing without opening).
+**Platforms**: WhatsApp, Facebook, X (Twitter), Telegram.
+
+### C. Content Formatting (Markdown) 📝
+**What**: Implemented `react-markdown` for articles.
+**Why**: Allows rich text (Bold `**`, Headings `##`) in Supabase articles to render correctly instead of showing raw symbols.
+
+### D. Security Audit & Hardening 🛡️
+**Status**: **100% Clean**.
+**Actions Taken**:
+1. **Vulnerability Fix**: Removed unused `node-nlp` usage which caused high-severity build warnings.
+2. **Server Audit**: Verified 0 vulnerabilities in backend code.
+3. **Build Tools**: Remaining warnings are strictly dev-dependencies (webpack/react-scripts) and do NOT affect production security.
+
