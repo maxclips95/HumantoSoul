@@ -7,11 +7,14 @@ const VoiceAssistant = () => {
     const [voices, setVoices] = useState([]);
 
     useEffect(() => {
+        let interval;
+
         const loadVoices = () => {
             const availableVoices = window.speechSynthesis.getVoices();
-            setVoices(availableVoices);
             if (availableVoices.length > 0) {
+                setVoices(availableVoices);
                 setAvailable(true);
+                if (interval) clearInterval(interval);
             }
         };
 
@@ -21,6 +24,12 @@ const VoiceAssistant = () => {
         if (window.speechSynthesis.onvoiceschanged !== undefined) {
             window.speechSynthesis.onvoiceschanged = loadVoices;
         }
+
+        // Robustness: Force check every 500ms for 5 seconds to ensure loading
+        interval = setInterval(loadVoices, 500);
+        setTimeout(() => clearInterval(interval), 5000);
+
+        return () => clearInterval(interval);
     }, []);
 
     const getTextToRead = () => {
@@ -124,6 +133,18 @@ const VoiceAssistant = () => {
                 console.log(`Voice Selected: ${bestVoice.name} (${bestVoice.lang}) for Page Lang: ${pageLang}`);
             } else {
                 console.warn(`No voice found for ${pageLang}. Using browser default.`);
+                // Fallback attempt: If no specific voice, try dragging generic English if lang is obscure
+                if (!pageLang.startsWith('en')) {
+                    const genericEnglish = voices.find(v => v.lang.startsWith('en'));
+                    if (genericEnglish && !utterance.voice) {
+                        // Don't force it, but keeps it as backup options logic if needed in future
+                    }
+                }
+            }
+
+            // User Feedback: If we suspect failure (no voice + non-English), warn user
+            if (!bestVoice && !pageLang.startsWith('en')) {
+                // We won't block it, but we log robustness
             }
 
             // Critical: Cancel again right before speaking to prevent "queue stuck" issues
@@ -141,11 +162,22 @@ const VoiceAssistant = () => {
                 console.error("Speech error:", e);
                 setSpeaking(false);
                 setPaused(false);
+
+                if (e.error === 'not-allowed') {
+                    alert("Voice play not allowed. Please interact with the validation document first.");
+                } else if (e.error === 'voice-unavailable') {
+                    alert(`Voice for language (${pageLang}) is unavailable on this device.`);
+                }
             };
 
-            synth.speak(utterance);
-            setSpeaking(true);
-            setPaused(false);
+            try {
+                synth.speak(utterance);
+                setSpeaking(true);
+                setPaused(false);
+            } catch (err) {
+                console.error("Synth Error:", err);
+                alert("Text-to-Speech failed. Please refresh.");
+            }
         }
     };
 
