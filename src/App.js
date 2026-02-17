@@ -21,6 +21,7 @@ import AdminDashboard from './components/AdminDashboard';
 import BlogPage from './pages/BlogPage';
 import ProphecyDetail from './pages/ProphecyDetail';
 import AnnouncementDetail from './pages/AnnouncementDetail';
+import VoiceAssistant from './components/common/VoiceAssistant';
 
 
 
@@ -50,10 +51,11 @@ function App() {
             <Route path="/announcement/:id" element={<AnnouncementDetail />} />
           </Routes>
         </main>
+        <VoiceAssistant />
         <Footer />
 
       </ErrorBoundary>
-    </div>
+    </div >
   );
 }
 
