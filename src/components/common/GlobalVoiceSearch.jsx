@@ -18,8 +18,17 @@ const GlobalVoiceSearch = () => {
             recognitionRef.current.continuous = false;
             recognitionRef.current.interimResults = true;
 
-            recognitionRef.current.onstart = () => setIsListening(true);
-            recognitionRef.current.onend = () => setIsListening(false);
+            recognitionRef.current.onstart = () => {
+                setIsListening(true);
+                // Clear any previous "No speech" message if we are retrying
+                setSearchText('');
+            };
+
+            recognitionRef.current.onend = () => {
+                setIsListening(false);
+                // Do NOT close modal automatically on silence. 
+                // Let user decide to retry or close.
+            };
 
             recognitionRef.current.onresult = (event) => {
                 const transcript = event.results[0][0].transcript;
@@ -28,27 +37,42 @@ const GlobalVoiceSearch = () => {
                     processSearch(transcript);
                 }
             };
+
+            recognitionRef.current.onerror = (event) => {
+                setIsListening(false);
+                if (event.error === 'no-speech') {
+                    setSearchText("Dig't hear anything. Tap mic to try again.");
+                } else if (event.error === 'not-allowed') {
+                    setSearchText("Microphone access denied.");
+                } else {
+                    console.error("Speech Recognition Error", event.error);
+                }
+            };
         }
     }, []);
 
     const startListening = () => {
         setModalOpen(true);
         setSearchText('');
+        startRecognition();
+    };
+
+    const startRecognition = () => {
         if (recognitionRef.current) {
             try {
-                // Auto-detect language from HTML tag (updated by Google Translate)
                 const currentLang = document.documentElement.lang || 'en-US';
                 recognitionRef.current.lang = currentLang;
-                console.log("Voice Search listening in:", currentLang);
                 recognitionRef.current.start();
+                setSearchText(''); // Clear text on fresh start
             } catch (e) {
                 console.error("Speech start error", e);
             }
         }
-    };
+    }
 
     const stopListening = () => {
         if (recognitionRef.current) recognitionRef.current.stop();
+        // Only close modal if user manually clicks X
         setModalOpen(false);
     };
 
@@ -155,12 +179,31 @@ const GlobalVoiceSearch = () => {
                         transition: 'all 0.3s ease',
                         animation: isListening ? 'pulse 1.5s infinite' : 'none'
                     }}>
-                        <i className="fas fa-microphone"></i>
+                        <i className={`fas fa-${isListening ? 'microphone' : 'microphone-slash'}`}></i>
                     </div>
 
                     <h2 style={{ marginBottom: '20px', fontWeight: '300' }}>
-                        {isListening ? "Listening..." : "Tap mic to speak"}
+                        {isListening ? "Listening..." : "Tap to Speak Again"}
                     </h2>
+
+                    {/* Retry Area */}
+                    {!isListening && (
+                        <button
+                            onClick={startRecognition}
+                            style={{
+                                background: '#c41e3a',
+                                color: 'white',
+                                border: 'none',
+                                padding: '10px 30px',
+                                borderRadius: '25px',
+                                fontSize: '1.2rem',
+                                cursor: 'pointer',
+                                marginBottom: '20px'
+                            }}
+                        >
+                            Tap to Retry
+                        </button>
+                    )}
 
                     <div style={{
                         fontSize: '1.5rem',
