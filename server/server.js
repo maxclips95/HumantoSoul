@@ -569,6 +569,22 @@ async function fetchTranscript(id) {
 cron.schedule('0 0 */2 * *', () => fetchYouTubeProphecies());
 // fetchYouTubeProphecies(); // Disable initial fetch to avoid startup overhead on Render if desired
 
+// --- SUPABASE KEEP-ALIVE (Prevent Inactivity Pause) ---
+cron.schedule('0 0 * * *', async () => {
+  console.log('[Keep-Alive] Running daily ping to Supabase...');
+  try {
+    if (process.env.USE_SUPABASE === 'true') {
+      // Simple lightweight query to keep the project active
+      await db.selectAll('announcements');
+      console.log('[Keep-Alive] Ping successful.');
+    } else {
+      console.log('[Keep-Alive] Skipped (Supabase not enabled).');
+    }
+  } catch (err) {
+    console.error('[Keep-Alive] Ping failed:', err.message);
+  }
+});
+
 // --- API ENDPOINTS ---
 
 // Auth Middleware - Secure JWT verification
@@ -831,15 +847,15 @@ app.post('/api/satvic/pledge', async (req, res) => {
   }
 
   try {
-    const info = db.prepare('INSERT INTO pledges (name, email, item, date) VALUES (?, ?, ?, ?)').run(
+    const newItem = await db.insert('pledges', {
       name,
-      email || '',
+      email: email || '',
       item,
-      new Date().toISOString()
-    );
+      date: new Date().toISOString()
+    });
 
-    logger.info(`[Pledge] Success! ID: ${info.lastInsertRowid}`);
-    res.json({ success: true, id: info.lastInsertRowid, message: 'Pledge recorded successfully!' });
+    logger.info(`[Pledge] Success! ID: ${newItem.id}`);
+    res.json({ success: true, id: newItem.id, message: 'Pledge recorded successfully!' });
   } catch (err) {
     logger.error('[Pledge] Database Error:', err.message);
     res.status(500).json({ message: `Database error: ${err.message}` });
@@ -847,15 +863,27 @@ app.post('/api/satvic/pledge', async (req, res) => {
 });
 
 // 3. Get Pledge Stats (Social Proof)
-app.get('/api/satvic/stats', (req, res) => {
+app.get('/api/satvic/stats', async (req, res) => {
   try {
-    const total = db.prepare('SELECT COUNT(*) as count FROM pledges').get().count;
-
-    // Get count for today (local time match)
+    let total, today, recent;
     const todayStr = new Date().toISOString().split('T')[0];
-    const today = db.prepare('SELECT COUNT(*) as count FROM pledges WHERE date LIKE ?').get(`${todayStr}%`).count;
 
-    const recent = db.prepare('SELECT name, item FROM pledges ORDER BY id DESC LIMIT 5').all();
+    if (process.env.USE_SUPABASE === 'true') {
+      // Supabase Raw Queries for Stats
+      const { count: totalCount } = await db.raw.supabase.from('pledges').select('*', { count: 'exact', head: true });
+      total = totalCount;
+
+      const { count: todayCount } = await db.raw.supabase.from('pledges').select('*', { count: 'exact', head: true }).like('date', `${todayStr}%`);
+      today = todayCount;
+
+      const { data } = await db.raw.supabase.from('pledges').select('name, item').order('id', { ascending: false }).limit(5);
+      recent = data;
+    } else {
+      // SQLite Raw Queries
+      total = db.prepare('SELECT COUNT(*) as count FROM pledges').get().count;
+      today = db.prepare('SELECT COUNT(*) as count FROM pledges WHERE date LIKE ?').get(`${todayStr}%`).count;
+      recent = db.prepare('SELECT name, item FROM pledges ORDER BY id DESC LIMIT 5').all();
+    }
     res.json({ total, today, recent });
   } catch (err) {
     res.status(500).json({ message: 'Error fetching stats' });
@@ -863,97 +891,145 @@ app.get('/api/satvic/stats', (req, res) => {
 });
 
 // Video Review (Alias for prophecies list but focused on transcript editing)
-app.get('/api/videoreview', verifyToken, (req, res) => {
-  const manual = db.prepare('SELECT * FROM prophecies').all();
-  const automated = db.prepare('SELECT * FROM automated_prophecies').all();
-  res.json({ manual, automated });
+app.get('/api/videoreview', verifyToken, async (req, res) => {
+  try {
+    const manual = await db.selectAll('prophecies');
+    const automated = await db.selectAll('automated_prophecies');
+    res.json({ manual, automated });
+  } catch (e) {
+    res.status(500).json({ message: 'Error fetching reviews' });
+  }
 });
 
 
 // Prophecies
 app.route('/api/prophecies')
-  .get((req, res) => {
-    const manual = db.prepare('SELECT * FROM prophecies').all();
-    const automated = db.prepare('SELECT * FROM automated_prophecies').all();
+  .get(async (req, res) => {
+    try {
+      const manual = await db.selectAll('prophecies');
+      const automated = await db.selectAll('automated_prophecies');
 
-    const manualYouTubeIds = new Set();
-    manual.forEach(item => {
-      const yId = getYouTubeId(item.link);
-      if (yId) manualYouTubeIds.add(yId);
-    });
+      const manualYouTubeIds = new Set();
+      manual.forEach(item => {
+        const yId = getYouTubeId(item.link);
+        if (yId) manualYouTubeIds.add(yId);
+      });
 
-    const filteredAutomated = automated.filter(item => !manualYouTubeIds.has(item.id));
-    res.json({ manual, automated: filteredAutomated });
+      const filteredAutomated = automated.filter(item => !manualYouTubeIds.has(item.id));
+      res.json({ manual, automated: filteredAutomated });
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to fetch prophecies' });
+    }
   })
-  .post(verifyToken, upload.single('file'), (req, res) => {
+  .post(verifyToken, upload.single('file'), async (req, res) => {
     const { title, link, thumbnail, description, year, type, summary, summaryStatus, transcript, transcriptStatus } = req.body;
     let finalThumbnail = thumbnail;
     if (req.file) finalThumbnail = `/uploads/${req.file.filename}`;
 
-    const info = db.prepare(`
-      INSERT INTO prophecies (title, link, thumbnail, description, year, type, summary, summaryStatus, transcript, transcriptStatus)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(title, link, finalThumbnail, description, year, type || 'manual', summary, summaryStatus, transcript, transcriptStatus);
-
-    const newItem = db.prepare('SELECT * FROM prophecies WHERE id = ?').get(info.lastInsertRowid);
-    res.json(newItem);
+    try {
+      const newItem = await db.insert('prophecies', {
+        title,
+        link,
+        thumbnail: finalThumbnail,
+        description,
+        year,
+        type: type || 'manual',
+        summary,
+        summaryStatus,
+        transcript,
+        transcriptStatus
+      });
+      res.json(newItem);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to add prophecy' });
+    }
   });
 
 app.route('/api/prophecies/:id')
-  .get((req, res) => {
+  .get(async (req, res) => {
     const { id } = req.params;
-    let item = db.prepare('SELECT * FROM prophecies WHERE id = ?').get(id);
-    if (!item) {
-      item = db.prepare('SELECT * FROM automated_prophecies WHERE id = ?').get(id);
+    try {
+      let item = await db.selectById('prophecies', id);
+      if (!item) {
+        item = await db.selectById('automated_prophecies', id);
+      }
+      if (item) res.json(item);
+      else res.status(404).json({ message: 'Prophecy not found' });
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching prophecy' });
     }
-    if (item) res.json(item);
-    else res.status(404).json({ message: 'Prophecy not found' });
   })
-  .put(verifyToken, upload.single('file'), (req, res) => {
+  .put(verifyToken, upload.single('file'), async (req, res) => {
     const { id } = req.params;
     const { title, link, thumbnail, description, year, type, summary, summaryStatus, transcript, transcriptStatus } = req.body;
 
     let finalThumbnail = thumbnail;
     if (req.file) finalThumbnail = `/uploads/${req.file.filename}`;
 
-    db.prepare(`
-      UPDATE prophecies 
-      SET title = ?, link = ?, thumbnail = ?, description = ?, year = ?, type = ?, summary = ?, summaryStatus = ?, transcript = ?, transcriptStatus = ?
-      WHERE id = ?
-    `).run(title, link, finalThumbnail, description, year, type, summary, summaryStatus, transcript, transcriptStatus, id);
+    const updates = {
+      title, link, thumbnail: finalThumbnail, description, year, type, summary, summaryStatus, transcript, transcriptStatus
+    };
 
-    const updatedItem = db.prepare('SELECT * FROM prophecies WHERE id = ?').get(id);
-    res.json(updatedItem);
+    try {
+      const updatedItem = await db.update('prophecies', id, updates);
+      res.json(updatedItem);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to update prophecy' });
+    }
   })
-  .delete(verifyToken, (req, res) => {
-    db.prepare('DELETE FROM prophecies WHERE id = ?').run(req.params.id);
-    res.json({ success: true });
+  .delete(verifyToken, async (req, res) => {
+    try {
+      await db.deleteById('prophecies', req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to delete prophecy' });
+    }
   });
 
 
 // Prophecy Highlight (Multiple Text Cards)
 app.route('/api/prophecy-highlight')
-  .get((req, res) => {
-    const data = db.prepare('SELECT * FROM highlights ORDER BY id DESC').all();
-    res.json(data);
+  .get(async (req, res) => {
+    try {
+      let data = await db.selectAll('highlights');
+      // Sort by ID DESC in JS since SelectAll doesn't support ordering yet
+      data.sort((a, b) => b.id - a.id);
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching highlights' });
+    }
   })
-  .post(verifyToken, (req, res) => {
+  .post(verifyToken, async (req, res) => {
     const { title, year, content } = req.body;
-    const info = db.prepare('INSERT INTO highlights (title, year, content) VALUES (?, ?, ?)').run(title, year || new Date().getFullYear().toString(), content);
-    const newItem = db.prepare('SELECT * FROM highlights WHERE id = ?').get(info.lastInsertRowid);
-    res.json(newItem);
+    try {
+      const newItem = await db.insert('highlights', {
+        title,
+        year: year || new Date().getFullYear().toString(),
+        content
+      });
+      res.json(newItem);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to create highlight' });
+    }
   });
 
 app.route('/api/prophecy-highlight/:id')
-  .put(verifyToken, (req, res) => {
+  .put(verifyToken, async (req, res) => {
     const { title, year, content } = req.body;
-    db.prepare('UPDATE highlights SET title = ?, year = ?, content = ? WHERE id = ?').run(title, year, content, req.params.id);
-    const updated = db.prepare('SELECT * FROM highlights WHERE id = ?').get(req.params.id);
-    res.json(updated);
+    try {
+      const updated = await db.update('highlights', req.params.id, { title, year, content });
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to update highlight' });
+    }
   })
-  .delete(verifyToken, (req, res) => {
-    db.prepare('DELETE FROM highlights WHERE id = ?').run(req.params.id);
-    res.json({ success: true });
+  .delete(verifyToken, async (req, res) => {
+    try {
+      await db.deleteById('highlights', req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to delete highlight' });
+    }
   });
 
 
@@ -963,22 +1039,20 @@ app.post('/api/videos/:id/transcript', verifyToken, async (req, res) => {
   const { id } = req.params;
   try {
     // 1. Try Automated First
-    const autoItem = db.prepare('SELECT * FROM automated_prophecies WHERE id = ?').get(id);
+    const autoItem = await db.selectById('automated_prophecies', id);
     if (autoItem) {
       const text = await fetchTranscriptText(id);
-      db.prepare('UPDATE automated_prophecies SET transcript = ?, transcriptStatus = ? WHERE id = ?')
-        .run(text, 'Draft', id);
+      await db.update('automated_prophecies', id, { transcript: text, transcriptStatus: 'Draft' });
       return res.json({ ...autoItem, transcript: text, transcriptStatus: 'Draft' });
     }
 
     // 2. Try Manual
-    const manualItem = db.prepare('SELECT * FROM prophecies WHERE id = ?').get(id);
+    const manualItem = await db.selectById('prophecies', id);
     if (manualItem) {
       const youtubeId = getYouTubeId(manualItem.link);
       if (!youtubeId) return res.status(400).json({ message: 'Invalid YouTube URL' });
       const text = await fetchTranscriptText(youtubeId);
-      db.prepare('UPDATE prophecies SET transcript = ?, transcriptStatus = ? WHERE id = ?')
-        .run(text, 'Draft', id);
+      await db.update('prophecies', id, { transcript: text, transcriptStatus: 'Draft' });
       return res.json({ ...manualItem, transcript: text, transcriptStatus: 'Draft' });
     }
 
@@ -989,82 +1063,93 @@ app.post('/api/videos/:id/transcript', verifyToken, async (req, res) => {
   }
 });
 
-app.put('/api/videos/:id', verifyToken, (req, res) => {
+app.put('/api/videos/:id', verifyToken, async (req, res) => {
   const { id } = req.params;
   const { transcript, transcriptStatus } = req.body;
 
-  let table = null;
-  const isAuto = db.prepare('SELECT id FROM automated_prophecies WHERE id = ?').get(id);
-  if (isAuto) table = 'automated_prophecies';
-  else {
-    const isManual = db.prepare('SELECT id FROM prophecies WHERE id = ?').get(id);
-    if (isManual) table = 'prophecies';
+  try {
+    let table = null;
+    const isAuto = await db.selectById('automated_prophecies', id);
+    if (isAuto) table = 'automated_prophecies';
+    else {
+      const isManual = await db.selectById('prophecies', id);
+      if (isManual) table = 'prophecies';
+    }
+
+    if (!table) return res.status(404).json({ message: 'Video not found' });
+
+    // Build dynamic update object
+    let updates = {};
+    if (transcript !== undefined) updates.transcript = transcript;
+    if (transcriptStatus !== undefined) updates.transcriptStatus = transcriptStatus;
+
+    if (Object.keys(updates).length > 0) {
+      await db.update(table, id, updates);
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Update video error:', error);
+    res.status(500).json({ message: 'Failed to update video' });
   }
-
-  if (!table) return res.status(404).json({ message: 'Video not found' });
-
-  // Build dynamic SQL for partial update
-  let updates = [];
-  let params = [];
-
-  if (transcript !== undefined) {
-    updates.push('transcript = ?');
-    params.push(transcript);
-  }
-  if (transcriptStatus !== undefined) {
-    updates.push('transcriptStatus = ?');
-    params.push(transcriptStatus);
-  }
-
-  if (updates.length > 0) {
-    const sql = `UPDATE ${table} SET ${updates.join(', ')} WHERE id = ?`;
-    params.push(id);
-    db.prepare(sql).run(...params);
-  }
-
-  res.json({ success: true });
 });
 
 
 // Announcements
 app.route('/api/announcements')
-  .get((req, res) => {
-    const items = db.prepare('SELECT * FROM announcements').all();
-    res.json(items);
+  .get(async (req, res) => {
+    try {
+      const items = await db.selectAll('announcements');
+      res.json(items);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to fetch announcements' });
+    }
   })
-  .post(verifyToken, upload.single('file'), (req, res) => {
+  .post(verifyToken, upload.single('file'), async (req, res) => {
     const { title, description, year } = req.body;
     const fileUrl = req.file ? `/uploads/${req.file.filename}` : null;
-    const info = db.prepare('INSERT INTO announcements (title, description, year, fileUrl) VALUES (?, ?, ?, ?)').run(title, description, year, fileUrl);
-    res.json(db.prepare('SELECT * FROM announcements WHERE id = ?').get(info.lastInsertRowid));
+
+    try {
+      const newItem = await db.insert('announcements', { title, description, year, fileUrl });
+      res.json(newItem);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to create announcement' });
+    }
   });
+
 app.route('/api/announcements/:id')
-  .get((req, res) => {
-    const item = db.prepare('SELECT * FROM announcements WHERE id = ?').get(req.params.id);
-    if (item) res.json(item);
-    else res.status(404).json({ message: 'Announcement not found' });
+  .get(async (req, res) => {
+    try {
+      const item = await db.selectById('announcements', req.params.id);
+      if (item) res.json(item);
+      else res.status(404).json({ message: 'Announcement not found' });
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching announcement' });
+    }
   })
-  .put(verifyToken, upload.single('file'), (req, res) => {
+  .put(verifyToken, upload.single('file'), async (req, res) => {
     const { id } = req.params;
     const { title, description, year } = req.body;
 
-    let sql = 'UPDATE announcements SET title = ?, description = ?, year = ?';
-    let params = [title, description, year];
-
+    const updates = { title, description, year };
     if (req.file) {
-      sql += ', fileUrl = ?';
-      params.push(`/uploads/${req.file.filename}`);
+      updates.fileUrl = `/uploads/${req.file.filename}`;
     }
 
-    sql += ' WHERE id = ?';
-    params.push(id);
-
-    db.prepare(sql).run(...params);
-    res.json(db.prepare('SELECT * FROM announcements WHERE id = ?').get(id));
+    try {
+      const updatedItem = await db.update('announcements', id, updates);
+      res.json(updatedItem);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to update announcement' });
+    }
   })
-  .delete(verifyToken, (req, res) => {
-    db.prepare('DELETE FROM announcements WHERE id = ?').run(req.params.id);
-    res.json({ success: true });
+  .delete(verifyToken, async (req, res) => {
+    try {
+      await db.deleteById('announcements', req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to delete announcement' });
+    }
   });
 
 // YouTube Feed
@@ -1085,171 +1170,244 @@ app.get('/api/youtube', (req, res) => {
 
 // Gallery
 app.route('/api/gallery')
-  .get((req, res) => {
-    res.json(db.prepare('SELECT * FROM gallery').all());
+  .get(async (req, res) => {
+    try {
+      const items = await db.selectAll('gallery');
+      res.json(items);
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching gallery' });
+    }
   })
-  .post(verifyToken, upload.single('image'), (req, res) => {
+  .post(verifyToken, upload.single('image'), async (req, res) => {
     const { alt } = req.body;
     const src = `/uploads/${req.file.filename}`;
-    const info = db.prepare('INSERT INTO gallery (alt, src) VALUES (?, ?)').run(alt, src);
-    res.json(db.prepare('SELECT * FROM gallery WHERE id = ?').get(info.lastInsertRowid));
+    try {
+      const newItem = await db.insert('gallery', { alt, src });
+      res.json(newItem);
+    } catch (error) {
+      res.status(500).json({ message: 'Error uploading image' });
+    }
   });
+
 app.route('/api/gallery/:id')
-  .put(verifyToken, upload.single('image'), (req, res) => {
+  .put(verifyToken, upload.single('image'), async (req, res) => {
     const { id } = req.params;
     const { alt } = req.body;
-    let sql = 'UPDATE gallery SET alt = ? WHERE id = ?';
-    let params = [alt, id];
+
+    const updates = { alt };
     if (req.file) {
-      sql = 'UPDATE gallery SET alt = ?, src = ? WHERE id = ?';
-      params = [alt, `/uploads/${req.file.filename}`, id];
+      updates.src = `/uploads/${req.file.filename}`;
     }
-    db.prepare(sql).run(...params);
-    res.json(db.prepare('SELECT * FROM gallery WHERE id = ?').get(id));
+
+    try {
+      const updated = await db.update('gallery', id, updates);
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ message: 'Error updating image' });
+    }
   })
-  .delete(verifyToken, (req, res) => {
-    db.prepare('DELETE FROM gallery WHERE id = ?').run(req.params.id);
-    res.json({ success: true });
+  .delete(verifyToken, async (req, res) => {
+    try {
+      await db.deleteById('gallery', req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ message: 'Error deleting image' });
+    }
   });
 
 // Literature
 app.route('/api/literature')
-  .get((req, res) => {
-    const data = db.prepare('SELECT * FROM literature').all().map(item => {
-      try { item.type = JSON.parse(item.type); } catch (e) { }
-      return item;
-    });
-    res.json(data);
+  .get(async (req, res) => {
+    try {
+      const data = await db.selectAll('literature');
+      const processed = data.map(item => {
+        try { item.type = JSON.parse(item.type); } catch (e) { }
+        return item;
+      });
+      res.json(processed);
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching literature' });
+    }
   })
-  .post(verifyToken, upload.fields([{ name: 'image', maxCount: 1 }, { name: 'pdf', maxCount: 1 }]), (req, res) => {
+  .post(verifyToken, upload.fields([{ name: 'image', maxCount: 1 }, { name: 'pdf', maxCount: 1 }]), async (req, res) => {
     const { title, author, description, type } = req.body;
     const image = req.files['image'] ? `/uploads/${req.files['image'][0].filename}` : null;
     const pdf = req.files['pdf'] ? `/uploads/${req.files['pdf'][0].filename}` : null;
-    const info = db.prepare('INSERT INTO literature (title, author, description, image, pdf, type) VALUES (?, ?, ?, ?, ?, ?)').run(title, author, description, image, pdf, type);
-    res.json(db.prepare('SELECT * FROM literature WHERE id = ?').get(info.lastInsertRowid));
+
+    try {
+      const newItem = await db.insert('literature', { title, author, description, image, pdf, type });
+      res.json(newItem);
+    } catch (error) {
+      res.status(500).json({ message: 'Error creating literature' });
+    }
   });
+
 app.route('/api/literature/:id')
-  .put(verifyToken, upload.fields([{ name: 'image', maxCount: 1 }, { name: 'pdf', maxCount: 1 }]), (req, res) => {
+  .put(verifyToken, upload.fields([{ name: 'image', maxCount: 1 }, { name: 'pdf', maxCount: 1 }]), async (req, res) => {
     const { id } = req.params;
     const { title, author, description, type } = req.body;
 
-    let sql = 'UPDATE literature SET title = ?, author = ?, description = ?, type = ?';
-    let params = [title, author, description, type];
-
+    const updates = { title, author, description, type };
     if (req.files['image']) {
-      sql += ', image = ?';
-      params.push(`/uploads/${req.files['image'][0].filename}`);
+      updates.image = `/uploads/${req.files['image'][0].filename}`;
     }
     if (req.files['pdf']) {
-      sql += ', pdf = ?';
-      params.push(`/uploads/${req.files['pdf'][0].filename}`);
+      updates.pdf = `/uploads/${req.files['pdf'][0].filename}`;
     }
 
-    sql += ' WHERE id = ?';
-    params.push(id);
-
-    db.prepare(sql).run(...params);
-    res.json(db.prepare('SELECT * FROM literature WHERE id = ?').get(id));
+    try {
+      const updated = await db.update('literature', id, updates);
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ message: 'Error updating literature' });
+    }
   })
-  .delete(verifyToken, (req, res) => {
-    db.prepare('DELETE FROM literature WHERE id = ?').run(req.params.id);
-    res.json({ success: true });
+  .delete(verifyToken, async (req, res) => {
+    try {
+      await db.deleteById('literature', req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ message: 'Error deleting literature' });
+    }
   });
 
 // Prarthana
 app.route('/api/prarthana')
-  .get((req, res) => res.json(db.prepare('SELECT * FROM prarthana').all()))
-  .post(verifyToken, (req, res) => {
-    console.log('POST /api/prarthana', req.body);
-    const { title, content, description } = req.body;
-    const info = db.prepare('INSERT INTO prarthana (title, content, description) VALUES (?, ?, ?)').run(title, content, description);
-    res.json(db.prepare('SELECT * FROM prarthana WHERE id = ?').get(info.lastInsertRowid));
-  });
-app.route('/api/prarthana/:id')
-  .put(verifyToken, (req, res) => {
-    const { id } = req.params;
-    console.log(`PUT /api/prarthana/${id}`, req.body);
-    const { title, content, description } = req.body;
-    db.prepare('UPDATE prarthana SET title = ?, content = ?, description = ? WHERE id = ?')
-      .run(title, content, description, id);
-    res.json(db.prepare('SELECT * FROM prarthana WHERE id = ?').get(id));
+  .get(async (req, res) => {
+    try {
+      const items = await db.selectAll('prarthana');
+      res.json(items);
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching prarthana' });
+    }
   })
-  .delete(verifyToken, (req, res) => {
-    db.prepare('DELETE FROM prarthana WHERE id = ?').run(req.params.id);
-    res.json({ success: true });
+  .post(verifyToken, async (req, res) => {
+    const { title, content, description } = req.body;
+    try {
+      const newItem = await db.insert('prarthana', { title, content, description });
+      res.json(newItem);
+    } catch (error) {
+      res.status(500).json({ message: 'Error creating prarthana' });
+    }
+  });
+
+app.route('/api/prarthana/:id')
+  .put(verifyToken, async (req, res) => {
+    const { id } = req.params;
+    const { title, content, description } = req.body;
+    try {
+      const updated = await db.update('prarthana', id, { title, content, description });
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ message: 'Error updating prarthana' });
+    }
+  })
+  .delete(verifyToken, async (req, res) => {
+    try {
+      await db.deleteById('prarthana', req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ message: 'Error deleting prarthana' });
+    }
   });
 
 // Profiles
-app.get('/api/profiles', (req, res) => res.json(db.prepare('SELECT * FROM profiles').all()));
-app.post('/api/profiles', verifyToken, upload.single('image'), (req, res) => {
+app.get('/api/profiles', async (req, res) => {
+  try {
+    const items = await db.selectAll('profiles');
+    res.json(items);
+  } catch (e) {
+    res.status(500).json({ message: 'Error fetching profiles' });
+  }
+});
+
+app.post('/api/profiles', verifyToken, upload.single('image'), async (req, res) => {
   const { id, title, description } = req.body;
   let image = null;
   if (req.file) image = `/uploads/${req.file.filename}`;
 
-  db.prepare('INSERT OR REPLACE INTO profiles (id, title, description, image) VALUES (?, ?, ?, COALESCE(?, (SELECT image FROM profiles WHERE id = ?)))')
-    .run(id, title, description, image, id);
+  try {
+    // Upsert Logic: Check existence to preserve image if not provided
+    let existing = await db.selectById('profiles', id);
+    if (existing && !image) {
+      image = existing.image;
+    }
 
-  res.json(db.prepare('SELECT * FROM profiles WHERE id = ?').get(id));
+    const newItem = await db.upsert('profiles', { id, title, description, image });
+    res.json(newItem);
+  } catch (e) {
+    res.status(500).json({ message: 'Error saving profile' });
+  }
 });
 
 app.route('/api/profiles/:id')
-  .put(verifyToken, upload.single('image'), (req, res) => {
+  .put(verifyToken, upload.single('image'), async (req, res) => {
     const { id } = req.params;
     const { title, description } = req.body;
-    let image = null;
-    if (req.file) image = `/uploads/${req.file.filename}`;
 
-    let sql = 'UPDATE profiles SET title = ?, description = ?';
-    let params = [title, description];
-
-    if (image) {
-      sql += ', image = ?';
-      params.push(image);
+    const updates = { title, description };
+    if (req.file) {
+      updates.image = `/uploads/${req.file.filename}`;
     }
 
-    sql += ' WHERE id = ?';
-    params.push(id);
-
-    db.prepare(sql).run(...params);
-    res.json(db.prepare('SELECT * FROM profiles WHERE id = ?').get(id));
+    try {
+      const updated = await db.update('profiles', id, updates);
+      res.json(updated);
+    } catch (e) {
+      res.status(500).json({ message: 'Error updating profile' });
+    }
   });
 
 // Downloads
 app.route('/api/downloads')
-  .get((req, res) => res.json(db.prepare('SELECT * FROM downloads').all()))
-  .post(verifyToken, upload.fields([{ name: 'pdfFile', maxCount: 1 }, { name: 'cdrFile', maxCount: 1 }]), (req, res) => {
+  .get(async (req, res) => {
+    try {
+      const items = await db.selectAll('downloads');
+      res.json(items);
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching downloads' });
+    }
+  })
+  .post(verifyToken, upload.fields([{ name: 'pdfFile', maxCount: 1 }, { name: 'cdrFile', maxCount: 1 }]), async (req, res) => {
     const { title, description, type, location, year } = req.body;
     const pdf = req.files['pdfFile'] ? `/uploads/${req.files['pdfFile'][0].filename}` : null;
     const cdrFile = req.files['cdrFile'] ? `/uploads/${req.files['cdrFile'][0].filename}` : null;
-    const info = db.prepare('INSERT INTO downloads (title, description, pdf, cdrFile, type, location, year) VALUES (?, ?, ?, ?, ?, ?, ?)').run(title, description, pdf, cdrFile, type, location, year);
-    res.json(db.prepare('SELECT * FROM downloads WHERE id = ?').get(info.lastInsertRowid));
+
+    try {
+      const newItem = await db.insert('downloads', { title, description, pdf, cdrFile, type, location, year });
+      res.json(newItem);
+    } catch (error) {
+      res.status(500).json({ message: 'Error creating download' });
+    }
   });
+
 app.route('/api/downloads/:id')
-  .put(verifyToken, upload.fields([{ name: 'pdfFile', maxCount: 1 }, { name: 'cdrFile', maxCount: 1 }]), (req, res) => {
+  .put(verifyToken, upload.fields([{ name: 'pdfFile', maxCount: 1 }, { name: 'cdrFile', maxCount: 1 }]), async (req, res) => {
     const { id } = req.params;
     const { title, description, type, location, year } = req.body;
 
-    let sql = 'UPDATE downloads SET title = ?, description = ?, type = ?, location = ?, year = ?';
-    let params = [title, description, type, location, year];
-
+    const updates = { title, description, type, location, year };
     if (req.files['pdfFile']) {
-      sql += ', pdf = ?';
-      params.push(`/uploads/${req.files['pdfFile'][0].filename}`);
+      updates.pdf = `/uploads/${req.files['pdfFile'][0].filename}`;
     }
     if (req.files['cdrFile']) {
-      sql += ', cdrFile = ?';
-      params.push(`/uploads/${req.files['cdrFile'][0].filename}`);
+      updates.cdrFile = `/uploads/${req.files['cdrFile'][0].filename}`;
     }
 
-    sql += ' WHERE id = ?';
-    params.push(id);
-
-    db.prepare(sql).run(...params);
-    res.json(db.prepare('SELECT * FROM downloads WHERE id = ?').get(id));
+    try {
+      const updated = await db.update('downloads', id, updates);
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ message: 'Error updating download' });
+    }
   })
-  .delete(verifyToken, (req, res) => {
-    db.prepare('DELETE FROM downloads WHERE id = ?').run(req.params.id);
-    res.json({ success: true });
+  .delete(verifyToken, async (req, res) => {
+    try {
+      await db.deleteById('downloads', req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ message: 'Error deleting download' });
+    }
   });
 
 
@@ -1263,10 +1421,10 @@ app.post('/api/newsletter/subscribe', async (req, res) => {
 
   try {
     // 1. Save to Database
-    const info = db.prepare('INSERT INTO newsletter_subscribers (email, subscribed_at) VALUES (?, ?)').run(
+    await db.insert('newsletter_subscribers', {
       email,
-      new Date().toISOString()
-    );
+      subscribed_at: new Date().toISOString()
+    });
 
     // 2. Send Welcome Email (Simulated OTP/Notification style)
     const subject = 'Welcome to the Jai Gurudev Community! 🙏';
@@ -1288,7 +1446,9 @@ app.post('/api/newsletter/subscribe', async (req, res) => {
 
     res.json({ success: true, message: 'Subscribed successfully!' });
   } catch (err) {
-    if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+    // Check for unique constraint error (Supabase or SQLite)
+    // Supabase error usually has code '23505' for unique violation
+    if (err.code === 'SQLITE_CONSTRAINT_UNIQUE' || err.code === '23505') {
       return res.status(409).json({ message: 'This email is already subscribed.' });
     }
     console.error('Newsletter Error:', err);
@@ -1297,9 +1457,11 @@ app.post('/api/newsletter/subscribe', async (req, res) => {
 });
 
 // Newsletter Subscription
-app.get('/api/newsletter/subscribers', verifyToken, (req, res) => {
+app.get('/api/newsletter/subscribers', verifyToken, async (req, res) => {
   try {
-    const subscribers = db.prepare('SELECT * FROM newsletter_subscribers ORDER BY subscribed_at DESC').all();
+    let subscribers = await db.selectAll('newsletter_subscribers');
+    // Sort in JS
+    subscribers.sort((a, b) => new Date(b.subscribed_at) - new Date(a.subscribed_at));
     const count = subscribers.length;
     res.json({ count, subscribers });
   } catch (err) {
@@ -1317,7 +1479,7 @@ app.post('/api/newsletter/broadcast', verifyToken, async (req, res) => {
 
   try {
     // 1. Fetch all subscribers
-    const subscribers = db.prepare('SELECT email FROM newsletter_subscribers').all();
+    const subscribers = await db.selectAll('newsletter_subscribers');
 
     if (subscribers.length === 0) {
       return res.status(400).json({ message: 'No subscribers found.' });

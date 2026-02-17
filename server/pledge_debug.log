@@ -266,3 +266,8 @@
 [Global] GET /api/prophecies - Status: 304 - Origin: undefined - Duration: 78ms
 [Global] GET /api/announcements - Status: 304 - Origin: undefined - Duration: 3ms
 [Global] GET /favicon.ico - Status: 304 - Origin: undefined - Duration: 4ms
+[Global] GET /api/literature - Status: 500 - Origin: undefined - Duration: 25ms
+[Global] GET /api/literature - Status: 500 - Origin: undefined - Duration: 14ms
+[Global] GET /api/literature - Status: 200 - Origin: undefined - Duration: 15ms
+[Global] GET /api/literature - Status: 500 - Origin: undefined - Duration: 542ms
+[Global] GET /api/literature - Status: 200 - Origin: undefined - Duration: 997ms
