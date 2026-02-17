@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import SEO from '../components/common/SEO';
 import ReactMarkdown from 'react-markdown';
+import ShareButtons from '../components/common/ShareButtons';
 
 export default function ProphecyDetail() {
     const { id } = useParams();
@@ -76,42 +77,7 @@ export default function ProphecyDetail() {
                     </h1>
 
                     {/* Social Share Buttons - Styled like Nav Menu */}
-                    <style>
-                        {`
-                            .share-btn {
-                                background-color: #c41e3a;
-                                color: white !important;
-                                padding: 8px 15px;
-                                border-radius: 4px;
-                                text-decoration: none;
-                                display: inline-flex;
-                                align-items: center;
-                                gap: 8px;
-                                font-weight: bold;
-                                transition: background-color 0.3s, transform 0.2s;
-                                font-size: 0.9rem;
-                            }
-                            .share-btn:hover {
-                                background-color: #a01830;
-                                transform: translateY(-2px);
-                                color: #FFD700 !important;
-                            }
-                        `}
-                    </style>
-                    <div style={{ marginTop: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                        <a href={`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`} target="_blank" rel="noopener noreferrer" className="share-btn" title="Share on WhatsApp">
-                            <i className="fab fa-whatsapp" style={{ fontSize: '1.2rem' }}></i> WhatsApp
-                        </a>
-                        <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" className="share-btn" title="Share on Facebook">
-                            <i className="fab fa-facebook" style={{ fontSize: '1.2rem' }}></i> Facebook
-                        </a>
-                        <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" className="share-btn" title="Share on X">
-                            <i className="fa-brands fa-x-twitter" style={{ fontSize: '1.2rem' }}></i> X
-                        </a>
-                        <a href={`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`} target="_blank" rel="noopener noreferrer" className="share-btn" title="Share on Telegram">
-                            <i className="fab fa-telegram" style={{ fontSize: '1.2rem' }}></i> Telegram
-                        </a>
-                    </div>
+                    <ShareButtons title={item.title} />
                 </header>
 
 

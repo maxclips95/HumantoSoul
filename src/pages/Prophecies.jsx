@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import TranscriptModal from "../components/TranscriptModal";
 import SEO from '../components/common/SEO';
+import ShareButtons from '../components/common/ShareButtons';
 
 
 const ReadingModal = ({ title, content, onClose }) => {
@@ -373,6 +374,7 @@ export default function Prophecies() {
                     Watch Video →
                   </a>
                 )}
+                <ShareButtons title={item.title} url={item.link ? item.link : `https://www.humantosoul.com/prophecy/${item.id}`} />
               </div>
             </div>
           ))}
