@@ -1,27 +1,21 @@
+/**
+ * search_engine.js — Semantic Search using Supabase
+ * Uses Xenova/all-MiniLM-L6-v2 (384-dim embeddings) stored in Supabase content_chunks table.
+ */
 const { pipeline } = require('@xenova/transformers');
 const { db } = require('./database');
-const fs = require('fs');
-const path = require('path');
 
-// Singleton to hold the model
 let extractor = null;
 
-// Clean text helper (reused from chatbot logic logic but tailored for indexing)
 const cleanTextForIndex = (text) => {
-    if (!text) return "";
-    let cleaned = text.replace(/\r\n/g, '\n');
-
-    // Remove heavy footer noise before indexing
+    if (!text) return '';
     const stopMarkers = ['website /', 'subscribe', 'address of', 'follow the', 'contact:'];
-    const lines = cleaned.split('\n');
+    const lines = text.replace(/\r\n/g, '\n').split('\n');
     const goodLines = [];
-
-    for (let line of lines) {
+    for (const line of lines) {
         const lower = line.toLowerCase();
-        if (stopMarkers.some(m => lower.includes(m))) break; // Stop at footer
-        if (!lower.startsWith('#') && line.trim().length > 0) {
-            goodLines.push(line.trim());
-        }
+        if (stopMarkers.some(m => lower.includes(m))) break;
+        if (!lower.startsWith('#') && line.trim().length > 0) goodLines.push(line.trim());
     }
     return goodLines.join('\n');
 };
@@ -29,112 +23,56 @@ const cleanTextForIndex = (text) => {
 const chunkText = (text, maxLength = 600) => {
     const sentences = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [text];
     const chunks = [];
-    let currentChunk = "";
-
+    let currentChunk = '';
     for (const sentence of sentences) {
         if ((currentChunk + sentence).length > maxLength) {
             chunks.push(currentChunk.trim());
             currentChunk = sentence;
         } else {
-            currentChunk += " " + sentence;
+            currentChunk += ' ' + sentence;
         }
     }
     if (currentChunk.trim()) chunks.push(currentChunk.trim());
     return chunks;
 };
 
+const detectLanguage = (text) => /[\u0900-\u097F]/.test(text) ? 'hi' : 'en';
+
 const SearchEngine = {
     initialize: async () => {
         if (!extractor) {
-            console.log('[SearchEngine] Loading Feature Extraction Model (MiniLM)...');
-            // Use quantized model for speed
+            console.log('[SearchEngine] Loading MiniLM model...');
             extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
-            console.log('[SearchEngine] Model Loaded.');
+            console.log('[SearchEngine] Model loaded.');
         }
     },
 
-    // Sync content from Source Table -> Vector Table
     syncContent: async () => {
-        console.log("---------------- FORCING SYNC START (V2 - SMART) ----------------");
+        console.log('[SearchEngine] Starting content sync to Supabase...');
         await SearchEngine.initialize();
 
-        // 1. Fetch Source Data
-        const announcements = db.prepare('SELECT id, title, description FROM announcements').all();
-        const prophecies = db.prepare('SELECT id, title, description FROM prophecies').all();
-        const automated = db.prepare('SELECT id, title, description FROM automated_prophecies').all();
-        const profiles = db.prepare('SELECT id, title, description FROM profiles').all();
-        const literature = db.prepare('SELECT id, title, description, author FROM literature').all();
-        const prarthana = db.prepare('SELECT id, title, content, description FROM prarthana').all(); // Prayers (Hindi mostly)
-        const highlights = db.prepare('SELECT id, title, content FROM highlights').all(); // Text Prophecies
+        // Fetch all source data from Supabase
+        const [announcements, prophecies, automated, profiles, literature, prarthana, highlights] = await Promise.all([
+            db.selectAll('announcements'),
+            db.selectAll('prophecies'),
+            db.selectAll('automated_prophecies'),
+            db.selectAll('profiles'),
+            db.selectAll('literature'),
+            db.selectAll('prarthana'),
+            db.selectAll('highlights'),
+        ]);
 
-        // Static Content (Tagged as 'general' or 'biography')
         const staticDocs = [
-            {
-                id: 1001,
-                title: 'Core Mission & About Us',
-                type: 'general',
-                description: `This website represents Baba Jai Gurudev and Baba Umakant Ji Maharaj (referred to as "Maalik"). They teach Sant Mat—the spiritual path to Satlok (True Home) to escape the cycle of 8.4 million (84 lakh) life forms. 
-                Key teachings include chanting "Jaigurudev" for divine protection, receiving Naamdan (initiation) in person, and leading a satvic vegetarian lifestyle. This is NOT about Lord Krishna or general Hinduism - this is a specific Sant Mat lineage.`
-            },
-            {
-                id: 1002,
-                title: 'Ashram Locations & Contact',
-                type: 'general',
-                description: `The main ashram locations are:
-                1. Ujjain Ashram (Madhya Pradesh): Opposite Pingleshwar Railway Station, Maksi Road, Ujjain. PIN: 456661. Phone: 9754700200, 9575600700.
-                2. Bawal Ashram (Haryana): Phone: 8801092023, 9671307438.
-                3. Thikariya Ashram (Rajasthan): Phone: 7023704540.
-                Email: info@jaigurudevukm.com
-                Website: www.jaigurudevukm.com`
-            },
-            {
-                id: 1003,
-                title: 'Rules & Initiation (Naamdan)',
-                type: 'general',
-                description: `Naamdan (Spiritual Initiation) must be received IN PERSON at the ashram or during Baba Ji's programs. There is NO online initiation. Followers must be strictly vegetarian (satvic diet) and abstain from alcohol, tobacco, and all intoxicants. Programs are held across India and abroad, predominantly in India each month.`
-            },
-            {
-                id: 1004,
-                title: 'Satvic Lifestyle & Pledge',
-                type: 'general',
-                description: `The Satvic Lifestyle section promotes a pure vegetarian diet (no meat, eggs, alcohol). Followers can take a pledge to give up specific non-vegetarian items. The website includes vegetarian recipes from around the world and educational content about the spiritual benefits of a plant-based diet.`
-            },
-            {
-                id: 1005,
-                title: 'Programs & Events',
-                type: 'general',
-                description: `Baba Umakant Ji Maharaj conducts regular spiritual programs called Satsangs across India. There are also special programs like Dukh Nivaran Kafila (Pain Relief Caravan), Sadhna Shivir (Spiritual Camps), and Sankat Mochan Ruhani Kafila (Liberation programs). Check the Announcements section for the latest program schedules.`
-            },
-            {
-                id: 1006,
-                title: 'Prophecies & Spiritual Warnings',
-                type: 'general',
-                description: `The Prophecies section contains spiritual warnings and predictions about future events, geopolitical changes, natural disasters, and the path to spiritual protection. These are delivered through Baba Umakant Ji Maharaj's satsangs and are available as video transcripts. Topics include warnings about 2025-2026 challenges, war predictions, disease outbreaks, and guidance on spiritual protection.`
-            },
-            {
-                id: 1007,
-                title: 'Spiritual Literature & Books',
-                type: 'general',
-                description: `The Literature section provides access to spiritual books, teachings, and written materials. These include works by Sant Mat teachers, spiritual guidance texts, and downloadable PDFs. Books cover topics like the path to Satlok, the nature of the soul, karma, and liberation.`
-            },
-            {
-                id: 1008,
-                title: 'Gallery & Media',
-                type: 'general',
-                description: `The Gallery section contains photos from satsangs, ashram events, spiritual programs, and images of Baba Jai Gurudev and Baba Umakant Ji Maharaj. It also includes images of ashram locations, devotees, and special ceremonies.`
-            },
-            {
-                id: 1009,
-                title: 'Downloads & Resources',
-                type: 'general',
-                description: `The Downloads section provides PDFs, posters, banners, and other materials for devotees. These include program schedules, spiritual texts, promotional materials for satsangs, and resources organized by location and year.`
-            },
-            {
-                id: 1010,
-                title: 'Admin & CMS System',
-                type: 'general',
-                description: `The website includes a secure admin panel for managing content. Admins can add/edit announcements, prophecies, literature, gallery images, prayers, downloads, and profiles. The admin system is protected with JWT authentication and bcrypt password hashing.`
-            }
+            { id: 1001, title: 'Core Mission & About Us', description: `This website represents Baba Jai Gurudev and Baba Umakant Ji Maharaj (referred to as "Maalik"). They teach Sant Mat—the spiritual path to Satlok (True Home) to escape the cycle of 8.4 million (84 lakh) life forms. Key teachings include chanting "Jaigurudev" for divine protection, receiving Naamdan (initiation) in person, and leading a satvic vegetarian lifestyle.` },
+            { id: 1002, title: 'Ashram Locations & Contact', description: `Main ashram locations: 1. Ujjain Ashram (MP): Opposite Pingleshwar Railway Station, Maksi Road, Ujjain. PIN: 456661. Phone: 9754700200. 2. Bawal Ashram (Haryana): 8801092023. 3. Thikariya Ashram (Rajasthan): 7023704540. Email: info@jaigurudevukm.com` },
+            { id: 1003, title: 'Rules & Initiation (Naamdan)', description: `Naamdan must be received IN PERSON at the ashram. No online initiation. Followers must be strictly vegetarian and abstain from alcohol, tobacco, and all intoxicants.` },
+            { id: 1004, title: 'Satvic Lifestyle & Pledge', description: `The Satvic Lifestyle section promotes a pure vegetarian diet (no meat, eggs, alcohol). Followers can take a pledge to give up specific non-vegetarian items.` },
+            { id: 1005, title: 'Programs & Events', description: `Baba Umakant Ji Maharaj conducts regular Satsangs across India. Special programs include Dukh Nivaran Kafila, Sadhna Shivir, and Sankat Mochan Ruhani Kafila.` },
+            { id: 1006, title: 'Prophecies & Spiritual Warnings', description: `The Prophecies section contains spiritual warnings and predictions about future events, geopolitical changes, natural disasters, and the path to spiritual protection.` },
+            { id: 1007, title: 'Spiritual Literature & Books', description: `The Literature section provides access to spiritual books, teachings, and written materials including works by Sant Mat teachers.` },
+            { id: 1008, title: 'Gallery & Media', description: `The Gallery section contains photos from satsangs, ashram events, and images of Baba Jai Gurudev and Baba Umakant Ji Maharaj.` },
+            { id: 1009, title: 'Downloads & Resources', description: `The Downloads section provides PDFs, posters, banners, and other materials for devotees including program schedules and spiritual texts.` },
+            { id: 1010, title: 'Admin & CMS System', description: `The website includes a secure admin panel for managing content with JWT authentication and bcrypt password hashing.` },
         ];
 
         const sources = [
@@ -145,30 +83,23 @@ const SearchEngine = {
             { name: 'literature', type: 'literature', data: literature.map(l => ({ ...l, description: `${l.title} by ${l.author}. ${l.description}` })) },
             { name: 'prarthana', type: 'ritual', data: prarthana.map(p => ({ ...p, description: `${p.content}\n${p.description}` })) },
             { name: 'highlights', type: 'prophecy', data: highlights.map(h => ({ ...h, description: h.content })) },
-            { name: 'static_content', type: 'general', data: staticDocs }
+            { name: 'static_content', type: 'general', data: staticDocs },
         ];
 
-        // Helper: Detect Language
-        const detectLanguage = (text) => {
-            const hindiChars = /[\u0900-\u097F]/;
-            return hindiChars.test(text) ? 'hi' : 'en';
-        };
+        // Clear existing chunks in Supabase
+        const { error: deleteError } = await db.raw.from('content_chunks').delete().neq('id', 0);
+        if (deleteError) {
+            console.error('[SearchEngine] Failed to clear content_chunks:', deleteError.message);
+            return;
+        }
 
         let totalChunks = 0;
-
-        // Reset Index
-        db.prepare('DELETE FROM content_chunks').run();
-
-        const insertStmt = db.prepare(`
-            INSERT INTO content_chunks (document_id, source_table, chunk_text, embedding, chunk_index, language, section_type)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        `);
+        const chunkBatch = [];
 
         for (const source of sources) {
             console.log(`[SearchEngine] Indexing ${source.name} (${source.data.length} items)...`);
             for (const item of source.data) {
-                // Determine Text & Language
-                const desc = item.description || "";
+                const desc = item.description || '';
                 const fullText = `Title: ${item.title}\n${cleanTextForIndex(desc)}`;
                 if (fullText.length < 30) continue;
 
@@ -176,80 +107,83 @@ const SearchEngine = {
                 const chunks = chunkText(fullText);
 
                 for (let i = 0; i < chunks.length; i++) {
-                    const chunk = chunks[i];
                     try {
-                        const output = await extractor(chunk, { pooling: 'mean', normalize: true });
-                        const embedding = Buffer.from(output.data.buffer);
+                        const output = await extractor(chunks[i], { pooling: 'mean', normalize: true });
+                        // Store as base64 string since Supabase doesn't support BLOB directly
+                        const embeddingArray = Array.from(output.data);
 
-                        let docId = 0;
-                        if (typeof item.id === 'number') docId = item.id;
-                        // For static docs, use their assigned numeric ID
-                        else if (typeof item.id === 'string' && item.id.startsWith('static_')) {
-                            docId = parseInt(item.id.replace('static_', '')); // Attempt to parse if it's a static ID string
-                            if (isNaN(docId)) docId = 0; // Fallback if parsing fails
-                        }
-
-                        insertStmt.run(docId, source.name, chunk, embedding, i, lang, source.type || 'general');
+                        chunkBatch.push({
+                            document_id: typeof item.id === 'number' ? item.id : 0,
+                            source_table: source.name,
+                            chunk_text: chunks[i],
+                            embedding: JSON.stringify(embeddingArray), // stored as JSON text
+                            chunk_index: i,
+                            language: lang,
+                            section_type: source.type || 'general'
+                        });
                         totalChunks++;
                     } catch (e) {
-                        console.error(`Error embedding chunk (${source.name}): ${e.message}`);
+                        console.error(`[SearchEngine] Embed error (${source.name}): ${e.message}`);
                     }
                 }
             }
         }
-        console.log(`[SearchEngine] Smart Sync Complete. Total Chunks: ${totalChunks}`);
+
+        // Batch insert in chunks of 100
+        const BATCH_SIZE = 100;
+        for (let i = 0; i < chunkBatch.length; i += BATCH_SIZE) {
+            const batch = chunkBatch.slice(i, i + BATCH_SIZE);
+            const { error } = await db.raw.from('content_chunks').insert(batch);
+            if (error) console.error(`[SearchEngine] Batch insert error:`, error.message);
+        }
+
+        console.log(`[SearchEngine] Sync complete. Total chunks: ${totalChunks}`);
     },
 
     search: async (query, limit = 3) => {
         await SearchEngine.initialize();
 
-        // 1. Detect Query Language
-        const hindiChars = /[\u0900-\u097F]/;
-        const queryLang = hindiChars.test(query) ? 'hi' : 'en';
-        console.log(`[SearchEngine] Searching in language: ${queryLang}`);
-
-        // 2. Embed Query
+        const queryLang = detectLanguage(query);
         const output = await extractor(query, { pooling: 'mean', normalize: true });
         const queryVector = output.data;
 
-        // 3. Fetch Candidate Chunks (Filter by Language)
-        const candidates = db.prepare('SELECT chunk_text, embedding, section_type FROM content_chunks WHERE language = ?')
-            .all(queryLang);
+        // Fetch candidates from Supabase filtered by language
+        const { data: candidates, error } = await db.raw
+            .from('content_chunks')
+            .select('chunk_text, embedding, section_type')
+            .eq('language', queryLang);
 
-        if (candidates.length === 0) {
-            // Fallback: If no hindi, try english (or vice versa) if it was short query
-            // But for "Smartest Bot", strictness is better.
-            return [];
-        }
+        if (error) throw new Error(`[SearchEngine] Search query failed: ${error.message}`);
+        if (!candidates || candidates.length === 0) return [];
 
-        // 4. Cosine Similarity & Rank
+        // Cosine similarity ranking
         let results = candidates.map(chunk => {
-            const vec = new Float32Array(chunk.embedding.buffer, chunk.embedding.byteOffset, chunk.embedding.byteLength / 4);
+            const vec = JSON.parse(chunk.embedding);
             let dot = 0.0;
             for (let i = 0; i < vec.length; i++) dot += vec[i] * queryVector[i];
-
-            // Boost certain sections based on logic if needed (e.g. 1.2x for exact titles)
             return { score: dot, text: chunk.chunk_text, type: chunk.section_type };
         });
 
-        results = results.filter(r => r.score > 0.35); // Threshold
+        results = results.filter(r => r.score > 0.35);
 
-        // 5. Keyword Fallback (Critical for Hindi)
+        // Keyword fallback for short/Hindi queries
         if (results.length === 0 && query.length > 2) {
             console.log('[SearchEngine] No semantic matches. Trying keyword fallback.');
-            const keywordMatches = db.prepare('SELECT chunk_text, section_type FROM content_chunks WHERE language = ? AND chunk_text LIKE ? LIMIT 5')
-                .all(queryLang, `%${query}%`);
+            const { data: keywordMatches } = await db.raw
+                .from('content_chunks')
+                .select('chunk_text, section_type')
+                .eq('language', queryLang)
+                .ilike('chunk_text', `%${query}%`)
+                .limit(5);
 
-            results = keywordMatches.map(m => ({
-                score: 0.9, // Artificial high score for exact keyword matches
+            results = (keywordMatches || []).map(m => ({
+                score: 0.9,
                 text: m.chunk_text,
                 type: m.section_type
             }));
         }
 
-        return results
-            .sort((a, b) => b.score - a.score)
-            .slice(0, limit);
+        return results.sort((a, b) => b.score - a.score).slice(0, limit);
     }
 };
 

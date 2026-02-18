@@ -350,33 +350,32 @@ const FEATURED_SHORTS = [
 const PROPHECY_KEYWORDS = ["भविष्यवाणी", "चेतावनी", "संदेश", "आगाही", "कलयुग", "सतयुग", "2025", "2026", "बचेंगे", "लड़ाई", "विनाश", "संदेश", "आगाही", "short", "shorts", "prophecy", "prediction"];
 
 async function fetchYouTubeProphecies() {
-  console.log('Automating Prophecies (Refined Search)...');
+  console.log('[YouTube] Fetching prophecies from RSS...');
   try {
     const response = await fetch(RSS_URL);
     const result = await (new xml2js.Parser()).parseStringPromise(await response.text());
     const entries = result.feed.entry || [];
 
-    // Load existing items to preserve summaries from SQLite
-    const existingItems = db.prepare('SELECT * FROM automated_prophecies').all();
+    // Load existing items from Supabase to preserve transcripts
+    const existingItems = await db.selectAll('automated_prophecies');
 
     let items = entries.map(entry => {
       const title = entry.title[0];
       const desc = entry['media:group'][0]['media:description'][0];
       const id = entry['yt:videoId'][0];
       const isShort = title.toLowerCase().includes('short') || desc.toLowerCase().includes('#shorts') || desc.toLowerCase().includes('#short');
-
       const existing = existingItems.find(ei => ei.id === id);
 
       return {
-        id: id,
-        title: title,
+        id,
+        title,
         link: isShort ? `https://www.youtube.com/shorts/${id}` : `https://www.youtube.com/watch?v=${id}`,
         published: entry.published[0],
         description: desc,
         thumbnail: entry['media:group'][0]['media:thumbnail'][0].$.url,
         type: isShort ? 'short' : 'video',
         transcript: existing ? existing.transcript : null,
-        transcriptStatus: existing ? existing.transcriptStatus : 'Pending'
+        transcriptstatus: existing ? existing.transcriptstatus : 'Pending'
       };
     });
 
@@ -386,8 +385,7 @@ async function fetchYouTubeProphecies() {
     });
 
     FEATURED_SHORTS.forEach(fs_item => {
-      const found = items.find(i => i.id === fs_item.id);
-      if (!found) {
+      if (!items.find(i => i.id === fs_item.id)) {
         const existing = existingItems.find(ei => ei.id === fs_item.id);
         items.push({
           id: fs_item.id,
@@ -395,28 +393,19 @@ async function fetchYouTubeProphecies() {
           link: `https://www.youtube.com/shorts/${fs_item.id}`,
           thumbnail: `https://i.ytimg.com/vi/${fs_item.id}/hqdefault.jpg`,
           type: 'short',
-          description: "Featured Prophecy",
+          description: 'Featured Prophecy',
           transcript: existing ? existing.transcript : null,
-          transcriptStatus: existing ? existing.transcriptStatus : 'Pending'
+          transcriptstatus: existing ? existing.transcriptstatus : 'Pending'
         });
       }
     });
 
-    // Save to SQLite
-    const insert = db.prepare(`
-      INSERT OR REPLACE INTO automated_prophecies (id, title, link, published, description, thumbnail, type, transcript, transcriptStatus)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-
-    const transaction = db.transaction((prophecies) => {
-      for (const p of prophecies) {
-        insert.run(p.id, p.title, p.link, p.published || null, p.description, p.thumbnail, p.type, p.transcript, p.transcriptStatus);
-      }
-    });
-
-    transaction(items);
-    console.log(`Updated ${items.length} prophecy items in SQLite.`);
-  } catch (error) { console.error('Error fetching YouTube data:', error); }
+    // Upsert all items to Supabase (insert or update by primary key 'id')
+    await db.upsert('automated_prophecies', items);
+    console.log(`[YouTube] Upserted ${items.length} prophecy items to Supabase.`);
+  } catch (error) {
+    console.error('[YouTube] Error fetching YouTube data:', error);
+  }
 }
 
 
@@ -548,17 +537,16 @@ async function fetchTranscriptText(youtubeId) {
   }
 }
 
-// Legacy wrapper for Cron (handles saving automatically for automated items)
+// Fetch and save transcript for an automated prophecy
 async function fetchTranscript(id) {
-  const item = db.prepare('SELECT * FROM automated_prophecies WHERE id = ?').get(id);
+  const item = await db.selectById('automated_prophecies', id);
   if (item) {
     try {
       const text = await fetchTranscriptText(id);
-      db.prepare('UPDATE automated_prophecies SET transcript = ?, transcriptStatus = ? WHERE id = ?')
-        .run(text, 'Draft', id);
-      return { ...item, transcript: text, transcriptStatus: 'Draft' };
+      await db.update('automated_prophecies', id, { transcript: text, transcriptstatus: 'Draft' });
+      return { ...item, transcript: text, transcriptstatus: 'Draft' };
     } catch (e) {
-      console.error(`Failed automated fetch for ${id}: ${e.message}`);
+      console.error(`[Transcript] Failed automated fetch for ${id}: ${e.message}`);
       return null;
     }
   }
@@ -573,13 +561,9 @@ cron.schedule('0 0 */2 * *', () => fetchYouTubeProphecies());
 cron.schedule('0 0 * * *', async () => {
   console.log('[Keep-Alive] Running daily ping to Supabase...');
   try {
-    if (process.env.USE_SUPABASE === 'true') {
-      // Simple lightweight query to keep the project active
-      await db.selectAll('announcements');
-      console.log('[Keep-Alive] Ping successful.');
-    } else {
-      console.log('[Keep-Alive] Skipped (Supabase not enabled).');
-    }
+    const { error } = await db.raw.from('announcements').select('id').limit(1);
+    if (error) throw error;
+    console.log('[Keep-Alive] Ping successful.');
   } catch (err) {
     console.error('[Keep-Alive] Ping failed:', err.message);
   }
@@ -617,207 +601,121 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
     if (attempts.lockedUntil && attempts.lockedUntil > Date.now()) {
       const remainingMinutes = Math.ceil((attempts.lockedUntil - Date.now()) / 60000);
       logSecurityEvent(clientIP, 'LOCKOUT_REJECTION', `Locked. Remaining: ${remainingMinutes}m`);
-      logToMemory('LOGIN_LOCKED', `IP Locked. Remaining: ${remainingMinutes}m`);
-      return res.status(429).json({
-        message: `Account locked. Try again in ${remainingMinutes} minutes.`
-      });
+      return res.status(429).json({ message: `Account locked. Try again in ${remainingMinutes} minutes.` });
     }
 
-    // Credentials MUST be in .env file
-    const envUser = process.env.ADMIN_USERNAME;
-    const envPassHash = process.env.ADMIN_PASSWORD_HASH;
-    const envPassPlain = process.env.ADMIN_PASSWORD; // Fallback for migration
-
-    if (!envUser) {
-      logToMemory('LOGIN_ERROR', 'Missing ADMIN_USERNAME in .env');
-      console.error('CRITICAL: ADMIN_USERNAME must be set in .env');
-      return res.status(500).json({ message: 'Server configuration error' });
+    if (!username || !password) {
+      return res.status(400).json({ message: 'Username and password are required' });
     }
+
+    // --- Authenticate against Supabase users table ---
+    const user = await db.selectOneWhere('users', 'username', username);
 
     let isPasswordValid = false;
-
-    // Check if password hash exists (preferred)
-    if (envPassHash) {
-      try {
-        logToMemory('LOGIN_STEP', 'Verifying hash with bcryptjs...');
-        isPasswordValid = await bcrypt.compare(password, envPassHash);
-        logToMemory('LOGIN_STEP', `Hash Result: ${isPasswordValid}`);
-      } catch (err) {
-        logToMemory('LOGIN_ERROR', `Bcrypt Error: ${err.message}`);
-        console.error('bcrypt compare error:', err.message);
-      }
-    } else if (envPassPlain) {
-      logToMemory('LOGIN_WARN', 'Using Plain Text Password');
-      isPasswordValid = (password === envPassPlain);
-      if (isPasswordValid) {
-        console.warn('WARNING: Using plain text password. Run password change to migrate to hash.');
-      }
-    } else {
-      logToMemory('LOGIN_ERROR', 'No Password Configured');
-      console.error('CRITICAL: ADMIN_PASSWORD or ADMIN_PASSWORD_HASH must be set in .env');
-      return res.status(500).json({ message: 'Server configuration error' });
+    if (user && user.password_hash) {
+      isPasswordValid = await bcrypt.compare(password, user.password_hash);
     }
 
-    if (username === envUser && isPasswordValid) {
+    if (isPasswordValid) {
       logToMemory('LOGIN_SUCCESS', `User ${username} logged in.`);
-      // Clear failed attempts on successful login
       failedLoginAttempts.delete(clientIP);
 
-      // Generate secure JWT with 24-hour expiration
       const token = jwt.sign(
-        { username: envUser, role: 'admin' },
+        { username: user.username, role: user.role || 'admin' },
         JWT_SECRET,
         { expiresIn: '24h' }
       );
-      res.json({ token, user: { username: envUser } });
+      return res.json({ token, user: { username: user.username } });
     } else {
       logToMemory('LOGIN_FAILED', `Invalid credentials for ${username}`);
-      // Track failed attempt
       attempts.count += 1;
 
-      // Lock account after 5 failed attempts for 30 minutes
       if (attempts.count >= 5) {
-        attempts.lockedUntil = Date.now() + (30 * 60 * 1000); // 30 minutes
-        logger.warn(`IP ${clientIP} locked out after 5 failed login attempts`);
+        attempts.lockedUntil = Date.now() + (30 * 60 * 1000);
         logSecurityEvent(clientIP, 'ACCOUNT_LOCKOUT', '5 failed attempts reached');
-        logToMemory('LOGIN_LOCKOUT', `IP ${clientIP} locked out now.`);
       } else {
         logSecurityEvent(clientIP, 'LOGIN_FAILED', `Attempt ${attempts.count} for user: ${username}`);
       }
 
       failedLoginAttempts.set(clientIP, attempts);
-
-      // Avoid timing attacks by using generic message
-      res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
   } catch (err) {
-    console.error('FATAL LOGIN ERROR:', err.message, err.stack);
+    console.error('[Login] FATAL ERROR:', err.message, err.stack);
     res.status(500).json({ message: 'Internal server error during authentication' });
   }
 });
 
-// Admin Password Change - Secure endpoint with bcrypt hashing
+// Admin Password Change — stores hash in Supabase users table (no .env writes)
 app.post('/api/auth/change-password', verifyToken, async (req, res) => {
   const { currentPassword, newPassword } = req.body;
+  const username = req.user.username;
 
-  // Validate input
   if (!currentPassword || !newPassword) {
     return res.status(400).json({ message: 'Current and new password are required' });
   }
-
   if (newPassword.length < 8) {
     return res.status(400).json({ message: 'New password must be at least 8 characters' });
   }
 
-  // Verify current password
-  const envPassHash = process.env.ADMIN_PASSWORD_HASH;
-  const envPassPlain = process.env.ADMIN_PASSWORD;
-
-  let isCurrentPasswordValid = false;
-
-  if (envPassHash) {
-    try {
-      isCurrentPasswordValid = await bcrypt.compare(currentPassword, envPassHash);
-    } catch (err) {
-      console.error('bcrypt compare error:', err.message);
-    }
-  } else if (envPassPlain) {
-    isCurrentPasswordValid = (currentPassword === envPassPlain);
-  }
-
-  if (!isCurrentPasswordValid) {
-    return res.status(401).json({ message: 'Current password is incorrect' });
-  }
-
-  // Hash the new password and update .env file
   try {
-    const saltRounds = 12;
-    const newPasswordHash = await bcrypt.hash(newPassword, saltRounds);
-
-    const envPath = path.join(__dirname, '../.env');
-    let envContent = fs.readFileSync(envPath, 'utf8');
-
-    // Replace or add ADMIN_PASSWORD_HASH
-    if (envContent.includes('ADMIN_PASSWORD_HASH=')) {
-      envContent = envContent.replace(
-        /ADMIN_PASSWORD_HASH=.*/,
-        `ADMIN_PASSWORD_HASH=${newPasswordHash}`
-      );
-    } else {
-      envContent += `\nADMIN_PASSWORD_HASH=${newPasswordHash}`;
+    // 1. Fetch user from Supabase
+    const user = await db.selectOneWhere('users', 'username', username);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found. Please contact support.' });
     }
 
-    // Remove plain text password if it exists (migration)
-    envContent = envContent.replace(/\nADMIN_PASSWORD=.*/, '');
-    envContent = envContent.replace(/^ADMIN_PASSWORD=.*\n?/m, '');
+    // 2. Verify current password
+    const isMatch = await bcrypt.compare(currentPassword, user.password_hash);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Current password is incorrect' });
+    }
 
-    fs.writeFileSync(envPath, envContent.trim() + '\n');
+    // 3. Hash new password (cost factor 12 — production standard)
+    const newPasswordHash = await bcrypt.hash(newPassword, 12);
 
-    // Update in-memory values
-    process.env.ADMIN_PASSWORD_HASH = newPasswordHash;
-    delete process.env.ADMIN_PASSWORD;
+    // 4. Update in Supabase
+    await db.updateWhere('users', 'username', username, { password_hash: newPasswordHash });
 
-    console.log('Admin password changed and hashed successfully');
+    console.log(`[Auth] Password updated for user: ${username}`);
     res.json({ message: 'Password changed successfully. Please login again.' });
   } catch (err) {
-    console.error('Failed to update password:', err);
+    console.error('[Auth] Failed to update password:', err.message);
     res.status(500).json({ message: 'Failed to update password' });
   }
 });
 
-// Helper for CRUD operations using SQLite
-const handleSqliteCrud = (tableName, req, res) => {
-  console.log(`${req.method} request for ${tableName}`);
-
-  if (req.method === 'GET') {
-    const items = db.prepare(`SELECT * FROM ${tableName}`).all();
-    res.json(items);
-  } else if (req.method === 'POST') {
-    const columns = Object.keys(req.body);
-    const placeholders = columns.map(() => '?').join(', ');
-    const values = columns.map(col => {
-      const val = req.body[col];
-      return (typeof val === 'object') ? JSON.stringify(val) : val;
-    });
-
-    // Add fileUrl if provided
-    let finalColumns = [...columns];
-    let finalValues = [...values];
-    if (req.file) {
-      finalColumns.push('src'); // For gallery/etc
-      finalValues.push(`/uploads/${req.file.filename}`);
+// Generic async CRUD handler — Supabase
+const handleCrud = async (tableName, req, res) => {
+  try {
+    if (req.method === 'GET') {
+      const items = await db.selectAll(tableName);
+      return res.json(items);
     }
 
-    const sql = `INSERT INTO ${tableName} (${finalColumns.join(', ')}) VALUES (${finalColumns.map(() => '?').join(', ')})`;
-    const info = db.prepare(sql).run(...finalValues);
-
-    // Fetch and return the new item
-    const newItem = db.prepare(`SELECT * FROM ${tableName} WHERE id = ?`).get(info.lastInsertRowid);
-    res.json(newItem);
-  } else if (req.method === 'PUT') {
-    const { id } = req.params;
-    const columns = Object.keys(req.body);
-    const setClause = columns.map(col => `${col} = ?`).join(', ');
-    const values = columns.map(col => {
-      const val = req.body[col];
-      return (typeof val === 'object') ? JSON.stringify(val) : val;
-    });
-
-    if (req.file) {
-      // Need specialized handling for different tables src/pdf/image
-      // For now, let's assume 'src' or 'image' or 'pdf' based on table
-      // Actually, better to explicitly handle these in specific routes or make this helper smarter
+    if (req.method === 'POST') {
+      const values = { ...req.body };
+      if (req.file) values.src = `/uploads/${req.file.filename}`;
+      const newItem = await db.insert(tableName, values);
+      return res.json(newItem);
     }
 
-    const sql = `UPDATE ${tableName} SET ${setClause} WHERE id = ?`;
-    db.prepare(sql).run(...values, id);
+    if (req.method === 'PUT') {
+      const { id } = req.params;
+      const values = { ...req.body };
+      if (req.file) values.src = `/uploads/${req.file.filename}`;
+      const updatedItem = await db.update(tableName, id, values);
+      return res.json(updatedItem);
+    }
 
-    const updatedItem = db.prepare(`SELECT * FROM ${tableName} WHERE id = ?`).get(id);
-    res.json(updatedItem);
-  } else if (req.method === 'DELETE') {
-    const { id } = req.params;
-    db.prepare(`DELETE FROM ${tableName} WHERE id = ?`).run(id);
-    res.json({ success: true });
+    if (req.method === 'DELETE') {
+      const { id } = req.params;
+      await db.deleteById(tableName, id);
+      return res.json({ success: true });
+    }
+  } catch (err) {
+    console.error(`[CRUD] ${req.method} ${tableName} error:`, err.message);
+    res.status(500).json({ message: `Database error: ${err.message}` });
   }
 };
 
@@ -865,27 +763,15 @@ app.post('/api/satvic/pledge', async (req, res) => {
 // 3. Get Pledge Stats (Social Proof)
 app.get('/api/satvic/stats', async (req, res) => {
   try {
-    let total, today, recent;
     const todayStr = new Date().toISOString().split('T')[0];
 
-    if (process.env.USE_SUPABASE === 'true') {
-      // Supabase Raw Queries for Stats
-      const { count: totalCount } = await db.raw.supabase.from('pledges').select('*', { count: 'exact', head: true });
-      total = totalCount;
+    const { count: total } = await db.raw.from('pledges').select('*', { count: 'exact', head: true });
+    const { count: today } = await db.raw.from('pledges').select('*', { count: 'exact', head: true }).like('date', `${todayStr}%`);
+    const { data: recent } = await db.raw.from('pledges').select('name, item').order('id', { ascending: false }).limit(5);
 
-      const { count: todayCount } = await db.raw.supabase.from('pledges').select('*', { count: 'exact', head: true }).like('date', `${todayStr}%`);
-      today = todayCount;
-
-      const { data } = await db.raw.supabase.from('pledges').select('name, item').order('id', { ascending: false }).limit(5);
-      recent = data;
-    } else {
-      // SQLite Raw Queries
-      total = db.prepare('SELECT COUNT(*) as count FROM pledges').get().count;
-      today = db.prepare('SELECT COUNT(*) as count FROM pledges WHERE date LIKE ?').get(`${todayStr}%`).count;
-      recent = db.prepare('SELECT name, item FROM pledges ORDER BY id DESC LIMIT 5').all();
-    }
     res.json({ total, today, recent });
   } catch (err) {
+    console.error('[Stats] Error fetching pledge stats:', err.message);
     res.status(500).json({ message: 'Error fetching stats' });
   }
 });
@@ -1153,17 +1039,22 @@ app.route('/api/announcements/:id')
   });
 
 // YouTube Feed
-app.get('/api/youtube', (req, res) => {
+app.get('/api/youtube', async (req, res) => {
   try {
-    const allVideos = db.prepare('SELECT * FROM automated_prophecies ORDER BY published DESC LIMIT 50').all();
+    const { data: allVideos, error } = await db.raw
+      .from('automated_prophecies')
+      .select('*')
+      .order('published', { ascending: false })
+      .limit(50);
 
-    // Split into shorts and full videos based on type or title
-    const shorts = allVideos.filter(v => v.type === 'short' || v.title.toLowerCase().includes('#shorts'));
-    const full = allVideos.filter(v => v.type !== 'short' && !v.title.toLowerCase().includes('#shorts'));
+    if (error) throw error;
+
+    const shorts = (allVideos || []).filter(v => v.type === 'short' || v.title.toLowerCase().includes('#shorts'));
+    const full = (allVideos || []).filter(v => v.type !== 'short' && !v.title.toLowerCase().includes('#shorts'));
 
     res.json({ shorts, full });
   } catch (err) {
-    console.error('Error fetching YouTube feed:', err);
+    console.error('[YouTube] Error fetching feed:', err.message);
     res.status(500).json({ error: 'Failed to fetch YouTube feed' });
   }
 });

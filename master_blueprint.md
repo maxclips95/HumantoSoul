@@ -612,3 +612,53 @@ EMAIL_PASS=your-app-password
 2. **Server Audit**: Verified 0 vulnerabilities in backend code.
 3. **Build Tools**: Remaining warnings are strictly dev-dependencies (webpack/react-scripts) and do NOT affect production security.
 
+---
+
+## 16. Voice Architecture (Phase 6) - Advanced AI Assistant 🧠🎤
+
+**Goal**: To make the website fully accessible to illiterate, elderly, and global users through voice interaction.
+
+### A. The "Ears" (GlobalVoiceSearch.jsx) 👂
+**Technology**: `webkitSpeechRecognition` (Web Speech API).
+**How it Works**:
+1.  **Dynamic Hearing**: Automatically detects the language based on the HTML `lang` tag (which Google Translate updates).
+2.  **Retry Mechanism**: If the user is silent for 5 seconds, it catches the `no-speech` error and displays a "Tap to Retry" button instead of failing silently.
+3.  **Visual Feedback**: Immersive full-screen black modal with pulsing red microphone.
+
+### B. The "Brain" (AdvancedVoiceLogic.js) 🧠
+**Purpose**: Maps natural language to specific website actions.
+**Structure**:
+- **Intents Array**: List of objects containing `keywords`, `route`, and `response`.
+- **Multilingual Support**: Keywords are defined in English, Hindi, Spanish, French, German, Russian, and Chinese.
+- **Fuzzy Matching**: Checks if the spoken text contains *any* keyword from the list.
+
+**Example Logic**:
+```javascript
+// User says: "Show me the calendar" OR "Panchang kahan hai" OR "Calendario"
+if (text.includes('calendar') || text.includes('पंचांग') || text.includes('calendario')) {
+    return { 
+        route: '/downloads', 
+        response: "Opening the Downloads section for calendars." 
+    };
+}
+```
+
+### C. The "Voice" (TTS Feedback) 🗣️
+**Technology**: `window.speechSynthesis`.
+**Feature**: The assistant "Talks Back" before acting.
+**How it handles accents**:
+1.  **Read Language**: It reads the `document.documentElement.lang` attribute.
+2.  **Match Voice**: It scans available browser voices to find one matching the detected language (e.g., "Google Français" for French).
+3.  **Speak**: It confirms the action ("Ouvrir le calendrier...") in the correct accent before navigating.
+
+### D. The "Universal" Polyglot Mode 🌐
+**Integration with Google Translate**:
+1.  **MutationObserver**: A background script in `VoiceAssistant.jsx` watches the `<html>` tag for changes.
+2.  **Real-time Switch**: When a user selects "Spanish" in Google Translate:
+    - The Observer detects `lang="es"`.
+    - The **Voice Assistant** immediately reloads with Spanish voices.
+    - The **Voice Search** immediately switches recognition to Spanish.
+    - The **Navigation Logic** starts listening for Spanish keywords.
+
+**Result**: A fully voice-navigable experience for users of any major language, regardless of literacy.
+
