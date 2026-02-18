@@ -24,6 +24,7 @@ function AdminDashboard() {
     // Password Change States
     const [passwordData, setPasswordData] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
     const [passwordMessage, setPasswordMessage] = useState('');
+    const [showPasswords, setShowPasswords] = useState({ current: false, new: false, confirm: false });
     const [showSubscribersModal, setShowSubscribersModal] = useState(false);
 
     useEffect(() => {
@@ -606,35 +607,53 @@ function AdminDashboard() {
                     <form onSubmit={handlePasswordChange} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                         <div>
                             <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Current Password</label>
-                            <input
-                                type="password"
-                                value={passwordData.currentPassword}
-                                onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                                required
-                                style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
-                            />
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    type={showPasswords.current ? 'text' : 'password'}
+                                    value={passwordData.currentPassword}
+                                    onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                                    required
+                                    style={{ width: '100%', padding: '10px 40px 10px 10px', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                                />
+                                <button type="button" onClick={() => setShowPasswords(p => ({ ...p, current: !p.current }))}
+                                    style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px', color: '#888', padding: 0 }}
+                                    title={showPasswords.current ? 'Hide password' : 'Show password'}
+                                >{showPasswords.current ? '🙈' : '👁️'}</button>
+                            </div>
                         </div>
                         <div>
                             <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>New Password</label>
-                            <input
-                                type="password"
-                                value={passwordData.newPassword}
-                                onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                                required
-                                minLength={8}
-                                style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
-                            />
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    type={showPasswords.new ? 'text' : 'password'}
+                                    value={passwordData.newPassword}
+                                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                                    required
+                                    minLength={8}
+                                    style={{ width: '100%', padding: '10px 40px 10px 10px', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                                />
+                                <button type="button" onClick={() => setShowPasswords(p => ({ ...p, new: !p.new }))}
+                                    style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px', color: '#888', padding: 0 }}
+                                    title={showPasswords.new ? 'Hide password' : 'Show password'}
+                                >{showPasswords.new ? '🙈' : '👁️'}</button>
+                            </div>
                             <small style={{ color: '#666' }}>Minimum 8 characters</small>
                         </div>
                         <div>
                             <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Confirm New Password</label>
-                            <input
-                                type="password"
-                                value={passwordData.confirmPassword}
-                                onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                                required
-                                style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
-                            />
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    type={showPasswords.confirm ? 'text' : 'password'}
+                                    value={passwordData.confirmPassword}
+                                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                                    required
+                                    style={{ width: '100%', padding: '10px 40px 10px 10px', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                                />
+                                <button type="button" onClick={() => setShowPasswords(p => ({ ...p, confirm: !p.confirm }))}
+                                    style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px', color: '#888', padding: 0 }}
+                                    title={showPasswords.confirm ? 'Hide password' : 'Show password'}
+                                >{showPasswords.confirm ? '🙈' : '👁️'}</button>
+                            </div>
                         </div>
                         <button
                             type="submit"
