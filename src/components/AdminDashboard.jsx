@@ -516,8 +516,8 @@ function AdminDashboard() {
                             <strong>ℹ️ Broadcast Mode</strong><br />
                             Send a special email message to all subscribers. Use this sparingly for important announcements.
                             <br /><br />
-                            <strong>Total Subscribers:</strong> {data.count || '0'}
-                            {data.subscribers && data.subscribers.length > 0 && (
+                            <strong>Total Subscribers:</strong> {data?.count || '0'}
+                            {data?.subscribers && Array.isArray(data.subscribers) && data.subscribers.length > 0 && (
                                 <button
                                     type="button"
                                     onClick={() => setShowSubscribersModal(true)}
@@ -544,7 +544,7 @@ function AdminDashboard() {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {data.subscribers.map((s, idx) => (
+                                                {data?.subscribers && Array.isArray(data.subscribers) && data.subscribers.map((s, idx) => (
                                                     <tr key={idx} style={{ background: idx % 2 === 0 ? 'white' : '#fafafa' }}>
                                                         <td style={{ padding: '10px', borderBottom: '1px solid #eee' }}>{s.email}</td>
                                                         <td style={{ padding: '10px', borderBottom: '1px solid #eee' }}>{new Date(s.subscribed_at).toLocaleDateString()}</td>
@@ -781,60 +781,62 @@ function AdminDashboard() {
                             <h3 style={{ marginTop: 0 }}>Existing Items</h3>
                             {loading ? <p>Loading...</p> : (
                                 <div style={{ display: 'grid', gap: '15px' }}>
-                                    {(activeTab === 'videoreview' ? [...data, ...automatedData] : data).map(item => (
-                                        <div key={item.id} style={{ display: 'flex', alignItems: 'center', padding: '15px', background: 'white', borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)', border: '1px solid #eee' }}>
-                                            {/* THUMBNAIL */}
-                                            {(item.thumbnail || item.src || item.image || (item.link && item.link.includes('youtube'))) && (
-                                                <img
-                                                    src={item.thumbnail || item.src || item.image || `https://img.youtube.com/vi/${item.link?.split('v=')[1]?.split('&')[0] || item.link?.split('/').pop()}/0.jpg`}
-                                                    alt={item.title || item.alt}
-                                                    style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px', marginRight: '15px', border: '1px solid #ddd' }}
-                                                    onError={(e) => { e.target.style.display = 'none' }}
-                                                />
-                                            )}
-
-                                            {/* CONTENT */}
-                                            <div style={{ flex: 1, maxWidth: '100%', overflow: 'hidden' }}>
-                                                <h4 style={{ margin: '0 0 5px 0', fontSize: '1.1rem' }}>{item.title || item.alt || "Untitled"}</h4>
-                                                <p style={{ margin: 0, fontSize: '0.85rem', color: '#666', whiteSpace: 'pre-wrap', wordBreak: 'break-word', maxHeight: '100px', overflow: 'hidden' }}>
-                                                    {(item.transcript ? item.transcript.substring(0, 200) + (item.transcript.length > 200 ? '...' : '') : item.description || item.content?.substring(0, 150) + '...' || (item.year ? `Year: ${item.year}` : ''))}
-                                                </p>
-                                                {item.transcriptStatus && (
-                                                    <span style={{ fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', background: item.transcriptStatus === 'Approved' ? '#e8f5e9' : '#fff3e0', color: item.transcriptStatus === 'Approved' ? '#2e7d32' : '#ef6c00', marginTop: '5px', display: 'inline-block' }}>
-                                                        {item.transcriptStatus}
-                                                    </span>
+                                    {(activeTab === 'videoreview'
+                                        ? [...(Array.isArray(data) ? data : []), ...(Array.isArray(automatedData) ? automatedData : [])]
+                                        : (Array.isArray(data) ? data : [])).map(item => (
+                                            <div key={item.id} style={{ display: 'flex', alignItems: 'center', padding: '15px', background: 'white', borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)', border: '1px solid #eee' }}>
+                                                {/* THUMBNAIL */}
+                                                {(item.thumbnail || item.src || item.image || (item.link && item.link.includes('youtube'))) && (
+                                                    <img
+                                                        src={item.thumbnail || item.src || item.image || `https://img.youtube.com/vi/${item.link?.split('v=')[1]?.split('&')[0] || item.link?.split('/').pop()}/0.jpg`}
+                                                        alt={item.title || item.alt}
+                                                        style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px', marginRight: '15px', border: '1px solid #ddd' }}
+                                                        onError={(e) => { e.target.style.display = 'none' }}
+                                                    />
                                                 )}
-                                            </div>
 
-                                            {/* ACTIONS */}
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginLeft: '10px', minWidth: '100px' }}>
-                                                {activeTab === 'videoreview' ? (
-                                                    <>
-                                                        <button onClick={() => handleFetchTranscript(item.id)} disabled={loading} style={{ background: loading ? '#ccc' : '#2196F3', color: 'white', border: 'none', borderRadius: '4px', padding: '5px 10px', cursor: loading ? 'not-allowed' : 'pointer', fontSize: '0.8rem' }}>
-                                                            {loading ? 'Fetching...' : 'Get Transcript'}
-                                                        </button>
-                                                        <button onClick={() => handleEdit(item)} style={{ background: '#4CAF50', color: 'white', border: 'none', borderRadius: '4px', padding: '5px 10px', cursor: 'pointer', fontSize: '0.8rem' }}>
-                                                            Edit Transcript
-                                                        </button>
-                                                        {item.transcriptStatus === 'Draft' && (
-                                                            <button onClick={() => handleApprove(item.id)} style={{ background: '#c41e3a', color: 'white', border: 'none', borderRadius: '4px', padding: '5px 10px', cursor: 'pointer', fontSize: '0.8rem' }}>
-                                                                Approve
+                                                {/* CONTENT */}
+                                                <div style={{ flex: 1, maxWidth: '100%', overflow: 'hidden' }}>
+                                                    <h4 style={{ margin: '0 0 5px 0', fontSize: '1.1rem' }}>{item.title || item.alt || "Untitled"}</h4>
+                                                    <p style={{ margin: 0, fontSize: '0.85rem', color: '#666', whiteSpace: 'pre-wrap', wordBreak: 'break-word', maxHeight: '100px', overflow: 'hidden' }}>
+                                                        {(item.transcript ? item.transcript.substring(0, 200) + (item.transcript.length > 200 ? '...' : '') : item.description || item.content?.substring(0, 150) + '...' || (item.year ? `Year: ${item.year}` : ''))}
+                                                    </p>
+                                                    {item.transcriptStatus && (
+                                                        <span style={{ fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', background: item.transcriptStatus === 'Approved' ? '#e8f5e9' : '#fff3e0', color: item.transcriptStatus === 'Approved' ? '#2e7d32' : '#ef6c00', marginTop: '5px', display: 'inline-block' }}>
+                                                            {item.transcriptStatus}
+                                                        </span>
+                                                    )}
+                                                </div>
+
+                                                {/* ACTIONS */}
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginLeft: '10px', minWidth: '100px' }}>
+                                                    {activeTab === 'videoreview' ? (
+                                                        <>
+                                                            <button onClick={() => handleFetchTranscript(item.id)} disabled={loading} style={{ background: loading ? '#ccc' : '#2196F3', color: 'white', border: 'none', borderRadius: '4px', padding: '5px 10px', cursor: loading ? 'not-allowed' : 'pointer', fontSize: '0.8rem' }}>
+                                                                {loading ? 'Fetching...' : 'Get Transcript'}
                                                             </button>
-                                                        )}
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <button onClick={() => handleEdit(item)} style={{ background: '#4CAF50', color: 'white', border: 'none', borderRadius: '4px', padding: '5px 10px', cursor: 'pointer' }}>
-                                                            Edit
-                                                        </button>
-                                                        <button onClick={() => handleDelete(item.id)} style={{ background: '#ff4444', color: 'white', border: 'none', borderRadius: '4px', padding: '5px 10px', cursor: 'pointer' }}>
-                                                            Delete
-                                                        </button>
-                                                    </>
-                                                )}
+                                                            <button onClick={() => handleEdit(item)} style={{ background: '#4CAF50', color: 'white', border: 'none', borderRadius: '4px', padding: '5px 10px', cursor: 'pointer', fontSize: '0.8rem' }}>
+                                                                Edit Transcript
+                                                            </button>
+                                                            {item.transcriptStatus === 'Draft' && (
+                                                                <button onClick={() => handleApprove(item.id)} style={{ background: '#c41e3a', color: 'white', border: 'none', borderRadius: '4px', padding: '5px 10px', cursor: 'pointer', fontSize: '0.8rem' }}>
+                                                                    Approve
+                                                                </button>
+                                                            )}
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <button onClick={() => handleEdit(item)} style={{ background: '#4CAF50', color: 'white', border: 'none', borderRadius: '4px', padding: '5px 10px', cursor: 'pointer' }}>
+                                                                Edit
+                                                            </button>
+                                                            <button onClick={() => handleDelete(item.id)} style={{ background: '#ff4444', color: 'white', border: 'none', borderRadius: '4px', padding: '5px 10px', cursor: 'pointer' }}>
+                                                                Delete
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        ))}
                                     {data.length === 0 && <p style={{ color: '#888', fontStyle: 'italic' }}>No items found. Add one on the left.</p>}
                                 </div>
                             )}
