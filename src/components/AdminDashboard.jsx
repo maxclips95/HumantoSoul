@@ -26,6 +26,7 @@ function AdminDashboard() {
     const [passwordMessage, setPasswordMessage] = useState('');
     const [showPasswords, setShowPasswords] = useState({ current: false, new: false, confirm: false });
     const [showSubscribersModal, setShowSubscribersModal] = useState(false);
+    const [isYouTubeConnected, setIsYouTubeConnected] = useState(false);
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -35,8 +36,43 @@ function AdminDashboard() {
         setData([]);
         setAutomatedData([]);
 
-        fetchData(activeTab);
+        if (activeTab === 'settings') {
+            checkYouTubeStatus();
+        } else {
+            fetchData(activeTab);
+        }
     }, [activeTab, navigate]);
+
+    const checkYouTubeStatus = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const res = await axios.get(`${BASE_URL}/api/youtube/auth-status`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            setIsYouTubeConnected(res.data.connected);
+        } catch (err) {
+            console.error('Error checking YouTube status:', err);
+        }
+    };
+
+    const connectYouTube = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const res = await axios.get(`${BASE_URL}/api/youtube/auth-url`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            // Open consent screen in new tab
+            window.open(res.data.url, '_blank', 'width=500,height=600');
+
+            // Poll for status change
+            const interval = setInterval(async () => {
+                await checkYouTubeStatus();
+                if (isYouTubeConnected) clearInterval(interval);
+            }, 2000);
+        } catch (err) {
+            alert('Failed to initiate YouTube connection: ' + (err.response?.data?.message || err.message));
+        }
+    };
 
     const fetchData = async (section) => {
         setLoading(true);
@@ -589,88 +625,131 @@ function AdminDashboard() {
 
             {/* Settings Panel - Show instead of CRUD when settings tab is active */}
             {activeTab === 'settings' ? (
-                <div style={{ background: '#f9f9f9', padding: '30px', borderRadius: '8px', maxWidth: '500px' }}>
-                    <h3 style={{ marginTop: 0, marginBottom: '25px', color: '#c41e3a' }}>🔐 Change Admin Password</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '30px', maxWidth: '500px' }}>
 
-                    {passwordMessage && (
-                        <div style={{
-                            padding: '10px 15px',
-                            marginBottom: '20px',
-                            borderRadius: '5px',
-                            background: passwordMessage.includes('✅') ? '#d4edda' : '#f8d7da',
-                            color: passwordMessage.includes('✅') ? '#155724' : '#721c24'
-                        }}>
-                            {passwordMessage}
-                        </div>
-                    )}
+                    {/* YouTube Connection Card */}
+                    <div style={{ background: '#f9f9f9', padding: '30px', borderRadius: '8px' }}>
+                        <h3 style={{ marginTop: 0, marginBottom: '20px', color: '#c41e3a' }}>📺 YouTube API Connection</h3>
+                        <p style={{ marginBottom: '20px', color: '#555', fontSize: '14px' }}>
+                            Connect the official YouTube channel to enable automatic Hindi caption fetching for all future videos.
+                        </p>
 
-                    <form onSubmit={handlePasswordChange} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                        <div>
-                            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Current Password</label>
-                            <div style={{ position: 'relative' }}>
-                                <input
-                                    type={showPasswords.current ? 'text' : 'password'}
-                                    value={passwordData.currentPassword}
-                                    onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                                    required
-                                    style={{ width: '100%', padding: '10px 40px 10px 10px', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
-                                />
-                                <button type="button" onClick={() => setShowPasswords(p => ({ ...p, current: !p.current }))}
-                                    style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px', color: '#888', padding: 0 }}
-                                    title={showPasswords.current ? 'Hide password' : 'Show password'}
-                                >{showPasswords.current ? '🙈' : '👁️'}</button>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
+                            <div style={{
+                                padding: '8px 12px',
+                                borderRadius: '4px',
+                                background: isYouTubeConnected ? '#d4edda' : '#f8d7da',
+                                color: isYouTubeConnected ? '#155724' : '#721c24',
+                                fontWeight: 'bold',
+                                fontSize: '14px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                            }}>
+                                {isYouTubeConnected ? '✅ Connected' : '❌ Not Connected'}
                             </div>
                         </div>
-                        <div>
-                            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>New Password</label>
-                            <div style={{ position: 'relative' }}>
-                                <input
-                                    type={showPasswords.new ? 'text' : 'password'}
-                                    value={passwordData.newPassword}
-                                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                                    required
-                                    minLength={8}
-                                    style={{ width: '100%', padding: '10px 40px 10px 10px', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
-                                />
-                                <button type="button" onClick={() => setShowPasswords(p => ({ ...p, new: !p.new }))}
-                                    style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px', color: '#888', padding: 0 }}
-                                    title={showPasswords.new ? 'Hide password' : 'Show password'}
-                                >{showPasswords.new ? '🙈' : '👁️'}</button>
-                            </div>
-                            <small style={{ color: '#666' }}>Minimum 8 characters</small>
-                        </div>
-                        <div>
-                            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Confirm New Password</label>
-                            <div style={{ position: 'relative' }}>
-                                <input
-                                    type={showPasswords.confirm ? 'text' : 'password'}
-                                    value={passwordData.confirmPassword}
-                                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                                    required
-                                    style={{ width: '100%', padding: '10px 40px 10px 10px', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
-                                />
-                                <button type="button" onClick={() => setShowPasswords(p => ({ ...p, confirm: !p.confirm }))}
-                                    style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px', color: '#888', padding: 0 }}
-                                    title={showPasswords.confirm ? 'Hide password' : 'Show password'}
-                                >{showPasswords.confirm ? '🙈' : '👁️'}</button>
-                            </div>
-                        </div>
+
                         <button
-                            type="submit"
+                            onClick={connectYouTube}
                             style={{
-                                padding: '12px',
-                                background: '#c41e3a',
+                                padding: '10px 20px',
+                                background: isYouTubeConnected ? '#28a745' : '#007bff',
                                 color: 'white',
                                 border: 'none',
-                                borderRadius: '4px',
+                                borderRadius: '5px',
                                 cursor: 'pointer',
-                                fontWeight: 'bold',
-                                marginTop: '10px'
+                                fontWeight: 'bold'
                             }}
                         >
-                            Change Password
+                            {isYouTubeConnected ? '🔄 Re-Connect Channel' : '🔗 Connect YouTube Channel'}
                         </button>
-                    </form>
+                    </div>
+
+                    {/* Password Change Card */}
+                    <div style={{ background: '#f9f9f9', padding: '30px', borderRadius: '8px' }}>
+                        <h3 style={{ marginTop: 0, marginBottom: '25px', color: '#c41e3a' }}>🔐 Change Admin Password</h3>
+
+                        {passwordMessage && (
+                            <div style={{
+                                padding: '10px 15px',
+                                marginBottom: '20px',
+                                borderRadius: '5px',
+                                background: passwordMessage.includes('✅') ? '#d4edda' : '#f8d7da',
+                                color: passwordMessage.includes('✅') ? '#155724' : '#721c24'
+                            }}>
+                                {passwordMessage}
+                            </div>
+                        )}
+
+                        <form onSubmit={handlePasswordChange} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Current Password</label>
+                                <div style={{ position: 'relative' }}>
+                                    <input
+                                        type={showPasswords.current ? 'text' : 'password'}
+                                        value={passwordData.currentPassword}
+                                        onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                                        required
+                                        style={{ width: '100%', padding: '10px 40px 10px 10px', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                                    />
+                                    <button type="button" onClick={() => setShowPasswords(p => ({ ...p, current: !p.current }))}
+                                        style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px', color: '#888', padding: 0 }}
+                                        title={showPasswords.current ? 'Hide password' : 'Show password'}
+                                    >{showPasswords.current ? '🙈' : '👁️'}</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>New Password</label>
+                                <div style={{ position: 'relative' }}>
+                                    <input
+                                        type={showPasswords.new ? 'text' : 'password'}
+                                        value={passwordData.newPassword}
+                                        onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                                        required
+                                        minLength={8}
+                                        style={{ width: '100%', padding: '10px 40px 10px 10px', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                                    />
+                                    <button type="button" onClick={() => setShowPasswords(p => ({ ...p, new: !p.new }))}
+                                        style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px', color: '#888', padding: 0 }}
+                                        title={showPasswords.new ? 'Hide password' : 'Show password'}
+                                    >{showPasswords.new ? '🙈' : '👁️'}</button>
+                                </div>
+                                <small style={{ color: '#666' }}>Minimum 8 characters</small>
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Confirm New Password</label>
+                                <div style={{ position: 'relative' }}>
+                                    <input
+                                        type={showPasswords.confirm ? 'text' : 'password'}
+                                        value={passwordData.confirmPassword}
+                                        onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                                        required
+                                        style={{ width: '100%', padding: '10px 40px 10px 10px', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                                    />
+                                    <button type="button" onClick={() => setShowPasswords(p => ({ ...p, confirm: !p.confirm }))}
+                                        style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px', color: '#888', padding: 0 }}
+                                        title={showPasswords.confirm ? 'Hide password' : 'Show password'}
+                                    >{showPasswords.confirm ? '🙈' : '👁️'}</button>
+                                </div>
+                            </div>
+                            <button
+                                type="submit"
+                                style={{
+                                    padding: '12px',
+                                    background: '#c41e3a',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    fontWeight: 'bold',
+                                    marginTop: '10px'
+                                }}
+                            >
+                                Change Password
+                            </button>
+                        </form>
+                    </div>
                 </div>
             ) : (
                 <div style={activeTab === 'newsletter' ? { display: 'block' } : { display: 'grid', gridTemplateColumns: '350px 1fr', gap: '40px' }}>

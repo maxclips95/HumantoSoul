@@ -16,6 +16,7 @@ const emailService = require('./email_service'); // Smart Multi-Provider Email S
 const axios = require('axios');
 const nodemailer = require('nodemailer');
 const { db, initializeDatabase } = require('./database');
+const youtubeOAuth = require('./youtube_oauth'); // YouTube OAuth Module
 
 // Initialize SQLite Database
 initializeDatabase();
@@ -469,10 +470,29 @@ async function translateText(text, targetLang = 'en') {
   return chunkResults.join('') || null;
 }
 
-// Direct Captions API Fetcher (Resilient & No-Library)
+// Direct Captions API Fetcher (Robust: OAuth -> Public Fallback)
 async function fetchTranscriptText(youtubeId) {
-  console.log(`[Transcript] Fetching for ID: ${youtubeId} via Captions API...`);
+  console.log(`[Transcript] Fetching for ID: ${youtubeId}...`);
 
+  // STRATEGY 1: Try OAuth API (Best, authenticated)
+  try {
+    if (await youtubeOAuth.isConnected()) {
+      console.log('[Transcript] Trying authenticated YouTube Data API...');
+      const text = await youtubeOAuth.fetchCaptionsViaAPI(youtubeId);
+      if (text) {
+        // Translation logic for OAuth result
+        try {
+          const translated = await translateText(text, 'en');
+          return (translated && translated !== text) ? `${text} ||| ${translated}` : text;
+        } catch (e) { return text; }
+      }
+    }
+  } catch (err) {
+    console.warn(`[Transcript] OAuth fetch failed (${err.message}). Falling back to public API.`);
+  }
+
+  // STRATEGY 2: Public TimedText API (Fallback)
+  console.log('[Transcript] Falling back to public timedtext API...');
   const headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
     'Accept-Language': 'hi,en;q=0.9',
@@ -486,7 +506,6 @@ async function fetchTranscriptText(youtubeId) {
     const xmlList = response.data;
 
     // 2. Parse the tracks to find Hindi (Manual or Automated)
-    // We look for 'hi' or 'a.hi'
     const tracksMatch = xmlList.match(/<track[^>]*\/>/g);
     if (!tracksMatch) throw new Error('No caption tracks found for this video.');
 
@@ -496,12 +515,8 @@ async function fetchTranscriptText(youtubeId) {
 
     if (!targetTrack) throw new Error('Hindi captions not available.');
 
-    // Extract attributes manually to avoid extra XML dependencies
     const langCode = targetTrack.match(/lang_code="([^"]+)"/)?.[1] || 'hi';
     const name = targetTrack.match(/name="([^"]+)"/)?.[1] || '';
-    const vssId = targetTrack.match(/vss_id="([^"]+)"/)?.[1] || '';
-
-    console.log(`[Transcript] Found: ${langCode} (${vssId})`);
 
     // 3. Fetch the actual transcript
     const fetchUrl = `https://www.youtube.com/api/timedtext?v=${youtubeId}&lang=${langCode}${name ? `&name=${encodeURIComponent(name)}` : ''}&fmt=srv3`;
@@ -509,7 +524,6 @@ async function fetchTranscriptText(youtubeId) {
     const transcript = transcriptRes.data;
 
     // 4. Extract text from SRV format
-    // Matches anything between tags in the SRV3/XML response
     const segments = transcript.match(/<s[^>]*>([\s\S]*?)<\/s>/g) || transcript.match(/<text[^>]*>([\s\S]*?)<\/text>/g);
     if (!segments) throw new Error('Transcript content is empty.');
 
@@ -532,7 +546,7 @@ async function fetchTranscriptText(youtubeId) {
     return fullTranscript;
 
   } catch (err) {
-    console.error(`[Transcript] Captions API error:`, err.message);
+    console.error(`[Transcript] All fetch methods failed:`, err.message);
     throw new Error(`Failed to fetch Hindi captions.`);
   }
 }
@@ -1057,6 +1071,41 @@ app.get('/api/youtube', async (req, res) => {
     console.error('[YouTube] Error fetching feed:', err.message);
     res.status(500).json({ error: 'Failed to fetch YouTube feed' });
   }
+});
+
+// --- YOUTUBE AUTH ROUTES ---
+app.get('/api/youtube/auth-url', verifyToken, (req, res) => {
+  try {
+    const url = youtubeOAuth.getAuthUrl();
+    res.json({ url });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+app.get('/api/youtube/oauth-callback', async (req, res) => {
+  const { code } = req.query;
+  if (!code) return res.status(400).send('No code provided');
+
+  try {
+    await youtubeOAuth.exchangeCodeForTokens(code);
+    res.send(`
+      <html>
+        <body style="font-family: sans-serif; text-align: center; padding: 50px;">
+          <h1 style="color: green;">✅ Connection Successful!</h1>
+          <p>YouTube channel connected successfully. You can close this window.</p>
+          <script>setTimeout(() => window.close(), 3000);</script>
+        </body>
+      </html>
+    `);
+  } catch (err) {
+    res.status(500).send(`<h1>❌ Connection Failed</h1><p>${err.message}</p>`);
+  }
+});
+
+app.get('/api/youtube/auth-status', verifyToken, async (req, res) => {
+  const connected = await youtubeOAuth.isConnected();
+  res.json({ connected });
 });
 
 // Gallery
