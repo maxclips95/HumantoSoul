@@ -114,8 +114,8 @@ const GlobalVoiceSearch = () => {
                 onClick={startListening}
                 className="nav-item"
                 style={{
-                    background: 'rgba(255,255,255,0.2)',
-                    border: '1px solid rgba(255,255,255,0.4)',
+                    background: '#00008B',
+                    border: '1px solid #00008B',
                     borderRadius: '50%',
                     width: '36px',
                     height: '36px',
