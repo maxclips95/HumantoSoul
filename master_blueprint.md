@@ -8,12 +8,12 @@
 
 A spiritual website platform featuring:
 - **Video Prophecies** with automatic Hindi-to-English transcripts
-- **AI RAG Chatbot** for answering spiritual questions
 - **Admin CMS** for content management
 - **Satvic Recipe System** with 300+ vegetarian recipes
 - **Multi-language Support** (Hindi/English/Global)
 - **Literature Library** with downloadable PDFs
 - **Voice Assistant FAB** for accessibility
+- **RAG Infrastructure** (Backend ready for AI Search)
 
 **Technology Stack**: React (Frontend) + Node.js (Backend) + Supabase (Cloud Database)
 
@@ -204,13 +204,12 @@ const newItem = await db.insert('recipes', { title, ingredients, steps, type });
 
 ---
 
-## 9. Current Status
+## 13. Current Status (v3.1.0)
 
 ✅ **Fully Operational (Cloud Native)**
 
 - **Database**: 100% Migrated to **Supabase** (PostgreSQL).
 - **Transcript System**: Working via **YouTube OAuth 2.0**.
-- **AI Search**: RAG system using OpenAI Embeddings.
 - **Voice Assistant**: Global FAB + Voice Navigation implemented.
-
-**Version**: 3.0.0
+- **RAG Engine (Storage)**: Content is indexed in Supabase (OpenAI Embeddings).
+- **AI Chatbot (UI)**: DORMANT (Backend logic complete, Frontend UI removed).

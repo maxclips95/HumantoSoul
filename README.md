@@ -11,15 +11,14 @@
     - **Global FAB**: Floating button that reads page content aloud in multiple languages.
     - **Voice Search**: Full-screen "Hands-Free" navigation—simply speak to go to any page.
     - **Polyglot Design**: Automatically switches voice accents based on the selected language.
-- **RAG-Powered AI Chatbot**:
-    - Intelligent search engine that answers spiritual questions based on site content.
-    - Uses OpenAI embeddings and vector-like search in Supabase.
 - **Supabase Cloud Architecture**: 
     - High-performance, scalable cloud database replacing local SQLite.
     - Secure real-time data management.
 - **Newsletter & Broadcast System**: 
     - Automated welcome emails and manual admin broadcasts.
     - Waterfall email logic (Brevo -> SendGrid -> Gmail) for maximum reliability.
+- **AI Infrastructure (Backend)**: 
+    - RAG-ready search engine using OpenAI embeddings for future indexing.
 
 ## 🛠️ Tech Stack
 
