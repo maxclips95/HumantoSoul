@@ -244,10 +244,10 @@ const VoiceAssistant = () => {
                     width: '60px',
                     height: '60px',
                     borderRadius: '50%',
-                    backgroundColor: speaking && !paused ? '#FFD700' : '#c41e3a',
+                    backgroundColor: speaking && !paused ? '#FFD700' : '#00008B',
                     color: speaking && !paused ? '#333' : 'white',
                     border: 'none',
-                    boxShadow: '0 4px 15px rgba(196, 30, 58, 0.4)',
+                    boxShadow: '0 4px 15px rgba(0, 0, 139, 0.4)',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
@@ -275,7 +275,7 @@ const VoiceAssistant = () => {
                         right: 0,
                         bottom: 0,
                         borderRadius: '50%',
-                        border: '2px solid #c41e3a',
+                        border: '2px solid #00008B',
                         animation: 'pulse-ring 2s infinite'
                     }}></div>
                 )}
