@@ -3,52 +3,54 @@
 ## 🚀 Key Features
 
 - **Admin Dashboard (CMS)**: Securely manage announcements, gallery, books, prayers, and prophecies.
-- **Dual-Language Video Transcripts**: 
-    - Hindi auto-captions fetched directly from YouTube.
+- **YouTube API Integration (OAuth 2.0)**: 
+    - Reliable Hindi caption fetching using official YouTube Data API v3.
+    - Requires one-time approval from the channel owner for perpetual access.
     - Automated parallel translation to English for global audiences.
-    - Side-by-side Hindi ||| English display for approved videos.
-- **Multilingual Support**: Integrated Google Translate widget for instant access in 100+ languages.
-- **Robust Security**: 
-    - JWT (JSON Web Token) authentication with 24-hour expiry.
-    - Stricter Rate Limiting on login (5 attempts / 15 mins).
-    - **Persistent Security Logging**: All failed attempts and lockouts recorded to `server/security.log`.
-    - Bcrypt password hashing (12 salt rounds).
-- **Data Architecture**: High-performance **SQLite Database** (`database.db`) replacing legacy JSON storage.
+- **AI Voice Assistant & Voice Search**:
+    - **Global FAB**: Floating button that reads page content aloud in multiple languages.
+    - **Voice Search**: Full-screen "Hands-Free" navigation—simply speak to go to any page.
+    - **Polyglot Design**: Automatically switches voice accents based on the selected language.
+- **RAG-Powered AI Chatbot**:
+    - Intelligent search engine that answers spiritual questions based on site content.
+    - Uses OpenAI embeddings and vector-like search in Supabase.
+- **Supabase Cloud Architecture**: 
+    - High-performance, scalable cloud database replacing local SQLite.
+    - Secure real-time data management.
 - **Newsletter & Broadcast System**: 
-    - Automated welcome emails for new subscribers.
-    - **Manual Admin Broadcasts**: Send custom updates to all subscribers via the Admin Dashboard.
-    - **Subscriber Management**: View total counts and full email list in a secure modal/popup.
-    - Robust email delivery using prioritized "waterfall" logic (Brevo -> SendGrid -> Gmail).
+    - Automated welcome emails and manual admin broadcasts.
+    - Waterfall email logic (Brevo -> SendGrid -> Gmail) for maximum reliability.
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React 18, Axios, i18next
-- **Backend**: Node.js, Express, better-sqlite3
-- **Security**: Helmet.js, express-rate-limit, jsonwebtoken, bcrypt
-- **Database**: SQLite (SQL query-based)
+- **Frontend**: React 18, Axios, i18next, Web Speech API
+- **Backend**: Node.js, Express, @supabase/supabase-js, googleapis
+- **AI/search**: OpenAI API (Embeddings), Supabase Vector logic
+- **Security**: JWT tokens, Helmet.js, express-rate-limit, bcryptjs
+- **Database**: Supabase (PostgreSQL-based cloud DB)
 
 ## 🏁 Quick Start (Production)
 
-To launch the website in production mode for the first time or after updates:
+To launch the website in production mode:
 
 ```powershell
 .\start_production.ps1
 ```
-This script will:
-1. Build and optimize the React frontend.
-2. Start the Node.js server to serve the site on **port 5000**.
-3. Handle process cleanup automatically.
+This script builds the React frontend and starts the Node.js server to serve the site on **port 5000**.
 
 ## ⚙️ Configuration
 
 1. Create a `.env` file in the root directory.
-2. Refer to the [.env.example](file:///c:/Users/Administrator/Desktop/jai_gurudev_clone/.env.example) file for the required variables.
-3. Replace the placeholder values with your actual configuration.
+2. Refer to the [.env.example](file:///c:/Users/Administrator/Desktop/jai_gurudev_clone/.env.example) for required keys:
+    - `SUPABASE_URL` & `SUPABASE_KEY`
+    - `OPENAI_API_KEY`
+    - `YOUTUBE_CLIENT_ID` & `YOUTUBE_CLIENT_SECRET`
+    - Email provider credentials (Brevo/SendGrid)
 
 ## 📜 Maintenance
 
-- **Backups**: Periodically copy `server/database.db` to a safe location.
-- **Security Audit**: Check `server/security.log` to monitor failed login attempts and suspected hacking activity.
+- **Backups**: Data is securely managed by Supabase; periodic SQL exports are recommended via the Supabase Dashboard.
+- **YouTube Connection**: If captions stop fetching, re-connect the channel via Admin Dashboard > Settings.
 
 ---
-*Last Updated: February 3, 2026*
+*Last Updated: February 18, 2026*
