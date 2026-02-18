@@ -169,13 +169,13 @@ const GlobalVoiceSearch = () => {
                         width: '100px',
                         height: '100px',
                         borderRadius: '50%',
-                        backgroundColor: isListening ? '#ff4d4d' : '#444',
+                        backgroundColor: isListening ? '#00008B' : '#444',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         fontSize: '3rem',
                         marginBottom: '30px',
-                        boxShadow: isListening ? '0 0 30px #ff4d4d' : 'none',
+                        boxShadow: isListening ? '0 0 30px rgba(0, 0, 139, 0.4)' : 'none',
                         transition: 'all 0.3s ease',
                         animation: isListening ? 'pulse 1.5s infinite' : 'none'
                     }}>
@@ -191,7 +191,7 @@ const GlobalVoiceSearch = () => {
                         <button
                             onClick={startRecognition}
                             style={{
-                                background: '#c41e3a',
+                                background: '#00008B',
                                 color: 'white',
                                 border: 'none',
                                 padding: '10px 30px',
@@ -219,9 +219,9 @@ const GlobalVoiceSearch = () => {
                     <style>
                         {`
                         @keyframes pulse {
-                            0% { transform: scale(1); boxShadow: 0 0 0 0 rgba(255, 77, 77, 0.7); }
-                            70% { transform: scale(1.1); boxShadow: 0 0 0 20px rgba(255, 77, 77, 0); }
-                            100% { transform: scale(1); boxShadow: 0 0 0 0 rgba(255, 77, 77, 0); }
+                            0% { transform: scale(1); boxShadow: 0 0 0 0 rgba(0, 0, 139, 0.7); }
+                            70% { transform: scale(1.1); boxShadow: 0 0 0 20px rgba(0, 0, 139, 0); }
+                            100% { transform: scale(1); boxShadow: 0 0 0 0 rgba(0, 0, 139, 0); }
                         }
                         @keyframes fadeIn {
                             from { opacity: 0; }
