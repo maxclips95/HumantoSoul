@@ -215,9 +215,15 @@ const newItem = await db.insert('recipes', { title, ingredients, steps, type });
 
 ✅ **Navigation UX & Menu Restructure**
 - Renamed "Downloads" to **"Programmes"** to better reflect ashram activities and events.
-- Moved **"Announcements"** into the **"Mission"** dropdown to clean up the top-level navigation layout.
+- Replaced "Prayer & Meditation" with **"Announcements"** on the main navigation bar.
+- Removed "Announcements" from the "Mission" dropdown to prevent duplication.
+- Updated the Global Voice Search icon with an explicit **"AI Guide"** text label for clarity.
 - Stripped inline emojis from top-level desktop navigation to create a cleaner, more professional header presentation.
 - Deployed pure CSS hover combined with React State for dropdown interactions ("Mission" tab). Ensures absolute stability across both desktop pointers and mobile touch interfaces without requiring tab-key fallbacks.
+
+✅ **Landing Page Polishing**
+- Removed redundant CTA buttons ("Begin Meditation", "Explore the Path") from the top Cinematic Hero.
+- Updated the bottom Cinematic CTA "Start Now" button to direct users explicitly to the `/contact` page.
 
 ✅ **Full-Scale Technical SEO Matrix**
 - Injected strict JSON-LD Schema (WebSite, FAQPage, Organization, Person, ImageGallery).
