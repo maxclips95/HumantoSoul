@@ -7,10 +7,16 @@
     - Reliable Hindi caption fetching using official YouTube Data API v3.
     - Requires one-time approval from the channel owner for perpetual access.
     - Automated parallel translation to English for global audiences.
-- **AI Voice Assistant & Voice Search**:
+- **AI Voice Assistant & "AI Guide"**:
     - **Global FAB**: Floating button that reads page content aloud in multiple languages.
-    - **Voice Search**: Full-screen "Hands-Free" navigation—simply speak to go to any page.
+    - **AI Guide (Voice Search)**: Full-screen "Hands-Free" navigation—simply speak to go to any page.
     - **Polyglot Design**: Automatically switches voice accents based on the selected language.
+- **Premium UI & Navigation System**:
+    - Cinematic hero redesign focusing heavily on "Inner Transformation" and Doctrinal Accuracy.
+    - React State + CSS Hybrid dropdowns ensuring flawless touch interaction on mobile devices.
+- **Technical SEO Matrix**:
+    - Comprehensive JSON-LD Schemas (WebSite, FAQPage, Organization, Person, ImageGallery).
+    - Fully automated Hreflang alternates, geo-targeting, and meta dynamics for deep Googlebot indexing.
 - **Supabase Cloud Architecture**: 
     - High-performance, scalable cloud database.
     - Secure real-time data management.
