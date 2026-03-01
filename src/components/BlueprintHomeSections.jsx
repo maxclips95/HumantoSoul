@@ -20,6 +20,7 @@ function useScrollReveal(threshold = 0.15) {
 
 export default function BlueprintHomeSections() {
     const section2Ref = useScrollReveal();
+    const doctrinalRef = useScrollReveal();
     const pillarsRef = useScrollReveal(0.1);
     const deepRef = useScrollReveal();
     const ctaRef = useScrollReveal();
