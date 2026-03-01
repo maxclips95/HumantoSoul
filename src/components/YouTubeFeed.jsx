@@ -16,7 +16,7 @@ export default function YouTubeFeed() {
     let isMounted = true;
     (async () => {
       try {
-        const res = await fetch("/api/youtube");
+        const res = await fetch(`${window.API_BASE || ''}/api/youtube`);
         if (!res.ok) throw new Error('Failed to fetch videos');
         const data = await res.json();
         if (!isMounted) return;

@@ -5,6 +5,51 @@ import TranscriptModal from "../components/TranscriptModal";
 import SEO from '../components/common/SEO';
 import ShareButtons from '../components/common/ShareButtons';
 
+const propheciesSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "url": "https://www.humantosoul.com/prophecies",
+      "name": "Baba Jaigurudev Prophecies & Future Predictions | Bhavishyavani",
+      "description": "Divine prophecies of Baba Jaigurudev and Baba Umakant Ji — predictions about world events, Satyug, Yug Parivartan, and the spiritual transformation of humanity.",
+      "keywords": "prophecy, prophecies, baba jaigurudev prophecies, baba umakant prophecies, predictions, bhavishyavani, satyug, yug parivartan, 2026 predictions",
+      "author": { "@id": "https://www.humantosoul.com/#organization" },
+      "publisher": { "@id": "https://www.humantosoul.com/#organization" },
+      "inLanguage": ["en", "hi"]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What are the prophecies of Baba Jaigurudev?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Baba Jaigurudev has made divine prophecies (Bhavishyavani) about world events including: natural calamities, world wars, political changes, the transition from Kaliyug to Satyug (Golden Age), and the spiritual awakening of humanity. Many prophecies have already come true. Visit humantosoul.com/prophecies for complete details."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is Yug Parivartan (Time Change)?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yug Parivartan (युग परिवर्तन) means the change of cosmic age or era. According to Baba Jaigurudev's prophecies, the world is transitioning from Kaliyug (age of darkness) to Satyug (age of truth/golden age). This change will bring massive upheaval followed by a new era of peace, harmony, power, and prosperity for all of humanity."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Have any of Baba Jaigurudev's predictions come true?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, many of Baba Jaigurudev's prophecies and predictions have been fulfilled — including predictions about specific political events, epidemics, natural disasters, and social changes. His divine foresight has been verified by millions of devotees over decades."
+          }
+        }
+      ]
+    }
+  ]
+};
+
 
 const ReadingModal = ({ title, content, onClose }) => {
   return (
@@ -187,9 +232,15 @@ export default function Prophecies() {
   return (
     <>
       <SEO
-        title={searchQuery ? `Search Results: ${searchQuery}` : "2026 Prophecies & Time Change (Parivartan)"}
-        description="Baba Jai Gurudev's predictions on the coming Time Change (Yug Parivartan). Read about the cycle change from Kaliyug to Satyug and how to survive the transition."
-        keywords="Satyug, Time Change, Yug Cycle Changing, Parivartan, Kaliyug to Satyug, Prophecies 2026, Jai Gurudev Predictions, World War 3 Prophecy"
+        title={searchQuery ? `Search: ${searchQuery} - Baba Jaigurudev Prophecies` : "Baba Jaigurudev Prophecies & Predictions | Bhavishyavani | भविष्यवाणियाँ"}
+        description="Read the divine prophecies (Bhavishyavani) of Baba Jaigurudev and Baba Umakant Ji — predictions about world events, Satyug (Golden Age), Yug Parivartan, natural calamities, and the spiritual transformation of humanity. Many prophecies have already come true. बाबा जयगुरुदेव और बाबा उमाकांत जी की भविष्यवाणियाँ।"
+        keywords="prophecy, prophecies, baba jaigurudev prophecies, baba umakant prophecies, predictions, bhavishyavani, satyug, yug parivartan, 2026 predictions, kaliyug to satyug, time change, parivartan, world events, spiritual predictions, divine prophecy, future predictions, india prophecy, jai gurudev predictions, umakant predictions, भविष्यवाणी, सत्युग, युग परिवर्तन, कलयुग"
+        url="https://www.humantosoul.com/prophecies"
+        schema={propheciesSchema}
+        breadcrumbs={[
+          { name: "Home", url: "https://www.humantosoul.com/" },
+          { name: "Prophecies", url: "https://www.humantosoul.com/prophecies" }
+        ]}
       />
       <section className="section" style={{ padding: "10px 20px" }}>
 
@@ -312,7 +363,7 @@ export default function Prophecies() {
               )}
               {item.thumbnail ? (
                 <a href={item.link} target="_blank" rel="noreferrer">
-                  <img src={item.thumbnail} alt={item.title} className="card-img" />
+                  <img src={item.thumbnail?.startsWith('/') ? `${window.API_BASE || ''}${item.thumbnail}` : item.thumbnail} alt={item.title} className="card-img" />
                   <div style={{
                     position: 'absolute',
                     top: '50%',
@@ -330,7 +381,7 @@ export default function Prophecies() {
                   }}>▶</div>
                 </a>
               ) : item.image && (
-                <img src={item.image} alt={item.title} className="card-img" />
+                <img src={item.image?.startsWith('/') ? `${window.API_BASE || ''}${item.image}` : item.image} alt={item.title} className="card-img" />
               )}
 
               <div className="card-content">

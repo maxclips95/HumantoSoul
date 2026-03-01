@@ -1,6 +1,6 @@
 # Scaling Guide: How to use Cloudflare (FREE) for High Traffic
 
-Since you are using SQLite, the best way to handle millions of visitors for free is to use Cloudflare. It acts as a shield in front of your server.
+Since you are using Supabase, the best way to handle millions of visitors for free is to use Cloudflare. It acts as a shield in front of your server.
 
 ## 1. What is a CDN (Cloudflare)?
 A CDN (Content Delivery Network) stores a "photocopy" of your website on thousands of servers worldwide. When a user visits:
@@ -30,9 +30,8 @@ To make your site handle huge traffic without the server slowing down:
 
 NOTE: When you use "Cache Everything", your website will be lightning fast. However, when you update an announcement in the Admin Dashboard, it might take 2 hours to show up for users. You can manually click "Purge Cache" in Cloudflare to show updates instantly.
 
-## 5. Summary of Scale with SQLite + Cloudflare
+## 5. Summary of Scale with Cloudflare
 | System | Role | Benefit |
 |--------|------|---------|
-| SQLite | Database | 100x faster than JSON for data lookups. |
 | Cloudflare | Shield | Blocks bots and delivers images/text without touching your server. |
 | Combined | Professional | You get a $1000/mo setup performance for $0/mo. |

@@ -47,6 +47,27 @@ export default function ProphecyDetail() {
                 keywords={`prophecy, ${item.year || 'future'}, spiritual warning, jai gurudev`}
                 image={item.thumbnail || item.image}
                 type="article"
+                schema={{
+                    "@context": "https://schema.org",
+                    "@type": "Article",
+                    "headline": item.title,
+                    "image": [
+                        item.thumbnail ? (item.thumbnail.startsWith('http') ? item.thumbnail : `https://www.humantosoul.com${item.thumbnail}`) : "https://www.humantosoul.com/assets/images/temple-bg.jpg"
+                    ],
+                    "datePublished": item.year ? `${item.year}-01-01` : undefined,
+                    "author": {
+                        "@type": "Organization",
+                        "name": "Jai Gurudev Spiritual Mission"
+                    },
+                    "publisher": {
+                        "@type": "Organization",
+                        "name": "Jai Gurudev Spiritual Mission",
+                        "logo": {
+                            "@type": "ImageObject",
+                            "url": "https://www.humantosoul.com/favicon.ico"
+                        }
+                    }
+                }}
             />
 
             <Link to="/blog" style={{ textDecoration: 'none', color: '#666', marginBottom: '20px', display: 'inline-block' }}>

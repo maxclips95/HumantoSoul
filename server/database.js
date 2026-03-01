@@ -1,6 +1,6 @@
 /**
  * database.js — Pure Supabase Client
- * Production-grade: no SQLite, no fallback, no dual-mode.
+ * Production-grade Supabase Client.
  */
 const { createClient } = require('@supabase/supabase-js');
 const path = require('path');

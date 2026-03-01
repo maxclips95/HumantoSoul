@@ -5,7 +5,7 @@ function Downloads() {
     const [loading, setLoading] = useState(true); // Start as true while fetching
     // SAMPLE DATA TO MATCH REFERENCE IMAGE
     useEffect(() => {
-        fetch('/api/downloads')
+        fetch(`${window.API_BASE || ''}/api/downloads`)
             .then(res => res.json())
             .then(data => {
                 if (data && data.length > 0) {
@@ -22,7 +22,7 @@ function Downloads() {
             });
     }, []);
 
-    const BASE_URL = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000';
+    const BASE_URL = window.API_BASE || '';
 
     return (
         <section className="section">

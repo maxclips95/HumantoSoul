@@ -10,7 +10,7 @@ function SatvicLifestyle() {
     const [showPledgeModal, setShowPledgeModal] = useState(false);
 
     useEffect(() => {
-        fetch('/api/satvic/stats')
+        fetch(`${window.API_BASE || ''}/api/satvic/stats`)
             .then(res => res.json())
             .then(data => setPledgeStats(data))
             .catch(err => console.error(err));
@@ -19,9 +19,14 @@ function SatvicLifestyle() {
     return (
         <div className="satvic-page">
             <SEO
-                title="Satvic Lifestyle & Pure Living"
-                description="Adopt a Satvic lifestyle for spiritual growth, health, and mental clarity. Learn about vegetarianism, non-violence, and pure living according to Jai Gurudev's teachings."
-                keywords="satvic lifestyle, vegetarianism, pure living, spiritual diet, non-violence, ahimsa"
+                title="Satvic Lifestyle - Holistic Wellness, Mindfulness, Breathwork & Conscious Living | Baba Jaigurudev"
+                description="Transform your life with the proven Satvic lifestyle — holistic wellness, conscious living, breathwork, somatic healing, and digital detox as taught by Baba Jaigurudev. Experience nervous system regulation, anxiety relief, inner peace, power, and prosperity through vegetarianism, yog sadhna, and mindfulness. Free beginner's guide. Trusted by 100 million+ souls. सत्विक जीवन, योग साधना।"
+                keywords="satvic lifestyle, holistic wellness, holistic living, holistic health, conscious living, digital detox, breathwork, somatic healing, nervous system regulation, mindfulness, mindfulness practice, mind body harmony, mental wellbeing, mental health, stress reduction, anxiety relief, satvic food, satvic diet, yog sadhna, yoga, yoga nidra, dhyan, meditation, vegetarianism, non-violence, ahimsa, inner peace, peace, power, prosperity, spiritual health, pure living, baba jaigurudev, sant mat, santmat, spiritual growth, soul purification, transformational spirituality, online wellness, free meditation guide, beginner wellness, सत्विक जीवन, शाकाहार, योग साधना, ध्यान, आंतरिक शांति"
+                url="https://www.humantosoul.com/satvic-lifestyle"
+                breadcrumbs={[
+                    { name: "Home", url: "https://www.humantosoul.com/" },
+                    { name: "Satvic Lifestyle", url: "https://www.humantosoul.com/satvic-lifestyle" }
+                ]}
             />
             <div className="satvic-hero">
                 <div className="hero-overlay">
@@ -50,9 +55,9 @@ function SatvicLifestyle() {
             {showPledgeModal && (
                 <PledgeModal onClose={() => {
                     setShowPledgeModal(false);
-                    fetch('/api/satvic/stats').then(r => r.json()).then(setPledgeStats);
+                    fetch(`${window.API_BASE || ''}/api/satvic/stats`).then(r => r.json()).then(setPledgeStats);
                 }} refreshStats={() => {
-                    fetch('/api/satvic/stats').then(r => r.json()).then(setPledgeStats);
+                    fetch(`${window.API_BASE || ''}/api/satvic/stats`).then(r => r.json()).then(setPledgeStats);
                 }} />
             )}
         </div>
@@ -66,7 +71,7 @@ function PledgeModal({ onClose, refreshStats }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch('/api/satvic/pledge', {
+            const res = await fetch(`${window.API_BASE || ''}/api/satvic/pledge`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)

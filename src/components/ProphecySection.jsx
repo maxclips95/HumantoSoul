@@ -105,7 +105,7 @@ export default function ProphecySection() {
                         )}
                         {item.thumbnail ? (
                             <a href={item.link} target="_blank" rel="noreferrer">
-                                <img src={item.thumbnail} alt={item.title} className="card-img" />
+                                <img src={item.thumbnail?.startsWith('/') ? `${window.API_BASE || ''}${item.thumbnail}` : item.thumbnail} alt={item.title} className="card-img" />
                                 <div style={{
                                     position: 'absolute',
                                     top: '50%',
@@ -123,7 +123,7 @@ export default function ProphecySection() {
                                 }}>▶</div>
                             </a>
                         ) : item.image && (
-                            <img src={item.image} alt={item.title} className="card-img" />
+                            <img src={item.image?.startsWith('/') ? `${window.API_BASE || ''}${item.image}` : item.image} alt={item.title} className="card-img" />
                         )}
 
                         <div className="card-content">

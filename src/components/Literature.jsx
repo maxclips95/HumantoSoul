@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 
-const BASE_URL = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000';
+const BASE_URL = window.API_BASE || '';
 
 const BookCard = ({ book, onReadMore }) => {
     const limit = 200; // Character limit for snippet
@@ -20,7 +20,7 @@ const BookCard = ({ book, onReadMore }) => {
                 {/* Inline Image (Clean Style) */}
                 <div style={{ marginBottom: '15px', display: 'flex', justifyContent: 'center' }}>
                     <img
-                        src={`${BASE_URL}${book.image}`}
+                        src={book.image?.startsWith('/') ? `${BASE_URL}${book.image}` : book.image}
                         alt={book.title}
                         style={{ maxHeight: '180px', maxWidth: '100%', objectFit: 'contain', borderRadius: '4px' }}
                         onError={(e) => { e.target.style.display = 'none' }}
@@ -127,7 +127,7 @@ const BookModal = ({ book, onClose }) => {
                         {/* Full Image */}
                         <div style={{ maxWidth: '300px', width: '100%', flexShrink: 0 }}>
                             <img
-                                src={`${BASE_URL}${book.image}`}
+                                src={book.image?.startsWith('/') ? `${BASE_URL}${book.image}` : book.image}
                                 alt={book.title}
                                 style={{ width: '100%', borderRadius: '10px', boxShadow: '0 0 20px rgba(255,255,255,0.1)' }}
                                 onError={(e) => { e.target.src = 'https://via.placeholder.com/150x200?text=Book' }}

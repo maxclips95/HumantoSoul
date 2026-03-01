@@ -10,10 +10,16 @@ import axios from 'axios';
 
 import { HelmetProvider } from 'react-helmet-async';
 
-// Set default base URL for API requests - environment aware
-// In production (build), uses relative URLs (same origin)
-// In development, uses localhost:5000
-axios.defaults.baseURL = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000';
+// Backend URL: api.humantosoul.com in production, localhost:5000 in dev
+const API_BASE = process.env.NODE_ENV === 'production'
+  ? 'https://api.humantosoul.com'
+  : 'http://localhost:5000';
+
+// Set axios base URL for all components using axios
+axios.defaults.baseURL = API_BASE;
+
+// Expose for components using fetch() directly
+window.API_BASE = API_BASE;
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

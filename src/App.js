@@ -22,6 +22,10 @@ import BlogPage from './pages/BlogPage';
 import ProphecyDetail from './pages/ProphecyDetail';
 import AnnouncementDetail from './pages/AnnouncementDetail';
 import VoiceAssistant from './components/common/VoiceAssistant';
+import MeditationPage from './pages/MeditationPage';
+import VegetarianLivingPage from './pages/VegetarianLivingPage';
+import LiberationPage from './pages/LiberationPage';
+import PeaceAndSocietyPage from './pages/PeaceAndSocietyPage';
 
 
 
@@ -47,6 +51,10 @@ function App() {
             <Route path="/admin-login" element={<AdminLogin />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/blog" element={<BlogPage />} />
+            <Route path="/meditation" element={<MeditationPage />} />
+            <Route path="/vegetarian-living" element={<VegetarianLivingPage />} />
+            <Route path="/liberation" element={<LiberationPage />} />
+            <Route path="/peace-and-society" element={<PeaceAndSocietyPage />} />
             <Route path="/prophecy/:id" element={<ProphecyDetail />} />
             <Route path="/announcement/:id" element={<AnnouncementDetail />} />
           </Routes>

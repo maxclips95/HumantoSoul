@@ -30,7 +30,7 @@ function Gallery() {
                 <div className="card-grid">
                     {images.map((image) => (
                         <div key={image.id} className="card">
-                            <img src={image.src} alt={image.alt || 'Gallery Image'} className="card-image" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                            <img src={image.src?.startsWith('/') ? `${window.API_BASE || ''}${image.src}` : image.src} alt={image.alt || 'Gallery Image'} className="card-image" style={{ width: '100%', height: 'auto', display: 'block' }} />
                             <div className="card-content" style={{ textAlign: 'center' }}>
                                 <p style={{ fontSize: '0.9rem', color: '#666' }}>{image.alt || 'Jai Gurudev'}</p>
                             </div>

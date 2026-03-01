@@ -32,7 +32,7 @@ function BabaUmakant() {
             <div style={{ textAlign: "center", marginBottom: "25px" }}>
                 {profile?.image ? (
                     <img
-                        src={profile.image}
+                        src={profile.image?.startsWith('/') ? `${window.API_BASE || ''}${profile.image}` : profile.image}
                         alt="Baba Umakant Ji Maharaj"
                         style={{
                             borderRadius: "50%",

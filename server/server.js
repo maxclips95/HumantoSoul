@@ -18,7 +18,7 @@ const nodemailer = require('nodemailer');
 const { db, initializeDatabase } = require('./database');
 const youtubeOAuth = require('./youtube_oauth'); // YouTube OAuth Module
 
-// Initialize SQLite Database
+// Initialize Database
 initializeDatabase();
 
 
@@ -72,7 +72,7 @@ logger.info("   JAI GURUDEV SERVER - MULTI-TEXT V2    ");
 logger.info("-----------------------------------------");
 logger.info(`Environment: ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'}`);
 
-const PORT = process.env.SERVER_PORT || 5000;
+const PORT = process.env.PORT || 5000;
 
 // Simplified logging to stdout for Render Dashboard
 const logToMemory = (type, message, details = '') => {
@@ -204,7 +204,7 @@ app.use(cors({
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      console.warn(`CORS blocked origin: ${origin}`);
+      logger.warn(`CORS blocked origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -279,7 +279,7 @@ const UPLOADS_DIR = path.join(__dirname, 'uploads');
 // Ensure uploads directory exists
 if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
-// SQLite database is initialized above. JSON file initialization is no longer needed.
+// Database is initialized above.
 
 
 // Secure uploads directory - block dangerous file types and add security headers
@@ -328,7 +328,7 @@ const fileFilter = (req, file, cb) => {
   if (ALLOWED_MIME_TYPES.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    console.warn(`Blocked upload: ${file.mimetype} not allowed`);
+    logger.warn(`Blocked upload: ${file.mimetype} not allowed`);
     cb(new Error('File type not allowed. Only images, PDFs, and CDR files are accepted.'), false);
   }
 };
@@ -351,7 +351,7 @@ const FEATURED_SHORTS = [
 const PROPHECY_KEYWORDS = ["भविष्यवाणी", "चेतावनी", "संदेश", "आगाही", "कलयुग", "सतयुग", "2025", "2026", "बचेंगे", "लड़ाई", "विनाश", "संदेश", "आगाही", "short", "shorts", "prophecy", "prediction"];
 
 async function fetchYouTubeProphecies() {
-  console.log('[YouTube] Fetching prophecies from RSS...');
+  logger.info('[YouTube] Fetching prophecies from RSS...');
   try {
     const response = await fetch(RSS_URL);
     const result = await (new xml2js.Parser()).parseStringPromise(await response.text());
@@ -403,9 +403,9 @@ async function fetchYouTubeProphecies() {
 
     // Upsert all items to Supabase (insert or update by primary key 'id')
     await db.upsert('automated_prophecies', items);
-    console.log(`[YouTube] Upserted ${items.length} prophecy items to Supabase.`);
+    logger.info(`[YouTube] Upserted ${items.length} prophecy items to Supabase.`);
   } catch (error) {
-    console.error('[YouTube] Error fetching YouTube data:', error);
+    logger.error('[YouTube] Error fetching YouTube data:', error);
   }
 }
 
@@ -431,7 +431,7 @@ async function translateText(text, targetLang = 'en') {
     chunks.push(text.slice(i, i + CHUNK_SIZE));
   }
 
-  console.log(`Translating ${text.length} characters in ${chunks.length} chunks (parallel batching)...`);
+  logger.info(`Translating ${text.length} characters in ${chunks.length} chunks (parallel batching)...`);
 
   const BATCH_SIZE = 5;
   const chunkResults = new Array(chunks.length).fill('');
@@ -472,12 +472,12 @@ async function translateText(text, targetLang = 'en') {
 
 // Direct Captions API Fetcher (Robust: OAuth -> Public Fallback)
 async function fetchTranscriptText(youtubeId) {
-  console.log(`[Transcript] Fetching for ID: ${youtubeId}...`);
+  logger.info(`[Transcript] Fetching for ID: ${youtubeId}...`);
 
   // STRATEGY 1: Try OAuth API (Best, authenticated)
   try {
     if (await youtubeOAuth.isConnected()) {
-      console.log('[Transcript] Trying authenticated YouTube Data API...');
+      logger.info('[Transcript] Trying authenticated YouTube Data API...');
       const text = await youtubeOAuth.fetchCaptionsViaAPI(youtubeId);
       if (text) {
         // Translation logic for OAuth result
@@ -492,7 +492,7 @@ async function fetchTranscriptText(youtubeId) {
   }
 
   // STRATEGY 2: Public TimedText API (Fallback)
-  console.log('[Transcript] Falling back to public timedtext API...');
+  logger.info('[Transcript] Falling back to public timedtext API...');
   const headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
     'Accept-Language': 'hi,en;q=0.9',
@@ -573,13 +573,13 @@ cron.schedule('0 0 */2 * *', () => fetchYouTubeProphecies());
 
 // --- SUPABASE KEEP-ALIVE (Prevent Inactivity Pause) ---
 cron.schedule('0 0 * * *', async () => {
-  console.log('[Keep-Alive] Running daily ping to Supabase...');
+  logger.info('[Keep-Alive] Running daily ping to Supabase...');
   try {
     const { error } = await db.raw.from('announcements').select('id').limit(1);
     if (error) throw error;
-    console.log('[Keep-Alive] Ping successful.');
+    logger.info('[Keep-Alive] Ping successful.');
   } catch (err) {
-    console.error('[Keep-Alive] Ping failed:', err.message);
+    logger.error('[Keep-Alive] Ping failed:', err.message);
   }
 });
 
@@ -691,7 +691,7 @@ app.post('/api/auth/change-password', verifyToken, async (req, res) => {
     // 4. Update in Supabase
     await db.updateWhere('users', 'username', username, { password_hash: newPasswordHash });
 
-    console.log(`[Auth] Password updated for user: ${username}`);
+    logger.info(`[Auth] Password updated for user: ${username}`);
     res.json({ message: 'Password changed successfully. Please login again.' });
   } catch (err) {
     console.error('[Auth] Failed to update password:', err.message);
@@ -1386,9 +1386,8 @@ app.post('/api/newsletter/subscribe', async (req, res) => {
 
     res.json({ success: true, message: 'Subscribed successfully!' });
   } catch (err) {
-    // Check for unique constraint error (Supabase or SQLite)
-    // Supabase error usually has code '23505' for unique violation
-    if (err.code === 'SQLITE_CONSTRAINT_UNIQUE' || err.code === '23505') {
+    // Check for unique constraint error (Supabase)
+    if (err.code === '23505') {
       return res.status(409).json({ message: 'This email is already subscribed.' });
     }
     console.error('Newsletter Error:', err);
@@ -1459,6 +1458,76 @@ app.post('/api/newsletter/broadcast', verifyToken, async (req, res) => {
   } catch (err) {
     console.error('Broadcast Error:', err);
     res.status(500).json({ message: 'Failed to send broadcast.' });
+  }
+});
+
+// --- Dynamic Sitemap & SEO ---
+app.get('/sitemap.xml', async (req, res) => {
+  try {
+    const baseUrl = 'https://www.humantosoul.com';
+    const routes = [
+      '/', '/about', '/baba-jaigurudev', '/baba-umakant',
+      '/contact', '/gallery', '/literature', '/prarthana',
+      '/downloads', '/prophecies', '/satvic-lifestyle',
+      '/announcements', '/blog'
+    ];
+
+    const sitemap = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'];
+
+    // 1. Static Routes
+    routes.forEach(route => {
+      sitemap.push(`
+        <url>
+          <loc>${baseUrl}${route}</loc>
+          <changefreq>daily</changefreq>
+          <priority>0.8</priority>
+        </url>`);
+    });
+
+    // 2. Prophecies (Dynamic)
+    const prophecies = await db.selectAll('prophecies');
+    prophecies.forEach(p => {
+      sitemap.push(`
+        <url>
+          <loc>${baseUrl}/prophecy/${p.id}</loc>
+          <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+          <changefreq>weekly</changefreq>
+          <priority>0.7</priority>
+        </url>`);
+    });
+
+    // 3. Announcements (Dynamic) - if you have detailed pages
+    const announcements = await db.selectAll('announcements');
+    announcements.forEach(a => {
+      sitemap.push(`
+        <url>
+          <loc>${baseUrl}/announcement/${a.id}</loc>
+          <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+          <changefreq>weekly</changefreq>
+          <priority>0.6</priority>
+        </url>`);
+    });
+
+    // 4. Automated Prophecies (Dynamic)
+    const automated = await db.selectAll('automated_prophecies');
+    automated.forEach(p => {
+      sitemap.push(`
+        <url>
+          <loc>${baseUrl}/prophecy/${p.id}</loc>
+          <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+          <changefreq>weekly</changefreq>
+          <priority>0.6</priority>
+        </url>`);
+    });
+
+    sitemap.push('</urlset>');
+
+    res.header('Content-Type', 'application/xml');
+    res.send(sitemap.join(''));
+
+  } catch (err) {
+    logger.error('Sitemap Generation Error:', err);
+    res.status(500).send('Error generating sitemap');
   }
 });
 

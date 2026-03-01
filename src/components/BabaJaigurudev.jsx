@@ -27,7 +27,7 @@ function BabaJaigurudev() {
             <div style={{ textAlign: "center", marginBottom: "30px" }}>
                 {profile?.image ? (
                     <img
-                        src={profile.image}
+                        src={profile.image?.startsWith('/') ? `${window.API_BASE || ''}${profile.image}` : profile.image}
                         alt="Baba Jaigurudev Ji Maharaj"
                         style={{
                             borderRadius: '50%',

@@ -74,9 +74,14 @@ export default function BlogPage() {
     return (
         <div className="blog-container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 20px' }}>
             <SEO
-                title="Spiritual Insights Blog"
-                description="Latest prophecies, announcements, and spiritual wisdom from the Jai Gurudev mission. Stay updated on the time change and Satvic lifestyle."
-                keywords="spiritual blog, prophecies, jai gurudev news, satyug updates, spiritual insights"
+                title="Spiritual Insights Blog - Prophecies, Meditation, Dhyan & Satsang | Baba Jaigurudev"
+                description="Read the latest spiritual insights, prophecies, announcements, and wisdom from Baba Jaigurudev Mission. Topics include meditation (dhyan), satsang, yog sadhna, inner peace, power, prosperity, soul awakening, and divine predictions. आध्यात्मिक ब्लॉग, बाबा जयगुरुदेव।"
+                keywords="spiritual blog, spiritual insights, prophecy blog, meditation blog, dhyan, satsang, yog sadhna, yoga, inner peace, power, prosperity, soul awakening, baba jaigurudev, baba umakant, jai gurudev, sant mat, satyug updates, 2026 predictions, spiritual news, announcements, bhavishyavani, God, atma, आध्यात्मिक ब्लॉग, ध्यान, सत्संग, भविष्यवाणी"
+                url="https://www.humantosoul.com/blog"
+                breadcrumbs={[
+                    { name: "Home", url: "https://www.humantosoul.com/" },
+                    { name: "Blog", url: "https://www.humantosoul.com/blog" }
+                ]}
             />
             <header style={{ textAlign: 'center', marginBottom: '60px' }}>
                 <h1 style={{ fontSize: '3rem', color: '#c41e3a', marginBottom: '10px' }}>Spiritual Insights</h1>

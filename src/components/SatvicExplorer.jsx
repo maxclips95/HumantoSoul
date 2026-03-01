@@ -16,7 +16,7 @@ function SatvicExplorer() {
     useEffect(() => {
         setLoading(true);
         // Get Metadata (Countries and Total count)
-        fetch('/api/satvic/recipes?metadata=true')
+        fetch(`${window.API_BASE || ''}/api/satvic/recipes?metadata=true`)
             .then(res => res.json())
             .then(data => setMeta(data));
 
@@ -25,7 +25,7 @@ function SatvicExplorer() {
     }, []);
 
     const fetchRecipes = (newOffset, isInitial = false) => {
-        let url = `/api/satvic/recipes?limit=${LIMIT}&offset=${newOffset}`;
+        let url = `${window.API_BASE || ''}/api/satvic/recipes?limit=${LIMIT}&offset=${newOffset}`;
         if (selectedType !== 'All') url += `&type=${selectedType}`;
 
         fetch(url)
@@ -53,7 +53,7 @@ function SatvicExplorer() {
 
         setSelectedType(value);
 
-        let url = `/api/satvic/recipes?limit=${LIMIT}&offset=0`;
+        let url = `${window.API_BASE || ''}/api/satvic/recipes?limit=${LIMIT}&offset=0`;
         if (value !== 'All') url += `&type=${value}`;
 
         fetch(url)

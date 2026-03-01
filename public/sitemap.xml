@@ -1,84 +1,170 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Core Pages -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <!-- Homepage -->
   <url>
     <loc>https://www.humantosoul.com/</loc>
-    <lastmod>2026-02-17</lastmod>
+    <lastmod>2026-03-01</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.humantosoul.com/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.humantosoul.com/"/>
   </url>
+
+  <!-- Meditation (Content Cluster Pillar) -->
+  <url>
+    <loc>https://www.humantosoul.com/meditation</loc>
+    <lastmod>2026-03-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.humantosoul.com/meditation"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.humantosoul.com/meditation"/>
+  </url>
+
+  <!-- Vegetarian Living (Content Cluster Pillar) -->
+  <url>
+    <loc>https://www.humantosoul.com/vegetarian-living</loc>
+    <lastmod>2026-03-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.humantosoul.com/vegetarian-living"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.humantosoul.com/vegetarian-living"/>
+  </url>
+
+  <!-- Liberation / Moksha (Deep Doctrine Page) -->
+  <url>
+    <loc>https://www.humantosoul.com/liberation</loc>
+    <lastmod>2026-03-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.92</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.humantosoul.com/liberation"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.humantosoul.com/liberation"/>
+  </url>
+
+  <!-- Peace & Society -->
+  <url>
+    <loc>https://www.humantosoul.com/peace-and-society</loc>
+    <lastmod>2026-03-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.88</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.humantosoul.com/peace-and-society"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.humantosoul.com/peace-and-society"/>
+  </url>
+
+
+  <!-- About -->
   <url>
     <loc>https://www.humantosoul.com/about</loc>
-    <lastmod>2026-02-17</lastmod>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.humantosoul.com/about"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.humantosoul.com/about"/>
   </url>
+
+  <!-- Baba Jaigurudev -->
   <url>
     <loc>https://www.humantosoul.com/baba-jaigurudev</loc>
-    <lastmod>2026-02-17</lastmod>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.95</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.humantosoul.com/baba-jaigurudev"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.humantosoul.com/baba-jaigurudev"/>
   </url>
+
+  <!-- Baba Umakant -->
   <url>
     <loc>https://www.humantosoul.com/baba-umakant</loc>
-    <lastmod>2026-02-17</lastmod>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.95</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.humantosoul.com/baba-umakant"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.humantosoul.com/baba-umakant"/>
   </url>
-  <url>
-    <loc>https://www.humantosoul.com/contact</loc>
-    <lastmod>2026-02-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <!-- Content Sections -->
+
+  <!-- Prophecies (High Priority - Key Landing Page) -->
   <url>
     <loc>https://www.humantosoul.com/prophecies</loc>
-    <lastmod>2026-02-17</lastmod>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
-    <priority>0.9</priority>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.humantosoul.com/prophecies"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.humantosoul.com/prophecies"/>
   </url>
+
+  <!-- Satvic Lifestyle -->
   <url>
     <loc>https://www.humantosoul.com/satvic-lifestyle</loc>
-    <lastmod>2026-02-17</lastmod>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.humantosoul.com/satvic-lifestyle"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.humantosoul.com/satvic-lifestyle"/>
   </url>
+
+  <!-- Literature -->
   <url>
     <loc>https://www.humantosoul.com/literature</loc>
-    <lastmod>2026-02-17</lastmod>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.humantosoul.com/literature"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.humantosoul.com/literature"/>
   </url>
+
+  <!-- Downloads -->
   <url>
     <loc>https://www.humantosoul.com/downloads</loc>
-    <lastmod>2026-02-17</lastmod>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
+
+  <!-- Gallery -->
   <url>
     <loc>https://www.humantosoul.com/gallery</loc>
-    <lastmod>2026-02-17</lastmod>
+    <lastmod>2026-02-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.humantosoul.com/gallery"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.humantosoul.com/gallery"/>
+  </url>
+
+  <!-- Prarthana (Prayer & Meditation) -->
+  <url>
+    <loc>https://www.humantosoul.com/prarthana</loc>
+    <lastmod>2026-02-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.humantosoul.com/prarthana"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.humantosoul.com/prarthana"/>
+  </url>
+
+  <!-- Announcements -->
+  <url>
+    <loc>https://www.humantosoul.com/announcements</loc>
+    <lastmod>2026-02-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Blog -->
+  <url>
+    <loc>https://www.humantosoul.com/blog</loc>
+    <lastmod>2026-02-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.humantosoul.com/blog"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.humantosoul.com/blog"/>
+  </url>
+
+  <!-- Contact -->
+  <url>
+    <loc>https://www.humantosoul.com/contact</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
-  <url>
-    <loc>https://www.humantosoul.com/prarthana</loc>
-    <lastmod>2026-02-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.humantosoul.com/announcements</loc>
-    <lastmod>2026-02-17</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.humantosoul.com/blog</loc>
-    <lastmod>2026-02-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
+
 </urlset>

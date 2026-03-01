@@ -1,7 +1,7 @@
 /* Header.css */
 .header {
     background-color: #8B0000;
-    padding: 1rem 2rem;
+    padding: 0.6rem 1.2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -14,20 +14,82 @@
 
 .nav-menu {
     display: flex;
-    gap: 20px;
+    gap: 14px;
     align-items: center;
+    flex-wrap: nowrap;
 }
 
 .nav-item {
     color: white;
     text-decoration: none;
-    font-weight: bold;
-    font-size: 16px;
+    font-weight: 600;
+    font-size: 13px;
     transition: color 0.3s;
+    white-space: nowrap;
 }
 
 .nav-item:hover {
     color: #FFD700;
+}
+
+/* ── Dropdown ── */
+.dropdown-parent {
+    position: relative;
+}
+
+.dropdown-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.dropdown-panel {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-8px);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    min-width: 230px;
+    z-index: 200;
+    padding: 8px 0;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Show when state is true OR hovering (fallback) */
+.dropdown-parent:hover .dropdown-panel,
+.dropdown-panel.show {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.dropdown-link {
+    display: block;
+    padding: 11px 20px;
+    color: #3d2010;
+    text-decoration: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+    white-space: nowrap;
+}
+
+.dropdown-link:hover {
+    background: #fff8f0;
+    color: #8b0000;
 }
 
 .hamburger {

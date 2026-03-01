@@ -20,7 +20,6 @@
 - **bcrypt**: ~5.1.x (Secure Password Hashing)
 - **helmet**: ~8.x (Security Headers)
 - **express-rate-limit**: ~8.x (Rate Limiting)
-- **better-sqlite3**: ~12.x (High-Performance SQLite Database)
 - **node-cron**: ~4.2.x (Task Scheduling)
 - **axios**: ~1.13.x (HTTP Client)
 - **node-fetch**: ~2.7.x (Fetch API for Node.js)
@@ -44,7 +43,7 @@
   - Kept for backward compatibility only
 
 ## Satvic Recipe System
-- **Database**: SQLite (`server/database.db`) with 300+ Authentic Indian Recipes
+- **Database**: Supabase (Cloud SQL) with 300+ Authentic Indian Recipes
 - **Compliance**: Satvic Requirements (Vegetarian, No Onion/Garlic option, No Alcohol)
 - **Local Images**: Recipes support local image storage in `public/images/recipes/`
 

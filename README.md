@@ -12,7 +12,7 @@
     - **Voice Search**: Full-screen "Hands-Free" navigation—simply speak to go to any page.
     - **Polyglot Design**: Automatically switches voice accents based on the selected language.
 - **Supabase Cloud Architecture**: 
-    - High-performance, scalable cloud database replacing local SQLite.
+    - High-performance, scalable cloud database.
     - Secure real-time data management.
 - **Newsletter & Broadcast System**: 
     - Automated welcome emails and manual admin broadcasts.

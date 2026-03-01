@@ -190,18 +190,6 @@ const newItem = await db.insert('recipes', { title, ingredients, steps, type });
 
 ---
 
-## 8. AI Chatbot Architecture (RAG) 🤖
-
-**Goal**: Intelligent spiritual assistant based on site content.
-
-### A. Search Engine (`search_engine.js`)
-- **Indexing**: Converts site content into vector embeddings using OpenAI.
-- **Sync**: Automated script ensures the "Knowledge Base" stays fresh.
-
-### B. Chat Logic (`chatbot.js`)
-- **Retrieval**: Uses cosine similarity to find relevant context in Supabase.
-- **Contextual Response**: Feeds retrieved data into GPT-4o for accurate, spiritual answers.
-
 ---
 
 ## 13. Current Status (v3.1.0)
@@ -212,4 +200,26 @@ const newItem = await db.insert('recipes', { title, ingredients, steps, type });
 - **Transcript System**: Working via **YouTube OAuth 2.0**.
 - **Voice Assistant**: Global FAB + Voice Navigation implemented.
 - **RAG Engine (Storage)**: Content is indexed in Supabase (OpenAI Embeddings).
-- **AI Chatbot (UI)**: DORMANT (Backend logic complete, Frontend UI removed).
+
+---
+
+## 14. Recent Enhancements (Premium UI & Technical SEO)
+
+✅ **Landing Page Redesign & Doctrine Accuracy**
+- Implemented a premium, cinematic Hero Section focused on "Inner Transformation" and "Purpose of Life".
+- Restructured doctrinal messaging strictly highlighting Baba Jaigurudev Ji as Anami Purush and Baba Umakant Ji as the living Successor.
+- Updated global mission statistics dynamically to `500M+ Naamdaan Initiated` across `600+ Years of Mission` (tracing back to Saint Kabir Das Ji).
+
+✅ **Lineage of Sants (About Us Integration)**
+- Integrated high-fidelity, user-provided images forming a continuous, stacked visual hierarchy representing the spiritual lineage leading to the Present Spiritual Master.
+
+✅ **Navigation UX & Menu Restructure**
+- Renamed "Downloads" to **"Programmes"** to better reflect ashram activities and events.
+- Moved **"Announcements"** into the **"Mission"** dropdown to clean up the top-level navigation layout.
+- Stripped inline emojis from top-level desktop navigation to create a cleaner, more professional header presentation.
+- Deployed pure CSS hover combined with React State for dropdown interactions ("Mission" tab). Ensures absolute stability across both desktop pointers and mobile touch interfaces without requiring tab-key fallbacks.
+
+✅ **Full-Scale Technical SEO Matrix**
+- Injected strict JSON-LD Schema (WebSite, FAQPage, Organization, Person, ImageGallery).
+- Configured dynamic meta tags, Hreflang alternates for global (en/hi) indexing, Geographic coordinates (geo.position), and automated `robots.txt`/`sitemap.xml` management.
+- Hardened crawler fallbacks with `<noscript>` architecture to ensure pure HTML link-graphs remain visible to Googlebot.

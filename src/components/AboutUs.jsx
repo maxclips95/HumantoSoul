@@ -1,83 +1,195 @@
 import React from "react";
 
+const API = typeof window !== 'undefined' ? (window.API_BASE || '') : '';
+
+const saints = [
+    {
+        name: "Kabir Das Ji",
+        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Kabir_Guru.jpg/120px-Kabir_Guru.jpg"
+    },
+    {
+        name: "Guru Nanak Dev Ji",
+        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Guru_Nanak_Artistic_Rendition.jpg/120px-Guru_Nanak_Artistic_Rendition.jpg"
+    },
+    {
+        name: "Guru Angad Dev Ji",
+        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Guru_Angad_Artistic_Rendition.jpg/120px-Guru_Angad_Artistic_Rendition.jpg"
+    },
+    {
+        name: "Guru Amardas Ji",
+        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Guru_Amar_Das.jpg/120px-Guru_Amar_Das.jpg"
+    },
+    {
+        name: "Guru Ramdas Ji",
+        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Guru_Ram_Das.jpg/120px-Guru_Ram_Das.jpg"
+    },
+    {
+        name: "Guru Arjun Dev Ji",
+        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Guru_Arjan_Dev.jpg/120px-Guru_Arjan_Dev.jpg"
+    },
+    {
+        name: "Guru Hargobind Ji",
+        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/GuruHargobind.jpg/120px-GuruHargobind.jpg"
+    },
+    {
+        name: "Guru Har Rai Ji",
+        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Guru_Har_Rai.jpg/120px-Guru_Har_Rai.jpg"
+    },
+    {
+        name: "Guru Harikishan Ji",
+        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Guru_Har_Krishan.jpg/120px-Guru_Har_Krishan.jpg"
+    },
+    {
+        name: "Guru Tegh Bahadur Ji",
+        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Guru_Tegh_Bahadur.jpg/120px-Guru_Tegh_Bahadur.jpg"
+    },
+    {
+        name: "Guru Gobind Singh",
+        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Guru_Gobind_Singh.jpg/120px-Guru_Gobind_Singh.jpg"
+    },
+    {
+        name: "Ratan Rao Ji",
+        img: null,
+        placeholder: "रतन राव जी"
+    },
+    {
+        name: "Tulsidas Ji",
+        sub: "(Hathras)",
+        img: `${API}/uploads/lineage/tulsidas.jpg`
+    },
+    {
+        name: "Shivdayal Ji Maharaj",
+        sub: "(Radha Swami Ji Maharaj)",
+        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Shiv_Dayal_Singh.jpg/120px-Shiv_Dayal_Singh.jpg"
+    },
+    {
+        name: "Garibdas Ji Maharaj",
+        img: null,
+        placeholder: "गरीबदास जी\nमहाराज"
+    },
+    {
+        name: "Pandit Vishnudayal Ji Maharaj",
+        img: `${API}/uploads/lineage/vishnudayal.jpg`
+    },
+    {
+        name: "Pandit Ghurelal Ji Maharaj",
+        sub: "(Dada Guru Ji Maharaj)",
+        img: `${API}/uploads/lineage/ghurelal.jpg`
+    },
+    {
+        name: "The Great Master Baba Jaigurudev Ji Maharaj",
+        sub: "(Tulsidas Ji Maharaj)",
+        img: `${API}/uploads/lineage/jaigurudev.jpg`
+    },
+];
+
+const imgStyle = {
+    width: 130,
+    height: 155,
+    objectFit: "cover",
+    borderRadius: 8,
+    border: "2px solid #e0cce8",
+    display: "block",
+    margin: "0 auto",
+};
+
+const SaintCard = ({ saint }) => {
+    const [failed, setFailed] = React.useState(false);
+    return (
+        <div style={{ textAlign: "center", width: 140, flexShrink: 0 }}>
+            {saint.img && !failed ? (
+                <img
+                    src={saint.img}
+                    alt={saint.name}
+                    style={imgStyle}
+                    onError={() => setFailed(true)}
+                />
+            ) : (
+                <div style={{
+                    ...imgStyle,
+                    background: "#e8d5f0",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "0.85rem",
+                    color: "#444",
+                    whiteSpace: "pre-line",
+                    padding: 6,
+                    fontWeight: "bold",
+                }}>
+                    {saint.placeholder || ""}
+                </div>
+            )}
+            <p style={{ fontSize: "0.78rem", color: "#c41e3a", marginTop: 6, fontWeight: "bold", lineHeight: 1.3 }}>
+                {saint.name}
+            </p>
+            {saint.sub && (
+                <p style={{ fontSize: "0.7rem", color: "#555", lineHeight: 1.2, marginTop: 2 }}>
+                    {saint.sub}
+                </p>
+            )}
+        </div>
+    );
+};
+
 function SantAndSantMat() {
     return (
         <section style={{ backgroundColor: "#fff5f0", padding: "40px 20px" }}>
 
             {/* Main Title */}
-            <h1
-                style={{
-                    textAlign: "center",
-                    color: "red",
-                    fontWeight: "bold",
-                    marginBottom: "40px",
-                }}
-            >
+            <h1 style={{ textAlign: "center", color: "red", fontWeight: "bold", marginBottom: "40px" }}>
                 Sant and Sant Mat
             </h1>
 
             <div style={{ maxWidth: "1000px", margin: "0 auto", lineHeight: "1.8" }}>
 
                 {/* Section 1 */}
-                <h3 style={{ color: "red", marginBottom: "10px" }}>
-                    Who is called a Sant?
-                </h3>
-
+                <h3 style={{ color: "red", marginBottom: "10px" }}>Who is called a Sant?</h3>
                 <p>
                     One who has knowledge of the beginning and the end, who explains the
                     difference between the beginning and the end, who shows the path from
                     the beginning to the end and leads one back from the end to the
                     beginning—such a person is called a Sant.
                 </p>
-
                 <p>
                     Just as a tree does not eat its own fruit but gives it to others; a
                     river does not drink its own water but gives it to others; it does not
                     bathe itself but enables others to bathe and cleanses them—likewise are
                     the Sants. They come for the sake of others. Therefore it is said:
                 </p>
-
                 <p style={{ fontStyle: "italic", marginLeft: "20px" }}>
-                    “A tree never eats its own fruit,
-                    <br />
-                    nor does a river store its water.
-                    <br />
-                    For the sake of the highest good,
-                    <br />
-                    the Sants have taken a human body.”
+                    "A tree never eats its own fruit,<br />
+                    nor does a river store its water.<br />
+                    For the sake of the highest good,<br />
+                    the Sants have taken a human body."
                 </p>
 
                 {/* Section 2 */}
                 <h3 style={{ color: "red", marginTop: "30px", marginBottom: "10px" }}>
                     The status of Sants is the highest
                 </h3>
-
                 <p>
                     The status of Sants is above rishis, munis, incarnate powers, yogis, and
                     yogeshwars. There are two kinds of Sants: Hidden (Gupt) Sants and
                     Manifest (Pragat) Sants.
                 </p>
-
                 <p>
                     Before Sant Mat existed and before manifest Sants appeared on earth,
                     hidden Sants lived on this earth and took care of all living beings.
                     When human actions became extremely corrupt, Satpurush sent one of His
                     sixteen sons, Jogjeet (Kabir Das Ji), to the earth.
                 </p>
-
                 <p>
                     He revealed the secret of Satlok, from where the power that animates the
                     body (the soul) descended into Mrityulok. He disclosed all spiritual
                     secrets and provided complete knowledge.
                 </p>
-
                 <p>
                     Hidden Sants always remain on earth and bear its burden, but they do
                     not liberate souls nor show the path. Only manifest Sants reveal the
                     path of liberation and salvation. Both hidden and manifest Sants know
                     each other.
                 </p>
-
                 <p>
                     Earlier, people were aware of hell, heaven, Vaikunth, and the cycle of
                     84 lakh (8,400,000) births across different life forms—humans, animals,
@@ -86,6 +198,43 @@ function SantAndSantMat() {
                     on Earth, they provided Naamdaan, taught devotion, revealed the inner divine
                     identity, and guided souls back to their True Home—Satlok.
                 </p>
+
+                {/* ══════ LINEAGE OF SANTS ══════ */}
+                <h2 style={{
+                    textAlign: "center", color: "red", fontWeight: "bold",
+                    marginTop: "50px", marginBottom: "30px", fontSize: "1.6rem",
+                    borderTop: "2px solid #ffcccc", paddingTop: "30px"
+                }}>
+                    Lineage of Sants
+                </h2>
+
+                <div style={{ textAlign: "center", marginBottom: "30px" }}>
+                    <img
+                        src="/assets/images/lineage1.png"
+                        alt="Lineage of Sants Part 1"
+                        style={{ maxWidth: "100%", height: "auto", display: "block", margin: "0 auto 10px" }}
+                    />
+                    <img
+                        src="/assets/images/lineage2.png"
+                        alt="Lineage of Sants Part 2"
+                        style={{ maxWidth: "100%", height: "auto", display: "block", margin: "0 auto 10px" }}
+                    />
+                    <img
+                        src="/assets/images/lineage3.png"
+                        alt="Lineage of Sants Part 3"
+                        style={{ maxWidth: "100%", height: "auto", display: "block", margin: "0 auto 10px" }}
+                    />
+                    <div style={{ textAlign: "center", display: "inline-block", margin: "0 auto" }}>
+                        <img 
+                            src="/assets/images/lineage4.png" 
+                            alt="Lineage of Sants Part 4" 
+                            style={{ maxWidth: "100%", height: "auto", display: "block", margin: "0 auto 10px" }} 
+                        />
+                        <p style={{ fontSize: "1.1rem", fontWeight: "bold", color: "#c41e3a", marginTop: "10px" }}>
+                            Present Spiritual Master
+                        </p>
+                    </div>
+                </div>
 
             </div>
         </section>
