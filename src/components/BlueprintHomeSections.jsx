@@ -41,10 +41,6 @@ export default function BlueprintHomeSections() {
                         Guided today by <strong style={{ color: '#f0c030' }}>Baba Umakant Ji Maharaj</strong>, appointed Spiritual Successor of Param Sant Baba Jaigurudev Ji Maharaj.
                     </p>
                     <div className="bp-hero__divider" />
-                    <div className="bp-hero__buttons">
-                        <Link to="/prarthana" className="bp-btn bp-btn--gold">Begin Meditation 🧘</Link>
-                        <Link to="/baba-jaigurudev" className="bp-btn bp-btn--ghost">Explore the Path →</Link>
-                    </div>
                 </div>
 
             </section>
@@ -171,7 +167,7 @@ export default function BlueprintHomeSections() {
                         Awaken to your true nature, discover lasting peace, and attain liberation from the cycle of birth and death.
                     </p>
                     <div className="bp-hero__buttons">
-                        <Link to="/prarthana" className="bp-btn bp-btn--gold">Start Now 🙏</Link>
+                        <Link to="/contact" className="bp-btn bp-btn--gold">Start Now 🙏</Link>
                         <Link to="/prophecies" className="bp-btn bp-btn--ghost">Prophecies →</Link>
                     </div>
                 </div>
