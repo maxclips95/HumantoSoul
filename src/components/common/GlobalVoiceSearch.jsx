@@ -116,8 +116,8 @@ const GlobalVoiceSearch = () => {
                 style={{
                     background: '#00008B',
                     border: '1px solid #00008B',
-                    borderRadius: '50%',
-                    width: '36px',
+                    borderRadius: '20px',
+                    padding: '0 15px',
                     height: '36px',
                     color: 'white',
                     cursor: 'pointer',
@@ -125,11 +125,15 @@ const GlobalVoiceSearch = () => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     marginLeft: '15px',
-                    transition: 'all 0.3s'
+                    transition: 'all 0.3s',
+                    gap: '8px',
+                    fontWeight: 'bold',
+                    fontSize: '0.9rem'
                 }}
                 title="Voice Search"
             >
                 <i className="fas fa-microphone"></i>
+                AI Guide
             </button>
 
             {/* Full Screen Modal Overlay */}
