@@ -43,11 +43,10 @@ function Header() {
             <Link to="/about" className="dropdown-link" onClick={() => { closeMenu(); setIsMissionOpen(false); }}>Our Mission &amp; Santmat</Link>
             <Link to="/baba-jaigurudev" className="dropdown-link" onClick={() => { closeMenu(); setIsMissionOpen(false); }}>Baba Jaigurudev Ji Maharaj</Link>
             <Link to="/baba-umakant" className="dropdown-link" onClick={() => { closeMenu(); setIsMissionOpen(false); }}>Baba Umakant Ji Maharaj</Link>
-            <Link to="/announcements" className="dropdown-link" onClick={() => { closeMenu(); setIsMissionOpen(false); }}>Announcements</Link>
           </div>
         </div>
 
-        <Link to="/prarthana" className="nav-item" onClick={closeMenu}>Meditation</Link>
+        <Link to="/announcements" className="nav-item" onClick={closeMenu}>Announcements</Link>
         <Link to="/satvic-lifestyle" className="nav-item" onClick={closeMenu}>Vegetarian Living</Link>
         <Link to="/prophecies" className="nav-item shine-effect" onClick={closeMenu}>Prophecies</Link>
         <Link to="/blog" className="nav-item" onClick={closeMenu}>Teachings</Link>
