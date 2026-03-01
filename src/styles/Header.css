@@ -67,6 +67,16 @@
     transition: all 0.2s ease-in-out;
 }
 
+/* Invisible bridge to prevent hover from breaking between button and panel */
+.dropdown-panel::before {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: 0;
+    width: 100%;
+    height: 15px;
+}
+
 /* Show when state is true OR hovering (fallback) */
 .dropdown-parent:hover .dropdown-panel,
 .dropdown-panel.show {
