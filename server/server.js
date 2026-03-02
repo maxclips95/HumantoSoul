@@ -887,6 +887,84 @@ app.route('/api/prophecies/:id')
   });
 
 
+// --- RSS FEED EXPORT (For Automation like Make.com) ---
+app.get('/api/rss/teachings', async (req, res) => {
+  try {
+    const manual = await db.selectAll('prophecies') || [];
+    const automated = await db.selectAll('automated_prophecies') || [];
+
+    // Combine and Filter exactly like the frontend BlogPage.jsx
+    const allProphecies = [...manual, ...automated].filter(p => {
+      const hasHindi = /[\u0900-\u097F]/.test(p.title);
+      const isSchedule = /satsang/i.test(p.title) && p.title.includes('|');
+      return !hasHindi && !isSchedule;
+    });
+
+    // Helper to safely escape XML characters
+    const escapeXml = (unsafe) => {
+      if (!unsafe) return '';
+      return String(unsafe).replace(/[<>&'"]/g, (c) => {
+        switch (c) {
+          case '<': return '&lt;';
+          case '>': return '&gt;';
+          case '&': return '&amp;';
+          case '\'': return '&apos;';
+          case '"': return '&quot;';
+          default: return c;
+        }
+      });
+    };
+
+    // Sort by Date DESC, then ID DESC
+    const sorted = allProphecies.sort((a, b) => {
+      if (b.year !== a.year) return (b.year || '').localeCompare(a.year || '');
+      return b.id - a.id;
+    });
+
+    // Take top 20 latest items for the feed
+    const latestItems = sorted.slice(0, 20);
+
+    let itemsXml = latestItems.map(item => {
+      const title = escapeXml(item.title);
+      // Fallback excerpt hierarchy
+      let rawDesc = item.summary || item.description || (item.transcript ? item.transcript.substring(0, 250) + '...' : 'New Spiritual Teaching');
+      const desc = escapeXml(rawDesc);
+
+      const link = `https://www.humantosoul.com/prophecy/${item.id}`;
+      // RFC-822 formatted date (or fallback)
+      const pubDate = item.published ? new Date(item.published).toUTCString() : new Date().toUTCString();
+
+      return `
+    <item>
+      <title>${title}</title>
+      <link>${link}</link>
+      <description>${desc}</description>
+      <pubDate>${pubDate}</pubDate>
+      <guid isPermaLink="true">${link}</guid>
+    </item>`;
+    }).join('');
+
+    const rssXml = `<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Baba Jaigurudev Spiritual Teachings</title>
+    <link>https://www.humantosoul.com/blog</link>
+    <description>Latest spiritual teachings, prophecies, and wisdom from Baba Jaigurudev Mission.</description>
+    <language>en-us</language>
+    <atom:link href="https://www.humantosoul.com/api/rss/teachings" rel="self" type="application/rss+xml" />${itemsXml}
+  </channel>
+</rss>`;
+
+    res.set('Content-Type', 'application/xml');
+    res.send(rssXml);
+
+  } catch (error) {
+    console.error('[RSS Feed] Error generating feed:', error);
+    res.status(500).send('Error generating RSS feed');
+  }
+});
+
+
 // Prophecy Highlight (Multiple Text Cards)
 app.route('/api/prophecy-highlight')
   .get(async (req, res) => {
