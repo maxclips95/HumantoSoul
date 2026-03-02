@@ -247,12 +247,12 @@ export default function Prophecies() {
         {/* SEO Header Section */}
         <div style={{ textAlign: 'center', marginBottom: '30px' }}>
           <h1 style={{ color: '#c41e3a', fontSize: '2.5rem', marginBottom: '15px' }}>
-            {searchQuery ? `Search Results for "${searchQuery}"` : "Jai Gurudev Prophecies & Future Predictions (Bhavishyavani)"}
+            {searchQuery ? `Search Results for "${searchQuery}"` : "Baba Umakant Ji Maharaj’s Prophecies"}
           </h1>
           {!searchQuery && (
             <p style={{ fontSize: '1.1rem', color: '#555', maxWidth: '800px', margin: '0 auto', lineHeight: '1.6' }}>
-              Explore the profound <strong>spiritual warnings</strong> and <strong>future predictions</strong> of Baba Jai Gurudev.
-              Understand the upcoming changes (Parivartan) and how to prepare for the <strong>Golden Age (Satya Yuga)</strong> through spiritual awakening and a Satvic lifestyle.
+              Explore the profound <strong>spiritual warnings</strong> and <strong>divine prophecies</strong> of Baba Jai Gurudev.
+              Understand the coming transformation (Parivartan) and discover how to prepare for the <strong>Golden Age (Satya Yuga)</strong> through inner awakening and a pure sattvic way of life.
             </p>
           )}
         </div>

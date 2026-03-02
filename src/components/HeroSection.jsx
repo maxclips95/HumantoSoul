@@ -74,12 +74,6 @@ function HeroSection() {
             By chanting <strong>“Jaigurudev Jaigurudev Jaigurudev Jai Jaigurudev”</strong> you engage in a divine practice whose powerful effects include <strong>protection in difficult times</strong> and spiritual awakening. This sacred name provides guidance, <strong>warnings about future times (prophecies)</strong>, and inner strength even when all hope seems lost, offering support to anyone, at any time.
           </p>
 
-          {/* SECTION 1: GUIDANCE */}
-          <div style={{ marginBottom: '20px' }}>
-            <p style={{ fontSize: '1.1rem' }}><span style={sectionHeadingStyle}>Guidance from the Living Guru:</span> This sacred practice is shared exclusively by <strong>Baba Umakant Ji Maharaj</strong>, <strong>revered as a living spiritual Guru, ever-present and omnipresent,</strong> who lovingly guides seekers to connect with the Supreme and receive divine blessings.
-            </p>
-          </div>
-
           {/* SECTION 2: THE PATH */}
           <div style={{ marginBottom: '20px' }}>
             <p style={{ fontSize: '1.1rem' }}><span style={sectionHeadingStyle}>The Precious Human Life & Path to Liberation:</span> <strong>The human body is extremely rare and precious.</strong> Ancient spiritual wisdom reveals that the <strong>soul journeys through 8.4 million forms of life</strong>—including plants, trees, birds, animals, insects, and aquatic beings—before attaining the <strong>rare and precious human birth</strong>. This human form is received only once in that vast journey and offers a unique opportunity to consciously pursue the true purpose of life: <strong>guiding the soul back to the Supreme Lord.</strong>

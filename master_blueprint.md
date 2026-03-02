@@ -217,6 +217,8 @@ const newItem = await db.insert('recipes', { title, ingredients, steps, type });
 - Renamed "Downloads" to **"Programmes"** to better reflect ashram activities and events.
 - Replaced "Prayer & Meditation" with **"Announcements"** on the main navigation bar.
 - Removed "Announcements" from the "Mission" dropdown to prevent duplication.
+- Repurposed the old "Blog" section entirely into **"Teachings"** (Spiritual Teachings & Prophecies).
+- Completely decoupled Announcements from Teachings; they now function as standalone sections pulling from separate `/api/announcements` and `/api/prophecies` backend routes.
 - Updated the Global Voice Search icon with an explicit **"AI Guide"** text label for clarity.
 - Stripped inline emojis from top-level desktop navigation to create a cleaner, more professional header presentation.
 - Deployed pure CSS hover combined with React State for dropdown interactions ("Mission" tab). Ensures absolute stability across both desktop pointers and mobile touch interfaces without requiring tab-key fallbacks.

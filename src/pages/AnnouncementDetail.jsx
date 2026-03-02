@@ -28,7 +28,7 @@ export default function AnnouncementDetail() {
         fetchItem();
 
         return () => {
-            document.title = "Jai Gurudev - Spiritual Teachings";
+            document.title = "Jai Gurudev - Announcements";
         };
     }, [id]);
 
@@ -39,8 +39,8 @@ export default function AnnouncementDetail() {
     return (
         <div style={{ maxWidth: '800px', margin: '0 auto', padding: '40px 20px', fontFamily: "'Segoe UI', sans-serif', minHeight: '60vh'" }}>
 
-            <Link to="/blog" style={{ textDecoration: 'none', color: '#666', marginBottom: '20px', display: 'inline-block' }}>
-                &larr; Back to Blog
+            <Link to="/announcements" style={{ textDecoration: 'none', color: '#666', marginBottom: '20px', display: 'inline-block' }}>
+                &larr; Back to Announcements
             </Link>
 
             <article style={{ background: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>

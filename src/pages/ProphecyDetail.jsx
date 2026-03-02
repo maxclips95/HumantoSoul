@@ -71,7 +71,7 @@ export default function ProphecyDetail() {
             />
 
             <Link to="/blog" style={{ textDecoration: 'none', color: '#666', marginBottom: '20px', display: 'inline-block' }}>
-                &larr; Back to Blog
+                &larr; Back to Teachings
             </Link>
 
             <article>

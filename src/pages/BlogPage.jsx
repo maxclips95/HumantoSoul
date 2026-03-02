@@ -10,11 +10,7 @@ export default function BlogPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Fetch both data sources in parallel
-                const [prophecyRes, announceRes] = await Promise.all([
-                    axios.get('/api/prophecies'),
-                    axios.get('/api/announcements')
-                ]);
+                const prophecyRes = await axios.get('/api/prophecies');
 
                 // Normalize Prophecies
                 // Backend returns { manual: [], automated: [] } for prophecies
@@ -38,21 +34,8 @@ export default function BlogPage() {
                     linkId: p.id
                 })).filter(p => p.excerpt && p.excerpt.length > 5); // Filter out empty posts
 
-                // Normalize Announcements
-                const announcements = (announceRes.data || []).map(a => ({
-                    id: a.id,
-                    type: 'announcement',
-                    title: a.title,
-                    excerpt: a.description,
-                    date: a.year,
-                    image: null, // Announcements rarely have images
-                    linkId: a.id
-                }));
-
-                // Merge and Sort (Newest first)
-                // Note: Since 'year' is just a string year, sorting might be rough. 
-                // We'll rely on ID as a secondary sort if years match, assuming higher ID = newer.
-                const allPosts = [...prophecies, ...announcements].sort((a, b) => {
+                // Sort (Newest first)
+                const allPosts = [...prophecies].sort((a, b) => {
                     if (b.date !== a.date) return (b.date || '').localeCompare(a.date || '');
                     return b.id - a.id;
                 });
@@ -74,18 +57,18 @@ export default function BlogPage() {
     return (
         <div className="blog-container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 20px' }}>
             <SEO
-                title="Spiritual Insights Blog - Prophecies, Meditation, Dhyan & Satsang | Baba Jaigurudev"
-                description="Read the latest spiritual insights, prophecies, announcements, and wisdom from Baba Jaigurudev Mission. Topics include meditation (dhyan), satsang, yog sadhna, inner peace, power, prosperity, soul awakening, and divine predictions. आध्यात्मिक ब्लॉग, बाबा जयगुरुदेव।"
-                keywords="spiritual blog, spiritual insights, prophecy blog, meditation blog, dhyan, satsang, yog sadhna, yoga, inner peace, power, prosperity, soul awakening, baba jaigurudev, baba umakant, jai gurudev, sant mat, satyug updates, 2026 predictions, spiritual news, announcements, bhavishyavani, God, atma, आध्यात्मिक ब्लॉग, ध्यान, सत्संग, भविष्यवाणी"
+                title="Spiritual Teachings & Prophecies - Meditation, Dhyan & Satsang | Baba Jaigurudev"
+                description="Read the latest spiritual teachings, prophecies, and wisdom from Baba Jaigurudev Mission. Topics include meditation (dhyan), satsang, yog sadhna, inner peace, power, prosperity, soul awakening, and divine predictions. आध्यात्मिक शिक्षण, बाबा जयगुरुदेव।"
+                keywords="spiritual teachings, spiritual insights, prophecy teachings, meditation teachings, dhyan, satsang, yog sadhna, yoga, inner peace, power, prosperity, soul awakening, baba jaigurudev, baba umakant, jai gurudev, sant mat, satyug updates, 2026 predictions, bhavishyavani, God, atma, आध्यात्मिक शिक्षण, ध्यान, सत्संग, भविष्यवाणी"
                 url="https://www.humantosoul.com/blog"
                 breadcrumbs={[
                     { name: "Home", url: "https://www.humantosoul.com/" },
-                    { name: "Blog", url: "https://www.humantosoul.com/blog" }
+                    { name: "Teachings", url: "https://www.humantosoul.com/blog" }
                 ]}
             />
             <header style={{ textAlign: 'center', marginBottom: '60px' }}>
-                <h1 style={{ fontSize: '3rem', color: '#c41e3a', marginBottom: '10px' }}>Spiritual Insights</h1>
-                <p style={{ fontSize: '1.2rem', color: '#666' }}>Latest prophecies, announcements, and wisdom from the mission.</p>
+                <h1 style={{ fontSize: '3rem', color: '#c41e3a', marginBottom: '10px' }}>Spiritual Teachings</h1>
+                <p style={{ fontSize: '1.2rem', color: '#666' }}>Latest prophecies, teachings, and wisdom from the mission.</p>
             </header>
 
             <div className="blog-grid" style={{
@@ -96,7 +79,7 @@ export default function BlogPage() {
                 {posts.map((post, index) => (
                     <Link
                         key={`${post.type}-${post.id}`}
-                        to={post.type === 'prophecy' ? `/prophecy/${post.linkId}` : `/announcement/${post.linkId}`}
+                        to={`/prophecy/${post.linkId}`}
                         style={{ textDecoration: 'none', color: 'inherit' }}
                     >
                         <article style={{
@@ -120,7 +103,7 @@ export default function BlogPage() {
                             }}
                         >
                             {/* Color Strip Indicator */}
-                            <div style={{ height: '10px', background: post.type === 'announcement' ? '#333' : '#c41e3a' }}></div>
+                            <div style={{ height: '10px', background: '#c41e3a' }}></div>
 
                             <div style={{ padding: '25px', flex: 1, display: 'flex', flexDirection: 'column' }}>
                                 <div style={{ marginBottom: '15px' }}>
@@ -128,12 +111,12 @@ export default function BlogPage() {
                                         fontSize: '0.8rem',
                                         textTransform: 'uppercase',
                                         fontWeight: 'bold',
-                                        color: post.type === 'prophecy' ? '#c41e3a' : '#333',
-                                        background: post.type === 'prophecy' ? '#fff0f0' : '#f0f0f0',
+                                        color: '#c41e3a',
+                                        background: '#fff0f0',
                                         padding: '4px 8px',
                                         borderRadius: '4px'
                                     }}>
-                                        {post.type}
+                                        Teachings
                                     </span>
                                     {post.date && <span style={{ marginLeft: '10px', fontSize: '0.85rem', color: '#888' }}>{post.date}</span>}
                                 </div>
