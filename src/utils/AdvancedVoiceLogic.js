@@ -49,7 +49,7 @@ export const processVoiceCommand = (transcript) => {
 
         // --- CONTACT / ASHRAM / DONATE ---
         {
-            keywords: ['contact', 'phone', 'email', 'address', 'location', 'reach', 'visit', 'ashram', 'mathura', 'ujjain', 'donate', 'sewa', 'संपर्क', 'पता', 'आश्रम', 'मथुरा', 'उज्जैन', 'फोन', 'दान', 'सेवा', 'contacto', 'contact', 'kontakt', 'контакт', '联系'],
+            keywords: ['contact', 'phone', 'email', 'address', 'location', 'reach', 'visit', 'ashram', 'ujjain', 'donate', 'sewa', 'संपर्क', 'पता', 'आश्रम', 'उज्जैन', 'फोन', 'दान', 'सेवा', 'contacto', 'contact', 'kontakt', 'контакт', '联系'],
             route: '/contact',
             response: "Taking you to the Contact and Ashram details page."
         },

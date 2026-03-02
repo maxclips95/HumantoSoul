@@ -163,36 +163,19 @@ function BabaUmakant() {
                     Ashram, Baba Umakant Ji Maharaj, amid extremely challenging
                     circumstances, left everything behind and arrived empty-handed in
                     Ujjain, Madhya Pradesh. With the cooperation of devotees, he
-                    established an ashram and founded the Baba Jaigurudev Dharma Vikas
-                    Sanstha, Ujjain.
+                    established an ashram and founded the Baba Jaigurudev Dharma Vikas Sanstha, Ujjain.
                 </p>
 
                 <p>
-                    To continue the Guru’s mission and to share the sorrow of his physical
-                    departure, Baba Umakant Ji Maharaj traveled throughout the country,
-                    conducting satsangs and explaining that although Guru Maharaj had
-                    departed physically, he remains ever-present in the form of the
-                    divine Word. He taught that through continuous simran, meditation,
-                    and bhajan performed with concentration, seekers would experience
-                    inner visions just as they had earlier experienced outer ones.
+                    To continue the Guru’s mission and to share the sorrow of his physical departure, Baba Umakant Ji Maharaj traveled throughout the country, conducting satsangs and explaining that although Guru Maharaj had departed physically, he remains ever-present in the form of the divine Word. He taught that through continuous simran, meditation, and bhajan performed with concentration, seekers would experience inner visions just as they had earlier experienced outer ones.
                 </p>
 
                 <p>
-                    As people began following these instructions, they started receiving
-                    both material and spiritual benefits. Large numbers of devotees
-                    joined Baba Umakant Ji Maharaj, while millions longed to receive
-                    Naamdaan, as only one living Sant at a time holds the authority to
-                    grant it.
+                    As people began following these instructions, they started receiving both material and spiritual benefits. Large numbers of devotees joined Baba Umakant Ji Maharaj, while millions longed to receive Naamdaan, as only one living Sant at a time holds the authority to grant it.
                 </p>
 
                 <p>
-                    While touring the country, Baba Umakant Ji Maharaj arrived in Jaipur
-                    and on 21 July 2013 announced that Naamdaan would be given there the
-                    following morning. The announcement was met with a powerful chant of
-                    “Jaigurudev” from the devotees. Showing compassion to deserving souls,
-                    and acting under his Guru’s command, Baba Umakant Ji Maharaj formally
-                    began granting Naamdaan from the open stage on Guru Purnima, 22 July
-                    2013, in Jaipur, Rajasthan, in the presence of a massive gathering.
+                    While touring the country, Baba Umakant Ji Maharaj arrived in Jaipur and on 21 July 2013 announced that Naamdaan would be given there the following morning. The announcement was met with a powerful chant of “Jaigurudev” from the devotees. Showing compassion to deserving souls, and acting under his Guru’s command, Baba Umakant Ji Maharaj formally began granting Naamdaan from the open stage on Guru Purnima, 22 July 2013, in Jaipur, Rajasthan, in the presence of a massive gathering.
                 </p>
 
                 <h4 style={{ color: "red", marginTop: "25px" }}>

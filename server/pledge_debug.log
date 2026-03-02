@@ -351,3 +351,10 @@
 [Global] GET /api/prophecies - Status: 500 - Origin: http://localhost:3000 - Duration: 10611ms
 [Global] GET /api/prophecy-highlight - Status: 500 - Origin: http://localhost:3000 - Duration: 10564ms
 [Global] GET /api/prophecies - Status: 500 - Origin: http://localhost:3000 - Duration: 10607ms
+[Global] GET /favicon.ico - Status: 404 - Origin: undefined - Duration: 2ms
+[Global] GET /api/youtube - Status: 500 - Origin: http://localhost:3000 - Duration: 10755ms
+[Global] GET /api/profiles - Status: 500 - Origin: http://localhost:3000 - Duration: 10311ms
+[Global] GET /api/youtube - Status: 500 - Origin: http://localhost:3000 - Duration: 10630ms
+[Global] GET /api/profiles - Status: 500 - Origin: http://localhost:3000 - Duration: 10627ms
+[Global] GET /api/gallery - Status: 500 - Origin: http://localhost:3000 - Duration: 10694ms
+[Global] GET /api/gallery - Status: 500 - Origin: http://localhost:3000 - Duration: 10587ms
