@@ -55,8 +55,8 @@ const SEO = ({
             <link rel="alternate" hreflang="x-default" href={metaUrl} />
 
             {/* Geo Tags */}
-            <meta name="geo.region" content="IN-UP" />
-            <meta name="geo.placename" content="Mathura, Uttar Pradesh, India" />
+            <meta name="geo.region" content="IN-MP" />
+            <meta name="geo.placename" content="Ujjain, Madhya Pradesh, India" />
 
             {/* Open Graph / Facebook / WhatsApp / LinkedIn */}
             <meta property="og:type" content={type} />
