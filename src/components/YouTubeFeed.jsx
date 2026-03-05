@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import VideoModal from "./VideoModal";
 import ProphecySection from "./ProphecySection";
+import ShareButtons from "./common/ShareButtons";
 import "../styles.css";
 
 export default function YouTubeFeed() {
@@ -102,6 +103,9 @@ export default function YouTubeFeed() {
                 <img src={video.thumbnail} alt={video.title} className="card-img" />
                 <div className="card-content">
                   <h3>{video.title}</h3>
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <ShareButtons title={video.title} url={`https://www.youtube.com/watch?v=${video.id}`} />
+                  </div>
                 </div>
               </div>
             ))}
@@ -135,6 +139,9 @@ export default function YouTubeFeed() {
                 <img src={video.thumbnail} alt={video.title} className="card-img" />
                 <div className="card-content">
                   <h3>{video.title}</h3>
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <ShareButtons title={video.title} url={`https://www.youtube.com/watch?v=${video.id}`} />
+                  </div>
                 </div>
               </div>
             ))}

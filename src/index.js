@@ -21,8 +21,9 @@ axios.defaults.baseURL = API_BASE;
 // Expose for components using fetch() directly
 window.API_BASE = API_BASE;
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
+const rootElement = document.getElementById('root');
+
+const appJsx = (
   <React.StrictMode>
     <HelmetProvider>
       <BrowserRouter>
@@ -31,6 +32,16 @@ root.render(
     </HelmetProvider>
   </React.StrictMode>
 );
+
+// If react-snap has pre-rendered HTML into #root, use hydrateRoot
+// so the browser reuses the existing DOM (faster first paint for users + SEO bots).
+// Otherwise, use createRoot for normal client-side rendering.
+if (rootElement.hasChildNodes()) {
+  ReactDOM.hydrateRoot(rootElement, appJsx);
+} else {
+  const root = ReactDOM.createRoot(rootElement);
+  root.render(appJsx);
+}
 
 // If you want to measure performance, pass a function
 reportWebVitals();

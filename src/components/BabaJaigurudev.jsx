@@ -16,12 +16,12 @@ function BabaJaigurudev() {
     return (
         <section className="section" style={{ backgroundColor: "#fff5f0", padding: "40px 20px" }}>
 
-            <h2
+            <h1
                 className="section-title"
                 style={{ textAlign: "center", color: "red", fontWeight: "bold" }}
             >
                 {profile?.title || 'Baba Jaigurudev Ji Maharaj'}
-            </h2>
+            </h1>
 
             {/* Image & Quote */}
             <div style={{ textAlign: "center", marginBottom: "30px" }}>

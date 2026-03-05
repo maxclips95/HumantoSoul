@@ -22,7 +22,9 @@ function Gallery() {
 
     return (
         <section className="section" style={{ paddingTop: '0' }}>
-
+            <h1 style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', border: 0 }}>
+                Jai Gurudev Photo Gallery
+            </h1>
 
             {images.length === 0 ? (
                 <p style={{ textAlign: 'center', color: '#666' }}>No images uploaded yet.</p>

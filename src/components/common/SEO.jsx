@@ -16,7 +16,7 @@ const SEO = ({
     noIndex = false
 }) => {
     const siteTitle = 'Human to Soul | Jai Gurudev Mission';
-    const fullTitle = title ? `${title} | ${siteTitle}` : siteTitle;
+    const fullTitle = title || siteTitle;
     const metaDescription = description || 'Official website of Baba Jaigurudev and Baba Umakant Ji. Discover divine satsang, meditation (dhyan), prophecies, yog sadhna, inner peace, and the path from Human to Soul. बाबा जयगुरुदेव की भविष्यवाणियाँ, सत्संग, और ध्यान।';
 
     const siteUrl = 'https://www.humantosoul.com';

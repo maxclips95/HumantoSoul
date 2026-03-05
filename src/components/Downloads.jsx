@@ -26,6 +26,9 @@ function Downloads() {
 
     return (
         <section className="section">
+            <h1 style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', border: 0 }}>
+                Downloads - Jai Gurudev Mission
+            </h1>
 
             {loading && (
                 <p style={{ textAlign: 'center', marginTop: '20px' }}>Loading downloads...</p>

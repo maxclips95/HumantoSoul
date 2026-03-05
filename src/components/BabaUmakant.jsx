@@ -17,7 +17,7 @@ function BabaUmakant() {
         <section style={{ backgroundColor: "#fff5f0", padding: "40px 20px" }}>
 
             {/* Page Title */}
-            <h2
+            <h1
                 style={{
                     textAlign: "center",
                     color: "red",
@@ -26,7 +26,7 @@ function BabaUmakant() {
                 }}
             >
                 {profile?.title || 'About Baba Umakant Ji Maharaj'}
-            </h2>
+            </h1>
 
             {/* Image & Quote */}
             <div style={{ textAlign: "center", marginBottom: "25px" }}>

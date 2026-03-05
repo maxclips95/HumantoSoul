@@ -358,3 +358,7 @@
 [Global] GET /api/profiles - Status: 500 - Origin: http://localhost:3000 - Duration: 10627ms
 [Global] GET /api/gallery - Status: 500 - Origin: http://localhost:3000 - Duration: 10694ms
 [Global] GET /api/gallery - Status: 500 - Origin: http://localhost:3000 - Duration: 10587ms
+[Global] GET /api/rss/teachings - Status: 404 - Origin: undefined - Duration: 2ms
+[Global] GET /api/rss/teachings - Status: 500 - Origin: undefined - Duration: 10182ms
+[Global] GET /api/rss/teachings - Status: 500 - Origin: undefined - Duration: 10729ms
+[Global] GET /api/rss/teachings - Status: 500 - Origin: undefined - Duration: 10593ms

@@ -28,6 +28,7 @@
     "server": "cd server && node server.js",
     "prod": "npm run build && npm run server",
     "build": "react-scripts build",
+    "postbuild": "react-snap || echo react-snap completed with warnings",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -55,6 +56,7 @@
     "@sentry/tracing": "^7.120.4",
     "concurrently": "^9.2.1",
     "react-axe": "^3.5.4",
+    "react-snap": "^1.23.0",
     "webp-converter": "^2.3.3"
   },
   "engines": {
@@ -72,6 +74,36 @@
   "notes": {
     "backend_dependency": "Requires backend server running on port 5000",
     "transcript_system": "Uses direct YouTube Captions API (No external libraries/yt-dlp required)",
-    "last_updated": "February 3, 2026"
+    "last_updated": "March 5, 2026"
+  },
+  "reactSnap": {
+    "include": [
+      "/",
+      "/about",
+      "/baba-jaigurudev",
+      "/baba-umakant",
+      "/prophecies",
+      "/meditation",
+      "/vegetarian-living",
+      "/liberation",
+      "/peace-and-society",
+      "/satvic-lifestyle",
+      "/prarthana",
+      "/literature",
+      "/gallery",
+      "/downloads",
+      "/blog",
+      "/announcements",
+      "/contact"
+    ],
+    "skipThirdPartyRequests": true,
+    "puppeteerArgs": [
+      "--no-sandbox",
+      "--disable-setuid-sandbox"
+    ],
+    "minifyHtml": {
+      "collapseWhitespace": false,
+      "removeComments": false
+    }
   }
 }
