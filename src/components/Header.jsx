@@ -6,10 +6,12 @@ import GlobalVoiceSearch from "./common/GlobalVoiceSearch";
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMissionOpen, setIsMissionOpen] = useState(false);
+  const [isResourcesOpen, setIsResourcesOpen] = useState(false);
 
   const closeMenu = () => {
     setIsMenuOpen(false);
     setIsMissionOpen(false);
+    setIsResourcesOpen(false);
   };
 
   return (
@@ -27,13 +29,13 @@ function Header() {
         <Link to="/" className="nav-item" onClick={closeMenu}>Home</Link>
 
         {/* MISSION DROPDOWN — React state + CSS hover */}
-        <div 
+        <div
           className="dropdown-parent"
           onMouseEnter={() => setIsMissionOpen(true)}
           onMouseLeave={() => setIsMissionOpen(false)}
         >
-          <button 
-            className="nav-item dropdown-btn" 
+          <button
+            className="nav-item dropdown-btn"
             onClick={() => setIsMissionOpen(!isMissionOpen)}
             aria-expanded={isMissionOpen}
           >
@@ -51,8 +53,27 @@ function Header() {
         <Link to="/prophecies" className="nav-item shine-effect" onClick={closeMenu}>Prophecies</Link>
         <Link to="/blog" className="nav-item" onClick={closeMenu}>Teachings</Link>
         <Link to="/gallery" className="nav-item" onClick={closeMenu}>Media</Link>
-        <Link to="/literature" className="nav-item" onClick={closeMenu}>Resources</Link>
         <Link to="/downloads" className="nav-item" onClick={closeMenu}>Programmes</Link>
+
+        {/* RESOURCES DROPDOWN */}
+        <div
+          className="dropdown-parent"
+          onMouseEnter={() => setIsResourcesOpen(true)}
+          onMouseLeave={() => setIsResourcesOpen(false)}
+        >
+          <button
+            className="nav-item dropdown-btn"
+            onClick={() => setIsResourcesOpen(!isResourcesOpen)}
+            aria-expanded={isResourcesOpen}
+          >
+            Resources {isResourcesOpen ? '▲' : '▼'}
+          </button>
+          <div className={`dropdown-panel ${isResourcesOpen ? 'show' : ''}`}>
+            <Link to="/literature" className="dropdown-link" onClick={() => { closeMenu(); setIsResourcesOpen(false); }}>Literature &amp; Downloads</Link>
+            <Link to="/glossary" className="dropdown-link" onClick={() => { closeMenu(); setIsResourcesOpen(false); }}>📖 Spiritual Glossary</Link>
+          </div>
+        </div>
+
         <Link to="/contact" className="nav-item" onClick={closeMenu}>Contact</Link>
       </nav>
 
