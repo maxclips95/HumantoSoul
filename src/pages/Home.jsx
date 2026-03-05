@@ -7,6 +7,7 @@ import YouTubeFeed from "../components/YouTubeFeed";
 import Testimonials from "../components/Testimonials";
 import BlueprintHomeSections from "../components/BlueprintHomeSections";
 import SEO from "../components/common/SEO";
+import StartHere from "../components/StartHere";
 
 const homeSchema = {
   "@context": "https://schema.org",
@@ -45,6 +46,8 @@ export default function Home() {
       <Carousel />
       <HeroSection />
       <AshramTour />
+      {/* START HERE — Journey for new visitors */}
+      <StartHere />
       {/* YOUTUBE SHORTS — below Ashram Tour */}
       <YouTubeFeed />
       <Testimonials />

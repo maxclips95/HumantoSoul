@@ -26,6 +26,7 @@ import MeditationPage from './pages/MeditationPage';
 import VegetarianLivingPage from './pages/VegetarianLivingPage';
 import LiberationPage from './pages/LiberationPage';
 import PeaceAndSocietyPage from './pages/PeaceAndSocietyPage';
+import GlossaryPage from './pages/GlossaryPage';
 
 
 
@@ -55,6 +56,7 @@ function App() {
             <Route path="/vegetarian-living" element={<VegetarianLivingPage />} />
             <Route path="/liberation" element={<LiberationPage />} />
             <Route path="/peace-and-society" element={<PeaceAndSocietyPage />} />
+            <Route path="/glossary" element={<GlossaryPage />} />
             <Route path="/prophecy/:id" element={<ProphecyDetail />} />
             <Route path="/announcement/:id" element={<AnnouncementDetail />} />
           </Routes>

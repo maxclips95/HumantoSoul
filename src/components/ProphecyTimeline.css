@@ -1,0 +1,223 @@
+/* ProphecyTimeline.css */
+
+.prophecy-timeline-section {
+  padding: 60px 20px;
+  background: linear-gradient(180deg, #fff 0%, #fff8f8 100%);
+}
+
+.prophecy-timeline-header {
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto 40px auto;
+}
+
+.prophecy-timeline-title {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  color: #c41e3a;
+  font-family: Georgia, serif;
+  margin-bottom: 12px;
+}
+
+.prophecy-timeline-subtitle {
+  font-size: 1.05rem;
+  color: #555;
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+
+/* Tabs */
+.timeline-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
+
+.timeline-tab {
+  padding: 12px 28px;
+  border: 2px solid #c41e3a;
+  background: transparent;
+  color: #c41e3a;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.timeline-tab:hover {
+  background: #fff0f0;
+}
+
+.timeline-tab--active {
+  background: #c41e3a;
+  color: #fff;
+}
+
+/* Grid */
+.timeline-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto 40px auto;
+}
+
+/* Cards */
+.timeline-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 22px;
+  box-shadow: 0 3px 16px rgba(0,0,0,0.07);
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.timeline-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+.timeline-card--urgent {
+  background: linear-gradient(135deg, #fff, #fff8f8);
+}
+
+.timeline-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.timeline-icon {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.timeline-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.timeline-category {
+  display: inline-block;
+  color: #fff;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  width: fit-content;
+}
+
+.timeline-year {
+  font-size: 0.82rem;
+  color: #777;
+  font-style: italic;
+}
+
+.timeline-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.timeline-hindi {
+  font-size: 0.97rem;
+  color: #333;
+  line-height: 1.7;
+  font-style: italic;
+  background: #f9f0f0;
+  padding: 10px 14px;
+  border-radius: 6px;
+  margin: 0;
+}
+
+.timeline-english {
+  font-size: 0.93rem;
+  color: #555;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.timeline-urgent-badge {
+  margin-top: 14px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #c41e3a;
+  background: #fff0f0;
+  border: 1px solid #f0c0c0;
+  padding: 4px 12px;
+  border-radius: 20px;
+  display: inline-block;
+}
+
+/* CTA at bottom */
+.timeline-cta {
+  text-align: center;
+  padding: 32px 20px;
+  background: linear-gradient(135deg, #4a0000, #c41e3a);
+  border-radius: 16px;
+  max-width: 700px;
+  margin: 0 auto;
+  color: white;
+}
+
+.timeline-cta p {
+  font-size: 1.05rem;
+  margin-bottom: 20px;
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+.timeline-cta-buttons {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.timeline-btn {
+  padding: 12px 26px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.timeline-btn--primary {
+  background: #fff;
+  color: #c41e3a;
+}
+
+.timeline-btn--primary:hover {
+  background: #f0f0f0;
+}
+
+.timeline-btn--outline {
+  background: transparent;
+  color: #fff;
+  border: 2px solid rgba(255,255,255,0.6);
+}
+
+.timeline-btn--outline:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .timeline-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .timeline-tab {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+}

@@ -4,6 +4,7 @@ import axios from "axios";
 import TranscriptModal from "../components/TranscriptModal";
 import SEO from '../components/common/SEO';
 import ShareButtons from '../components/common/ShareButtons';
+import ProphecyTimeline from '../components/ProphecyTimeline';
 
 const propheciesSchema = {
   "@context": "https://schema.org",
@@ -257,6 +258,9 @@ export default function Prophecies() {
           )}
         </div>
 
+        {/* PROPHECY TIMELINE — Fulfilled & Upcoming */}
+        {!searchQuery && <ProphecyTimeline />}
+
         {/* GLOBAL PROPHECY TEXT */}
         {/* TEXT PROPHECY GRID - 5 cards per row */}
         {filteredTextProphecies.length > 0 && (
@@ -340,7 +344,7 @@ export default function Prophecies() {
         )}
 
         {/* JSON BASED PROPHECY CARDS */}
-        <div className="card-grid" style={{ marginTop: "0px" }}>
+        <div id="prophecy-videos" className="card-grid" style={{ marginTop: "0px" }}>
           {filteredItems.map((item, index) => (
             <div key={index} className="card" style={{ position: "relative" }}>
               {item.year && (
