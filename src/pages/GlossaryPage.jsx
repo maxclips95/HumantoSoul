@@ -71,14 +71,13 @@ const terms = [
     {
         term: 'Satyug (सत्युग)',
         english: 'The Age of Truth / Golden Age',
-        definition: 'The divine era of truth and righteousness that is now approaching. As per Baba Jaigurudev Ji\'s specific teaching, the coming Satyug will last approximately 1,000 years — after which Kaliyug will return again. This is not the full eternal Satyug, but a transitional golden period of peace, truth, and spiritual elevation for humanity. Human lifespans will extend greatly, and there will be no disease or sorrow during this time.',
-        quote: '"Satyug is coming — only a few years remain. The world will be purified and a golden era of 1000 years will begin. After that, Kaliyug will come again. So prepare now — there is not much time left."',
+        definition: 'The divine era of truth and righteousness that is now approaching, as spoken by Baba Jaigurudev Ji Maharaj. After the great Yug Parivartan (Change of Time), there will be a period of peace, truth, and spiritual upliftment for humanity. Those who follow a satvic, pure, and spiritually devoted way of life will experience this new era.',
         category: 'Cosmic Time',
     },
     {
         term: 'Yug Parivartan (युग परिवर्तन)',
-        english: 'Change of the Age / World Transformation',
-        definition: 'The imminent divine transition from Kaliyug to the coming golden age (Satyug), as prophesied by Baba Jaigurudev. We are currently in the final stage of this transition — only a few years remain. This transition involves massive upheaval (natural disasters, wars, epidemics, economic collapse) before ~1000 years of peace and truth begin. After that golden era, Kaliyug will come again. Those who live a pure, satvic, and spiritually devoted life will be protected during this transition.',
+        english: 'Change of Time',
+        definition: 'The imminent divine Change of Time, as prophesied by Baba Jaigurudev Ji Maharaj. We are currently in the final, most turbulent stage of Kaliyug. This transition will involve great upheaval — natural disasters, wars, epidemics — before a new era of truth and peace begins. As said by Baba Jaigurudev and Baba Umakant Ji Maharaj, very little time remains. Those living a pure, vegetarian, and spiritually devoted life will be protected during this transition.',
         category: 'Cosmic Time',
     },
     {

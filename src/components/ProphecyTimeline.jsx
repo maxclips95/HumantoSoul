@@ -64,8 +64,8 @@ const upcomingProphecies = [
     {
         yearSpoken: '2020s',
         expectedWhen: 'Only a few years away',
-        hindi: 'युग परिवर्तन होगा। कलियुग का अंत और लगभग 1000 वर्षों का सत्युग का आगमन होगा। यह सबसे बड़ा परिवर्तन है जो सृष्टि में होने वाला है। उसके बाद फिर कलियुग आएगा। अभी बहुत कम समय बचा है — तैयारी करो।',
-        english: 'The age will change. Kaliyug will end and a Satyug of approximately 1,000 years will begin — after which Kaliyug will come again. This is the greatest transformation to happen in creation. Very little time remains. Prepare now.',
+        hindi: 'युग परिवर्तन होगा — समय बदलेगा। यह सबसे बड़ा परिवर्तन है जो सृष्टि में होने वाला है। अभी बहुत कम समय बचा है — तैयारी करो।',
+        english: 'The Time will change (Yug Parivartan). This is the greatest transformation to happen in all of creation. Very little time remains. Prepare now.',
         category: 'Yug Parivartan',
         icon: '🌅',
         urgent: true
@@ -90,9 +90,9 @@ const upcomingProphecies = [
     },
     {
         yearSpoken: '2020s',
-        expectedWhen: '~1000 years after Parivartan',
-        hindi: 'सत्युग में हर तरफ शांति होगी। लगभग 1000 वर्षों तक सत्य और शांति का राज रहेगा। कोई रोग नहीं होगा, कोई दुःख नहीं होगा। उसके बाद फिर कलियुग आएगा।',
-        english: 'In Satyug there will be peace everywhere. Truth and peace will reign for approximately 1000 years. There will be no disease, no sorrow. After that, Kaliyug will come again.',
+        expectedWhen: 'After Parivartan',
+        hindi: 'सत्युग में हर तरफ शांति होगी। सत्य और शांति का राज रहेगा। कोई रोग नहीं होगा, कोई दुःख नहीं होगा।',
+        english: 'In the new era of Satyug there will be peace everywhere. Truth will reign. There will be no disease, no sorrow.',
         category: 'Satyug',
         icon: '✨'
     },
