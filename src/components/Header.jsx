@@ -70,7 +70,7 @@ function Header() {
           </button>
           <div className={`dropdown-panel ${isResourcesOpen ? 'show' : ''}`}>
             <Link to="/literature" className="dropdown-link" onClick={() => { closeMenu(); setIsResourcesOpen(false); }}>Literature &amp; Downloads</Link>
-            <Link to="/glossary" className="dropdown-link" onClick={() => { closeMenu(); setIsResourcesOpen(false); }}>📖 Spiritual Glossary</Link>
+            <Link to="/glossary" className="dropdown-link" onClick={() => { closeMenu(); setIsResourcesOpen(false); }}>Spiritual Glossary</Link>
           </div>
         </div>
 
