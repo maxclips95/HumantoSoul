@@ -44,11 +44,29 @@
     padding: 0;
     font-family: inherit;
     font-size: inherit;
-    font-weight: normal;  /* Force normal to match other links */
+    font-weight: normal;
     color: inherit;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
+}
+
+/* Premium CSS chevron — thin rotating arrow, no emoji */
+.nav-chevron {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-right: 1.8px solid currentColor;
+    border-bottom: 1.8px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform 0.22s ease;
+    margin-bottom: 3px;
+    opacity: 0.8;
+}
+
+.nav-chevron--open {
+    transform: rotate(-135deg);
+    margin-bottom: -2px;
 }
 
 .dropdown-panel {

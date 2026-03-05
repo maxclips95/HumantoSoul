@@ -39,7 +39,7 @@ function Header() {
             onClick={() => setIsMissionOpen(!isMissionOpen)}
             aria-expanded={isMissionOpen}
           >
-            Mission {isMissionOpen ? '▲' : '▼'}
+            Mission <span className={`nav-chevron ${isMissionOpen ? 'nav-chevron--open' : ''}`}></span>
           </button>
           <div className={`dropdown-panel ${isMissionOpen ? 'show' : ''}`}>
             <Link to="/about" className="dropdown-link" onClick={() => { closeMenu(); setIsMissionOpen(false); }}>Our Mission &amp; Santmat</Link>
@@ -66,7 +66,7 @@ function Header() {
             onClick={() => setIsResourcesOpen(!isResourcesOpen)}
             aria-expanded={isResourcesOpen}
           >
-            Resources {isResourcesOpen ? '▲' : '▼'}
+            Resources <span className={`nav-chevron ${isResourcesOpen ? 'nav-chevron--open' : ''}`}></span>
           </button>
           <div className={`dropdown-panel ${isResourcesOpen ? 'show' : ''}`}>
             <Link to="/literature" className="dropdown-link" onClick={() => { closeMenu(); setIsResourcesOpen(false); }}>Literature &amp; Downloads</Link>
