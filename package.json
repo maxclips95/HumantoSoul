@@ -1,6 +1,6 @@
 {
   "name": "jai-gurudev-frontend",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Frontend for Jai Gurudev Spiritual Website - A comprehensive MERN stack application featuring a content management system, video transcripts, multi-language support, resource libraries for books and media, and a robust newsletter email system.",
   "author": "Antigravity",
   "private": true,
@@ -74,7 +74,7 @@
   "notes": {
     "backend_dependency": "Requires backend server running on port 5000",
     "transcript_system": "Uses direct YouTube Captions API (No external libraries/yt-dlp required)",
-    "last_updated": "March 5, 2026"
+    "last_updated": "March 6, 2026"
   },
   "reactSnap": {
     "include": [
@@ -93,6 +93,7 @@
       "/literature",
       "/gallery",
       "/downloads",
+      "/virtual-tour",
       "/blog",
       "/announcements",
       "/contact"
