@@ -27,6 +27,7 @@ import VegetarianLivingPage from './pages/VegetarianLivingPage';
 import LiberationPage from './pages/LiberationPage';
 import PeaceAndSocietyPage from './pages/PeaceAndSocietyPage';
 import GlossaryPage from './pages/GlossaryPage';
+import VirtualTour from './pages/VirtualTour';
 
 
 
@@ -57,6 +58,7 @@ function App() {
             <Route path="/liberation" element={<LiberationPage />} />
             <Route path="/peace-and-society" element={<PeaceAndSocietyPage />} />
             <Route path="/glossary" element={<GlossaryPage />} />
+            <Route path="/virtual-tour" element={<VirtualTour />} />
             <Route path="/prophecy/:id" element={<ProphecyDetail />} />
             <Route path="/announcement/:id" element={<AnnouncementDetail />} />
           </Routes>

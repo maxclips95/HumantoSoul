@@ -66,6 +66,7 @@ function Header() {
           <Link to="/prophecies" className="nav-item shine-effect" onClick={closeMenu}>Prophecies</Link>
           <Link to="/blog" className="nav-item" onClick={closeMenu}>Teachings</Link>
           <Link to="/gallery" className="nav-item" onClick={closeMenu}>Media</Link>
+          <Link to="/virtual-tour" className="nav-item shine-effect" onClick={closeMenu}>Virtual Tour</Link>
           <Link to="/downloads" className="nav-item" onClick={closeMenu}>Programmes</Link>
 
           {/* RESOURCES DROPDOWN */}
