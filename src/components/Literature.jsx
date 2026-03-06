@@ -236,8 +236,12 @@ function Literature() {
             answer: 'Baba Umakant Ji Maharaj does not charge any fee for giving Naamdaan. It is an act of service and is provided completely free of cost.'
         },
         {
-            question: 'What is the main objective of Jai Gurudev Dharm Pracharak Sanstha?',
+            question: 'The main objective of Jai Gurudev Dharm Pracharak Sanstha?',
             answer: 'The main objectives of the organization are: To instill good values in humanity, To create a vegetarian and intoxicant-free society, And to connect people with the true path to attaining God (Surat-Shabd Yoga).'
+        },
+        {
+            question: 'How long is the session required to learn and receive Naamdaan (Dhyan, Bhajan, and Sumiran)?',
+            answer: 'The session to learn and receive Naamdaan (the three practices of Dhyan, Bhajan, and Sumiran) takes approximately 30 minutes during Baba Umakant Ji Maharaj\'s programmes across the country and abroad.'
         }
     ];
 
