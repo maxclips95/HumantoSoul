@@ -26,9 +26,9 @@ body {
 
 /* TOP BAR — slim utility row */
 .top-bar {
-    background: #f0ece8;
+    background: #dfd0c3;
     padding: 5px 24px;
-    border-bottom: 1px solid #ddd3cc;
+    border-bottom: 1px solid #cbbdae;
 }
 
 .top-bar-inner {
