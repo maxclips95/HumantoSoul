@@ -392,3 +392,10 @@ body {
     padding-top: 20px !important;
     margin-top: -25px !important;
 }
+
+/* Hide lineage arrows on mobile */
+@media (max-width: 768px) {
+    .lineage-arrow {
+        display: none !important;
+    }
+}

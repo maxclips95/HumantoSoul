@@ -143,97 +143,92 @@ function SantAndSantMat() {
 
             <div style={{ maxWidth: "1000px", margin: "0 auto", lineHeight: "1.8" }}>
 
-                {/* Section 1 */}
-                <h3 style={{ color: "red", marginBottom: "10px" }}>Who is called a Sant?</h3>
+                {/* Section 1: Origins of Santmat */}
+                <h3 style={{ color: "#c41e3a", marginBottom: "10px" }}>The Origins of Santmat</h3>
                 <p>
-                    One who has knowledge of the beginning and the end, who explains the
-                    difference between the beginning and the end, who shows the path from
-                    the beginning to the end and leads one back from the end to the
-                    beginning—such a person is called a Sant.
+                    Santmat is not a new religion or sect, but the ancient, eternal path of the Sants. It is the science of the soul. While various practices have existed since Satyug, Santmat was formalized and made accessible to the masses in Kaliyug by Kabir Das Ji.
                 </p>
                 <p>
-                    Just as a tree does not eat its own fruit but gives it to others; a
-                    river does not drink its own water but gives it to others; it does not
-                    bathe itself but enables others to bathe and cleanses them—likewise are
-                    the Sants. They come for the sake of others. Therefore it is said:
+                    One who has complete knowledge of the beginning and the end, who explains the difference between the two, who reveals the inner path from the beginning to the end, and leads the soul back to its true origin—such an awakened being is called a Sant.
                 </p>
-                <p style={{ fontStyle: "italic", marginLeft: "20px" }}>
-                    "A tree never eats its own fruit,<br />
-                    nor does a river store its water.<br />
-                    For the sake of the highest good,<br />
-                    the Sants have taken a human body."
+                <p>
+                    Just as a tree does not eat its own fruit but gives it to others; a river does not drink its own water but gives it to others; it does not bathe itself but cleanses others—likewise are the Sants. They incarnate strictly for the liberation of others.
                 </p>
+                <div style={{
+                    background: "#fff", borderLeft: "4px solid #c41e3a", padding: "15px 20px",
+                    margin: "20px 0", fontStyle: "italic", color: "#555", borderRadius: "0 8px 8px 0",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.05)"
+                }}>
+                    "A tree never eats its own fruit, nor does a river store its water.<br />
+                    For the sake of the highest good, the Sants have taken a human body."
+                </div>
 
-                {/* Section 2 */}
-                <h3 style={{ color: "red", marginTop: "30px", marginBottom: "10px" }}>
-                    The status of Sants is the highest
+                {/* Section 2: Hidden vs Manifest Sants */}
+                <h3 style={{ color: "#c41e3a", marginTop: "35px", marginBottom: "10px" }}>
+                    Hidden and Manifest Sants (Waqt Ke Guru)
                 </h3>
                 <p>
-                    The status of Sants is above rishis, munis, incarnate powers, yogis, and
-                    yogeshwars. There are two kinds of Sants: Hidden (Gupt) Sants and
-                    Manifest (Pragat) Sants.
+                    The spiritual status of a True Master (Waqt Ke Guru) is above rishis, munis, incarnate powers, yogis, and yogeshwars. In Santmat, there are two kinds of Sants: Hidden (Gupt) and Manifest (Pragat).
                 </p>
                 <p>
-                    Before Sant Mat existed and before manifest Sants appeared on earth,
-                    hidden Sants lived on this earth and took care of all living beings.
-                    When human actions became extremely corrupt, Satpurush sent one of His
-                    sixteen sons, Jogjeet (Kabir Das Ji), to the earth.
+                    Before Manifest Sants appeared on earth, Hidden Sants lived here and silently took care of the balance of creation. However, when human actions became extremely corrupt and souls forgot their true home, Satpurush (the Supreme Lord) sent one of His divine sons, Jogjeet (Kabir Das Ji), to the earth as a Manifest Sant.
                 </p>
                 <p>
-                    He revealed the secret of Satlok, from where the power that animates the
-                    body (the soul) descended into Mrityulok. He disclosed all spiritual
-                    secrets and provided complete knowledge.
+                    He revealed the secret of Satlok (the True Abode), explaining how the soul descended into Mrityulok (the realm of death and illusion). He disclosed the spiritual secrets of inner sound and light (Surat Shabd Yoga) and provided the method of liberation.
                 </p>
                 <p>
-                    Hidden Sants always remain on earth and bear its burden, but they do
-                    not liberate souls nor show the path. Only manifest Sants reveal the
-                    path of liberation and salvation. Both hidden and manifest Sants know
-                    each other.
-                </p>
-                <p>
-                    Earlier, people were aware of hell, heaven, Vaikunth, and the cycle of
-                    84 lakh (8,400,000) births across different life forms—humans, animals,
-                    birds, trees, and other beings—through which the soul passes. However,
-                    they did not know how to escape this cycle. When manifest Sants appeared
-                    on Earth, they provided Naamdaan, taught devotion, revealed the inner divine
-                    identity, and guided souls back to their True Home—Satlok.
+                    While Hidden Sants maintain the earthly balance, they do not give Naamdaan (Initiation) nor show the path. <strong>Only a living, Manifest Sant (Waqt Ke Guru) can reveal the inner path of salvation.</strong> By connecting the seeker's soul to the divine Sound Current (Shabd), the living Master guides the soul out of the cycle of 84 lakh (8.4 million) species back to its True Home.
                 </p>
 
-                {/* ══════ LINEAGE OF SANTS ══════ */}
+                {/* ══════ LINEAGE OF SANTS (Dynamic Grid) ══════ */}
                 <h2 style={{
-                    textAlign: "center", color: "red", fontWeight: "bold",
-                    marginTop: "50px", marginBottom: "30px", fontSize: "1.6rem",
-                    borderTop: "2px solid #ffcccc", paddingTop: "30px"
+                    textAlign: "center", color: "#c41e3a", fontWeight: "bold",
+                    marginTop: "60px", marginBottom: "20px", fontSize: "1.8rem",
+                    borderTop: "2px solid #f0d8d8", paddingTop: "40px"
                 }}>
-                    Lineage of Sants
+                    The Eternal Lineage (Parampara)
                 </h2>
+                <p style={{ textAlign: "center", color: "#666", marginBottom: "40px", maxWidth: "800px", margin: "0 auto 40px" }}>
+                    The divine power of the Master never leaves the earth. When one Manifest Sant departs, the spiritual charge is transferred to the appointed successor to continue the mission of awakening souls.
+                </p>
 
-                <div style={{ textAlign: "center", marginBottom: "30px" }}>
-                    <img
-                        src="/assets/images/lineage1.png"
-                        alt="Lineage of Sants Part 1"
-                        style={{ maxWidth: "100%", height: "auto", display: "block", margin: "0 auto 10px" }}
-                    />
-                    <img
-                        src="/assets/images/lineage2.png"
-                        alt="Lineage of Sants Part 2"
-                        style={{ maxWidth: "100%", height: "auto", display: "block", margin: "0 auto 10px" }}
-                    />
-                    <img
-                        src="/assets/images/lineage3.png"
-                        alt="Lineage of Sants Part 3"
-                        style={{ maxWidth: "100%", height: "auto", display: "block", margin: "0 auto 10px" }}
-                    />
-                    <div style={{ textAlign: "center", display: "inline-block", margin: "0 auto" }}>
-                        <img 
-                            src="/assets/images/lineage4.png" 
-                            alt="Lineage of Sants Part 4" 
-                            style={{ maxWidth: "100%", height: "auto", display: "block", margin: "0 auto 10px" }} 
-                        />
-                        <p style={{ fontSize: "1.1rem", fontWeight: "bold", color: "#c41e3a", marginTop: "10px" }}>
-                            Present Spiritual Master
-                        </p>
-                    </div>
+                <div style={{
+                    display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "25px",
+                    padding: "20px 0"
+                }}>
+                    {saints.map((saint, index) => {
+                        const isLast = index === saints.length - 1;
+                        return (
+                            <div key={index} style={{
+                                position: "relative",
+                                padding: isLast ? "15px" : "0",
+                                background: isLast ? "#fff" : "transparent",
+                                borderRadius: isLast ? "16px" : "0",
+                                boxShadow: isLast ? "0 4px 20px rgba(196,30,58,0.15)" : "none",
+                                border: isLast ? "2px solid #ffcccc" : "none"
+                            }}>
+                                {isLast && (
+                                    <div style={{
+                                        position: "absolute", top: "-12px", left: "50%", transform: "translateX(-50%)",
+                                        background: "#c41e3a", color: "#fff", fontSize: "0.75rem", fontWeight: "bold",
+                                        padding: "4px 12px", borderRadius: "12px", whiteSpace: "nowrap", zIndex: 2
+                                    }}>
+                                        Present Spiritual Master
+                                    </div>
+                                )}
+                                <SaintCard saint={saint} />
+                                {/* Add an arrow after every saint except the last one, visible only on desktop */}
+                                {!isLast && (
+                                    <span style={{
+                                        position: "absolute", right: "-18px", top: "50%", transform: "translateY(-50%)",
+                                        color: "#f0d8d8", fontSize: "1.5rem", pointerEvents: "none"
+                                    }} className="lineage-arrow">
+                                        ➔
+                                    </span>
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
 
             </div>
