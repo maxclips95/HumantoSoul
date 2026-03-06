@@ -70,8 +70,8 @@ export default function StartHere() {
             <div className="start-here-cta">
                 <div className="start-here-cta-card">
                     <p>✨ Ready to receive Naamdaan (Spiritual Initiation)?</p>
-                    <p className="start-here-cta-sub">Naamdaan is given completely free of cost by Baba Umakant Ji Maharaj.</p>
-                    <Link to="/baba-umakant" className="start-here-btn">Learn About Naamdaan 🙏</Link>
+                    <p className="start-here-cta-sub">Naamdaan is given completely free of cost at monthly programmes held across India. Find one near you.</p>
+                    <Link to="/downloads" className="start-here-btn">View Monthly Programmes →</Link>
                 </div>
             </div>
         </section>
