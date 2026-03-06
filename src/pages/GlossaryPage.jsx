@@ -65,7 +65,7 @@ const terms = [
     {
         term: 'Kaliyug (कलियुग)',
         english: 'The Age of Darkness / Iron Age',
-        definition: 'The current cosmic era (yug), characterized by spiritual decline, materialism, ego, violence, and increasing natural disasters. According to Baba Jaigurudev\'s teachings, we are now in the final, most intense phase of Kaliyug — only a few years remain before the great Yug Parivartan (change of age). This is the most urgent time for spiritual practice.',
+        definition: 'The current cosmic era (yug), characterized by spiritual decline, materialism, ego, violence, and increasing natural disasters. According to Baba Jaigurudev\'s teachings, we are now in the final, most intense phase of Kaliyug — only a few years remain before the great Yug Parivartan (change of time). This is the most urgent time for spiritual practice.',
         category: 'Cosmic Time',
     },
     {

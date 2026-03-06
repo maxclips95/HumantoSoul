@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import VoiceRecorder from './VoiceRecorder';
 
 function Contact() {
     const [formData, setFormData] = useState({
@@ -145,6 +146,17 @@ function Contact() {
                     </button>
                 </form>
             </div>
+
+            {/* VOICE NOTE SECTION */}
+            <div style={{ maxWidth: '500px', margin: '30px auto 0 auto' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                    <div style={{ flex: 1, height: '1px', background: '#e0d0d0' }}></div>
+                    <span style={{ color: '#c41e3a', fontWeight: '700', fontSize: '0.85rem', whiteSpace: 'nowrap' }}>OR / या</span>
+                    <div style={{ flex: 1, height: '1px', background: '#e0d0d0' }}></div>
+                </div>
+                <VoiceRecorder />
+            </div>
+
         </section>
     );
 }

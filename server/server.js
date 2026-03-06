@@ -1653,3 +1653,85 @@ process.on('uncaughtException', (err) => {
 process.on('unhandledRejection', (reason, promise) => {
   logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
+
+// ─────────────────────────────────────────────
+// VOICE NOTE CONTACT ENDPOINT
+// POST /api/contact/voice
+// Accepts: multipart/form-data with voiceNote (audio/webm), name, phone
+// ─────────────────────────────────────────────
+const voiceUploadDir = path.join(__dirname, 'uploads', 'voice-notes');
+if (!fs.existsSync(voiceUploadDir)) fs.mkdirSync(voiceUploadDir, { recursive: true });
+
+const voiceStorage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, voiceUploadDir),
+  filename: (req, file, cb) => {
+    const ts = Date.now();
+    cb(null, `voice-${ts}.webm`);
+  }
+});
+const voiceUpload = multer({
+  storage: voiceStorage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('audio/')) cb(null, true);
+    else cb(new Error('Only audio files allowed'), false);
+  }
+});
+
+app.post('/api/contact/voice', voiceUpload.single('voiceNote'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No audio file received' });
+
+    const { name = 'Unknown', phone = 'Not provided' } = req.body;
+    const filePath = req.file.path;
+    const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+
+    logger.info(`[VoiceNote] Received from: ${name} | Phone: ${phone} | File: ${req.file.filename}`);
+
+    // Try to send email notification with attachment
+    try {
+      const orgEmail = process.env.ORG_EMAIL || process.env.EMAIL_USER || 'info@jaigurudevukm.com';
+      const transporter = nodemailer.createTransporter({
+        service: 'gmail',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS
+        }
+      });
+
+      await transporter.sendMail({
+        from: `"Human to Soul Website" <${process.env.EMAIL_USER}>`,
+        to: orgEmail,
+        subject: `🎙️ New Voice Message from ${name} — HumantoSoul.com`,
+        html: `
+          <h2>New Voice Message Received</h2>
+          <p><strong>Received on:</strong> ${timestamp} (IST)</p>
+          <p><strong>Sender Name:</strong> ${name}</p>
+          <p><strong>Phone Number:</strong> ${phone}</p>
+          <p><em>The audio file is attached. Please listen and respond to the sender.</em></p>
+          <p style="color:#888;font-size:12px;">Sent via humantosoul.com contact form voice recorder</p>
+        `,
+        attachments: [{
+          filename: `voice-message-${name.replace(/\s+/g, '-')}.webm`,
+          path: filePath
+        }]
+      });
+
+      logger.info(`[VoiceNote] Email sent to ${orgEmail}`);
+    } catch (emailErr) {
+      // Email failed but file is saved — non-fatal
+      logger.warn(`[VoiceNote] Email failed (file saved): ${emailErr.message}`);
+    }
+
+    res.json({
+      success: true,
+      message: 'Voice message received. Our team will contact you soon. Jai Gurudev!',
+      savedAs: req.file.filename
+    });
+  } catch (err) {
+    logger.error('[VoiceNote] Error:', err.message);
+    res.status(500).json({ error: 'Failed to save voice message. Please try again.' });
+  }
+});
+
+

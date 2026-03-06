@@ -1,0 +1,299 @@
+/* VoiceRecorder.css */
+
+.vr-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 28px;
+    box-shadow: 0 4px 20px rgba(196, 30, 58, 0.1);
+    border: 1.5px solid #f0d8d8;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.vr-done {
+    text-align: center;
+    padding: 40px 28px;
+}
+
+.vr-done-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+}
+
+.vr-done h3 {
+    font-size: 1.5rem;
+    color: #c41e3a;
+    margin-bottom: 10px;
+}
+
+.vr-done p {
+    color: #555;
+    line-height: 1.7;
+}
+
+.vr-header {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.vr-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.vr-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1a0000;
+    margin: 0 0 4px;
+}
+
+.vr-subtitle {
+    font-size: 0.88rem;
+    color: #666;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Minimal input fields */
+.vr-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.vr-input {
+    padding: 10px 14px;
+    border: 1.5px solid #e0c8c8;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: #333;
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: inherit;
+}
+
+.vr-input:focus {
+    border-color: #c41e3a;
+}
+
+/* Recorder area */
+.vr-recorder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+
+/* Buttons */
+.vr-btn {
+    border: none;
+    border-radius: 50px;
+    padding: 13px 28px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.vr-btn--record {
+    background: #c41e3a;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+}
+
+.vr-btn--record:hover {
+    background: #9b0000;
+}
+
+.vr-mic-dot {
+    width: 12px;
+    height: 12px;
+    background: #fff;
+    border-radius: 50%;
+    animation: blink 1.2s infinite;
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+}
+
+.vr-btn--stop {
+    background: #333;
+    color: #fff;
+    margin-top: 8px;
+}
+
+.vr-btn--stop:hover {
+    background: #111;
+}
+
+.vr-btn--send {
+    background: #c41e3a;
+    color: #fff;
+}
+
+.vr-btn--send:hover {
+    background: #9b0000;
+}
+
+.vr-btn--discard {
+    background: transparent;
+    color: #888;
+    border: 1.5px solid #ddd;
+    font-size: 0.9rem;
+}
+
+.vr-btn--discard:hover {
+    background: #f5f5f5;
+}
+
+/* Recording panel */
+.vr-recording-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.vr-pulse-ring {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vr-pulse-ring::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(196, 30, 58, 0.15);
+    border-radius: 50%;
+    animation: pulse 1.4s ease-out infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.8);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1.6);
+        opacity: 0;
+    }
+}
+
+.vr-mic-live {
+    font-size: 2rem;
+    z-index: 1;
+}
+
+.vr-timer {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #c41e3a;
+    letter-spacing: 1px;
+    font-variant-numeric: tabular-nums;
+}
+
+.vr-progress-bar {
+    width: 100%;
+    height: 5px;
+    background: #f0d8d8;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.vr-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #c41e3a, #ff6b8a);
+    border-radius: 10px;
+    transition: width 0.5s linear;
+}
+
+.vr-hint {
+    font-size: 0.85rem;
+    color: #888;
+    margin: 0;
+}
+
+/* Preview */
+.vr-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+}
+
+.vr-recorded-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #2d7a2d;
+    margin: 0;
+}
+
+.vr-audio-player {
+    width: 100%;
+    border-radius: 8px;
+}
+
+.vr-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Uploading */
+.vr-uploading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.vr-spinner {
+    width: 36px;
+    height: 36px;
+    border: 4px solid #f0d8d8;
+    border-top: 4px solid #c41e3a;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Error */
+.vr-error {
+    color: #c41e3a;
+    font-size: 0.86rem;
+    margin-top: 10px;
+    text-align: center;
+}
