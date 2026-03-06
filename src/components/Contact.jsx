@@ -38,8 +38,7 @@ function Contact() {
     };
 
     return (
-        <section className="section" style={{ paddingTop: '10px' }}>
-            <h1 className="section-title">Contact Us</h1>
+        <section className="section" style={{ paddingTop: '20px', paddingBottom: '40px' }}>
 
             <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '20px', marginBottom: '20px' }}>
                 <div style={{ flex: '1 1 300px', backgroundColor: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
