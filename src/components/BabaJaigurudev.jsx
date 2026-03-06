@@ -65,31 +65,15 @@ function BabaJaigurudev() {
                 </p>
 
                 <h4 style={{ color: "red", marginTop: "25px" }}>
-                    The Divine Play (Leela) of Seeking God
+                    The Preordained Meeting and the Example of a Disciple
                 </h4>
 
                 <p>
-                    As part of this roleplay, Swami Ji Maharaj outwardly demonstrated an intense desire to find God. He devotedly served mahants and priests at temples and studied religious scriptures. When he did not find the ultimate truth there, he associated with ascetics, bathing them and washing their clothes.
+                    To teach humanity the importance of rigorous discipline and total surrender to a True Master, the Supreme Creator enacted the divine play of a seeker. In 1945, guided by his own cosmic will, he orchestrated a meeting with the great saint Ghurelal Ji Maharaj in Chirauli.
                 </p>
 
                 <p>
-                    Continuing this divine play, someone advised him to pray in a mosque. He humbly requested maulvis to teach him namaz. However, one day while praying, he heard a heart-wrenching cry and saw a goat being slaughtered behind the mosque. Deeply disturbed by this violence, he immediately left the place, demonstrating his strict message of non-violence and vegetarianism.
-                </p>
-
-                <h4 style={{ color: "red", marginTop: "25px" }}>
-                    Tireless Service and the Preordained Meeting
-                </h4>
-
-                <p>
-                    During a journey to Kashmir, Swami Ji joined a group of sadhus who consumed intoxicants. Driven by his outward "longing" for God, he served them tirelessly, even preparing their chillums, though he himself never consumed any toxins. When a sadhu died instantly from forcefully inhaling a chillum, Swami Ji enacted utter despair, preparing to jump into Dal Lake.
-                </p>
-
-                <p>
-                    At that moment, a sweet divine voice spoke: “Child, the means to attain God exists. You will receive it from a householder.” Soon after, a trikal-darshi saint informed him that his "search" would end within six months.
-                </p>
-
-                <p>
-                    In 1945, guided by his own cosmic will, he met the great saint Ghurelal Ji Maharaj in Chirauli. Ghurelal Ji recognized him instantly, saying, “Why are you crying? You have wandered enough; now you have arrived.” Through this preordained meeting, Swami Ji was formally initiated into Surat Shabd Yoga, completing the earthly roleplay of a disciple, ready to begin his true global work as the Awakener of Souls. Before leaving for his divine abode in 1948, Guru Ji declared that Swami Ji would lead the congregation after him.
+                    Through this preordained meeting, Swami Ji formally completed the earthly roleplay of a disciple, perfectly demonstrating the ideal devotion one should have for their Guru. Having established this powerful example for his future disciples, he was ready to begin his true global work as the Awakener of Souls. Before leaving for his divine abode in 1948, Guru Ji declared that Swami Ji would lead the congregation to carry forward the mission of Satyug.
                 </p>
 
                 <h4 style={{ color: "red", marginTop: "25px" }}>
@@ -97,17 +81,11 @@ function BabaJaigurudev() {
                 </h4>
 
                 <p>
-                    Swami Ji Maharaj worked tirelessly for the welfare of souls. By 1971,
-                    he had over Ten crore disciples. He spread the message of vegetarianism
-                    and freedom from intoxication across the nation, transforming millions
-                    into moral, hardworking, honest, and disciplined individuals.
+                    Swami Ji Maharaj worked tirelessly for the welfare of souls. He started his public mission in the year 1952 from Ardali Bazar in Varanasi, Uttar Pradesh, and by 1971, he had over ten crore (100 million) disciples. He spread the absolute necessity of a vegetarian diet and freedom from intoxication across the nation and abroad, transforming millions into moral, hardworking, honest, and disciplined individuals.
                 </p>
 
                 <p>
-                    He guided millions on the path of God-realization and devotion, relieved
-                    their suffering, and showed them the way to happiness. He established
-                    the power of the name “Jaigurudev,” declaring that chanting it removes
-                    difficulties and reduces suffering at the time of death.
+                    He guided millions on the path of God-realization and devotion, relieved their suffering, and showed them the way to true, lasting happiness. He established the power of the awakened name “Jaigurudev,” declaring that chanting it removes worldly difficulties and drastically reduces suffering at the time of death.
                 </p>
 
                 <h4 style={{ color: "red", marginTop: "25px" }}>
