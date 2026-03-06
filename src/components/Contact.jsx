@@ -103,58 +103,86 @@ function Contact() {
                 </div>
             </div>
 
-            <div style={{ maxWidth: '500px', margin: '0 auto' }}>
-                <h3 style={{ color: '#c41e3a', marginBottom: '20px' }}>Contact Form</h3>
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                    <input
-                        type="text"
-                        name="fullName"
-                        placeholder="Full Name"
-                        value={formData.fullName}
-                        onChange={handleChange}
-                        required
-                        style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
-                    />
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                        style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
-                    />
-                    <input
-                        type="tel"
-                        name="phoneNumber"
-                        placeholder="Phone Number"
-                        value={formData.phoneNumber}
-                        onChange={handleChange}
-                        style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
-                    />
-                    <textarea
-                        name="message"
-                        placeholder="Write your message here"
-                        value={formData.message}
-                        onChange={handleChange}
-                        required
-                        style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc', resize: 'vertical' }}
-                        rows="5"
-                    ></textarea>
-                    <button type="submit" className="btn" style={{ padding: '10px', fontSize: '1rem' }}>
-                        Send
-                    </button>
-                </form>
-            </div>
-
-            {/* VOICE NOTE SECTION */}
-            <div style={{ maxWidth: '500px', margin: '30px auto 0 auto' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                    <div style={{ flex: 1, height: '1px', background: '#e0d0d0' }}></div>
-                    <span style={{ color: '#c41e3a', fontWeight: '700', fontSize: '0.85rem', whiteSpace: 'nowrap' }}>OR / या</span>
-                    <div style={{ flex: 1, height: '1px', background: '#e0d0d0' }}></div>
+            {/* FORM + VOICE NOTE — side by side */}
+            <div style={{
+                display: 'flex',
+                gap: '0',
+                alignItems: 'flex-start',
+                justifyContent: 'center',
+                flexWrap: 'wrap',
+                maxWidth: '1060px',
+                margin: '0 auto'
+            }}>
+                {/* LEFT: Contact Form */}
+                <div style={{ flex: '1 1 400px', maxWidth: '500px' }}>
+                    <h3 style={{ color: '#c41e3a', marginBottom: '20px' }}>Contact Form</h3>
+                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                        <input
+                            type="text"
+                            name="fullName"
+                            placeholder="Full Name"
+                            value={formData.fullName}
+                            onChange={handleChange}
+                            required
+                            style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+                        />
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="Email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            required
+                            style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+                        />
+                        <input
+                            type="tel"
+                            name="phoneNumber"
+                            placeholder="Phone Number"
+                            value={formData.phoneNumber}
+                            onChange={handleChange}
+                            style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+                        />
+                        <textarea
+                            name="message"
+                            placeholder="Write your message here"
+                            value={formData.message}
+                            onChange={handleChange}
+                            required
+                            style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc', resize: 'vertical' }}
+                            rows="5"
+                        ></textarea>
+                        <button type="submit" className="btn" style={{ padding: '10px', fontSize: '1rem' }}>
+                            Send
+                        </button>
+                    </form>
                 </div>
-                <VoiceRecorder />
+
+                {/* VERTICAL DIVIDER */}
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '0 28px',
+                    alignSelf: 'stretch',
+                    minHeight: '200px'
+                }}>
+                    <div style={{ flex: 1, width: '1px', background: '#e0d0d0' }}></div>
+                    <span style={{
+                        color: '#c41e3a',
+                        fontWeight: '700',
+                        fontSize: '0.82rem',
+                        padding: '10px 0',
+                        whiteSpace: 'nowrap'
+                    }}>OR / या</span>
+                    <div style={{ flex: 1, width: '1px', background: '#e0d0d0' }}></div>
+                </div>
+
+                {/* RIGHT: Voice Recorder */}
+                <div style={{ flex: '1 1 400px', maxWidth: '500px' }}>
+                    <VoiceRecorder />
+                </div>
             </div>
 
         </section>
