@@ -59,7 +59,7 @@ export default function VirtualTour() {
                                 height: "100%",
                                 border: 0
                             }}
-                            src="https://www.youtube.com/embed/YOUR_VIDEO_ID_HERE?rel=0" // PLACEHOLDER: Replace 'YOUR_VIDEO_ID_HERE' with the real video ID
+                            src="https://www.youtube.com/embed/9XQUN9FBLBw?rel=0"
                             title="Baba Jaigurudev Ashram Ujjain Virtual Tour"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             allowFullScreen>
