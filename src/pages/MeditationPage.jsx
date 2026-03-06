@@ -189,6 +189,10 @@ export default function MeditationPage() {
                                 <h3>What was Baba Jaigurudev's daily meditation practice?</h3>
                                 <p>After receiving Naamdaan from Ghurelal Ji Maharaj, Baba Jaigurudev Ji Maharaj practiced meditation (dhyan) for eighteen hours a day. Surviving on one meal a day, he attained the highest spiritual state within a short period through the grace of his Guru.</p>
                             </div>
+                            <div className="faq-item">
+                                <h3>How long is the session required to learn and receive Naamdaan (Dhyan, Bhajan, and Sumiran)?</h3>
+                                <p>The session to learn and receive Naamdaan (the three practices of Dhyan, Bhajan, and Sumiran) takes approximately 30 minutes during Baba Umakant Ji Maharaj's programmes across the country and abroad.</p>
+                            </div>
                         </div>
                     </section>
 
