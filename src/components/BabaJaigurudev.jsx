@@ -81,7 +81,7 @@ function BabaJaigurudev() {
                 </h4>
 
                 <p>
-                    Swami Ji Maharaj worked tirelessly for the welfare of souls. He started his public mission in the year 1952 from Ardali Bazar in Varanasi, Uttar Pradesh, and by 1971, he had over ten crore (100 million) disciples. He spread the absolute necessity of a vegetarian diet and freedom from intoxication across the nation and abroad, transforming millions into moral, hardworking, honest, and disciplined individuals.
+                    Swami Ji Maharaj worked tirelessly for the welfare of souls. After leaving his village and completing his earthly roleplay under Pandit Ghurelal Ji Sharma in Aligarh, he officially launched his spiritual mission. He held his very first satsang in the Ardali Bazar area of Varanasi on <strong>July 10, 1952</strong>, starting with only five disciples. From these humble beginnings, his following exploded into the millions. By 1971, he had over ten crore (100 million) disciples. He spread the absolute necessity of a vegetarian diet and freedom from intoxication across the nation and abroad, transforming millions into moral, hardworking, honest, and disciplined individuals.
                 </p>
 
                 <p>
