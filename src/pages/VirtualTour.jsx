@@ -114,7 +114,7 @@ export default function VirtualTour() {
                             <strong> We warmly invite all seekers to visit us at least once</strong> to attend our spiritual programmes, join the satsang, and feel the divine presence that transforms lives.
                         </p>
                         <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
-                            <a href="https://maps.app.goo.gl/YourGoogleMapsLink" target="_blank" rel="noopener noreferrer" className="bp-btn bp-btn--gold" style={{ textDecoration: 'none' }}>Get Directions →</a>
+                            <a href="https://www.google.com/maps/search/?api=1&query=Baba+Jaigurudev+Ashram+Ujjain" target="_blank" rel="noopener noreferrer" className="bp-btn bp-btn--gold" style={{ textDecoration: 'none' }}>Get Directions →</a>
                             <Link to="/contact" className="bp-btn bp-btn--outline">Plan Your Visit 🙏</Link>
                         </div>
                     </div>
