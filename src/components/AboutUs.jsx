@@ -188,7 +188,7 @@ function SantAndSantMat() {
                         borderRadius: "12px", boxShadow: "0 5px 20px rgba(0,0,0,0.05)"
                     }}>
                         <h3 style={{ color: "#c41e3a", fontSize: "1.5rem", marginBottom: "15px" }}>
-                            <i className="fas fa-om" style={{ marginRight: "10px" }}></i> The Origins of Santmat
+                            The Origins of Santmat
                         </h3>
                         <p style={{ lineHeight: "1.7", color: "#555", marginBottom: "15px" }}>
                             Santmat is not a new religion or sect; it is the ancient, eternal path of the Sants. It is the pure science of the soul. While various practices have existed since Satyug, Santmat was formalized and made accessible to the masses in Kaliyug by Kabir Das Ji.
@@ -204,7 +204,7 @@ function SantAndSantMat() {
                         borderRadius: "12px", boxShadow: "0 5px 20px rgba(0,0,0,0.05)"
                     }}>
                         <h3 style={{ color: "#c41e3a", fontSize: "1.5rem", marginBottom: "15px" }}>
-                            <i className="fas fa-sun" style={{ marginRight: "10px" }}></i> Hidden &amp; Manifest Sants
+                            Hidden &amp; Manifest Sants
                         </h3>
                         <p style={{ lineHeight: "1.7", color: "#555", marginBottom: "15px" }}>
                             The spiritual status of a True Master (Waqt Ke Guru) is supreme. In Santmat, there are two kinds of Sants: Hidden (Gupt) and Manifest (Pragat).
