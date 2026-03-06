@@ -81,11 +81,11 @@ function BabaJaigurudev() {
                 </h4>
 
                 <p>
-                    Swami Ji Maharaj worked tirelessly for the welfare of souls. After leaving his village and completing his earthly roleplay under Pandit Ghurelal Ji Sharma in Aligarh, he officially launched his spiritual mission. He held his very first satsang in the Ardali Bazar area of Varanasi on <strong>July 10, 1952</strong>, starting with only five disciples. From these humble beginnings, his following exploded into the millions. By 1971, he had over ten crore (100 million) disciples. He spread the absolute necessity of a vegetarian diet and freedom from intoxication across the nation and abroad, transforming millions into moral, hardworking, honest, and disciplined individuals.
+                    Swami Ji Maharaj worked tirelessly for the welfare of souls. After leaving his village and completing his earthly roleplay under Guru Pandit Ghurelal Ji in Aligarh, he officially launched his spiritual mission. He held his very first satsang in the Ardali Bazar area of Varanasi on <strong>July 10, 1952</strong>, starting with only five disciples. From these humble beginnings, his following exploded into the millions. By 1971, he had over ten crore (100 million) disciples. He spread the absolute necessity of a vegetarian diet and freedom from intoxication across the nation and abroad, transforming millions into moral, hardworking, honest, and disciplined individuals.
                 </p>
 
                 <p>
-                    He guided millions on the path of God-realization and devotion, relieved their suffering, and showed them the way to true, lasting happiness. He established the power of the awakened name “Jaigurudev,” declaring that chanting it removes worldly difficulties and drastically reduces suffering at the time of death.
+                    He guided millions on the path of God-realization and devotion. He awakened and bestowed the supreme, all-powerful name <strong>“Jaigurudev,”</strong> declaring that this name alone will protect a soul in any worldly difficulty. Most importantly, he promised that if a person remembers or even tries to call this name at the exact moment of death, he himself will physically appear there. He will not allow the messengers of death (Yamdoot) near the soul, completely saving them from suffering in hell. He will personally help the soul attain another human birth so they can definitively complete their spiritual journey back to Satlok—the eternal True Home of all pure souls.
                 </p>
 
                 <h4 style={{ color: "red", marginTop: "25px" }}>

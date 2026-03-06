@@ -88,41 +88,7 @@ export default function YouTubeFeed() {
 
       <ProphecySection />
 
-      {/* SHORTS */}
-      {shorts.length > 0 && (
-        <>
-          <h2 className="section-title" style={{ marginTop: '40px' }}>Short Sandesh</h2>
 
-          <div className="card-grid">
-            {shorts.slice(0, visibleShorts).map((video) => (
-              <div
-                key={video.id}
-                className="card"
-                onClick={() => openModal(video.id)}
-              >
-                <img src={video.thumbnail} alt={video.title} className="card-img" />
-                <div className="card-content">
-                  <h3>{video.title}</h3>
-                  <div onClick={(e) => e.stopPropagation()}>
-                    <ShareButtons title={video.title} url={`https://www.youtube.com/watch?v=${video.id}`} />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {visibleShorts < shorts.length && (
-            <div className="load-more-container">
-              <button
-                className="load-more-btn"
-                onClick={() => setVisibleShorts((prev) => prev + 15)}
-              >
-                Load More
-              </button>
-            </div>
-          )}
-        </>
-      )}
 
       {/* FULL */}
       {full.length > 0 && (
