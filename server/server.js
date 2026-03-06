@@ -802,6 +802,43 @@ app.get('/api/videoreview', verifyToken, async (req, res) => {
 });
 
 
+// --- Virtual Tours Management ---
+app.get('/api/virtual_tours', async (req, res) => {
+  try {
+    const tours = await db.selectAll('virtual_tours');
+    // Default sorted to newest first if id is sequential
+    if (tours) tours.reverse();
+    res.json(tours);
+  } catch (err) {
+    logger.error('Error fetching virtual tours:', err);
+    res.status(500).json({ error: 'Failed to fetch virtual tours' });
+  }
+});
+
+app.post('/api/virtual_tours', verifyToken, async (req, res) => {
+  try {
+    const { video_id, title } = req.body;
+    if (!video_id || !title) {
+      return res.status(400).json({ error: 'Video ID and title are required' });
+    }
+    const newTour = await db.insert('virtual_tours', { video_id, title });
+    res.json(newTour);
+  } catch (err) {
+    logger.error('Error adding virtual tour:', err);
+    res.status(500).json({ error: 'Failed to add virtual tour' });
+  }
+});
+
+app.delete('/api/virtual_tours/:id', verifyToken, async (req, res) => {
+  try {
+    await db.deleteById('virtual_tours', req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    logger.error('Error deleting virtual tour:', err);
+    res.status(500).json({ error: 'Failed to delete virtual tour' });
+  }
+});
+
 // Prophecies
 app.route('/api/prophecies')
   .get(async (req, res) => {

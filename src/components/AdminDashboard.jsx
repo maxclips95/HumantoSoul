@@ -593,6 +593,96 @@ function AdminDashboard() {
         }
     };
 
+    // ─── Virtual Tours Admin Panel ─────────────────────────────────────────────
+    function VirtualToursPanel({ BASE_URL }) {
+        const [tours, setTours] = useState([]);
+        const [form, setForm] = useState({ title: '', youtube_url: '' });
+        const [msg, setMsg] = useState('');
+
+        const load = async () => {
+            try {
+                const res = await axios.get(`${BASE_URL}/api/virtual_tours`);
+                setTours(Array.isArray(res.data) ? res.data : []);
+            } catch { setTours([]); }
+        };
+
+        useEffect(() => { load(); }, []);
+
+        const extractId = (url) => {
+            try {
+                const u = new URL(url);
+                if (u.hostname.includes('youtu.be')) return u.pathname.slice(1).split('?')[0];
+                return u.searchParams.get('v') || '';
+            } catch { return url.trim(); }
+        };
+
+        const handleAdd = async (e) => {
+            e.preventDefault();
+            const token = localStorage.getItem('token');
+            const video_id = extractId(form.youtube_url);
+            if (!video_id) { setMsg('❌ Invalid YouTube URL or ID.'); return; }
+            try {
+                await axios.post(`${BASE_URL}/api/virtual_tours`, { video_id, title: form.title }, { headers: { Authorization: `Bearer ${token}` } });
+                setMsg('✅ Tour video added!');
+                setForm({ title: '', youtube_url: '' });
+                load();
+            } catch (err) {
+                setMsg('❌ Error: ' + (err.response?.data?.error || err.message));
+            }
+        };
+
+        const handleDelete = async (id) => {
+            if (!window.confirm('Remove this tour video?')) return;
+            const token = localStorage.getItem('token');
+            try {
+                await axios.delete(`${BASE_URL}/api/virtual_tours/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+                setMsg('✅ Removed.');
+                load();
+            } catch { setMsg('❌ Failed to remove.'); }
+        };
+
+        return (
+            <div style={{ display: 'grid', gridTemplateColumns: '350px 1fr', gap: '40px' }}>
+                <div style={{ background: '#f9f9f9', padding: '20px', borderRadius: '8px', height: 'fit-content' }}>
+                    <h3 style={{ marginTop: 0, borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>🗺️ Add Tour Video</h3>
+                    {msg && <div style={{ padding: '10px', marginBottom: '15px', borderRadius: '5px', background: msg.includes('✅') ? '#d4edda' : '#f8d7da', color: msg.includes('✅') ? '#155724' : '#721c24' }}>{msg}</div>}
+                    <form onSubmit={handleAdd} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px' }}>Location / Title</label>
+                            <input required value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="e.g. Ujjain Ashram, M.P." style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }} />
+                        </div>
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px' }}>YouTube URL or Video ID</label>
+                            <input required value={form.youtube_url} onChange={e => setForm({ ...form, youtube_url: e.target.value })} placeholder="https://youtu.be/xxxx or video ID" style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }} />
+                            <small style={{ color: '#888' }}>Paste the full YouTube link — we'll extract the ID automatically.</small>
+                        </div>
+                        <button type="submit" style={{ padding: '10px', background: '#c41e3a', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Add Tour Video</button>
+                    </form>
+                </div>
+                <div>
+                    <h3 style={{ marginTop: 0 }}>Current Tour Videos ({tours.length})</h3>
+                    {tours.length === 0 ? (
+                        <p style={{ color: '#888' }}>No tour videos added yet. Add one using the form.</p>
+                    ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            {tours.map(t => (
+                                <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: '15px', background: '#f9f9f9', padding: '12px', borderRadius: '8px' }}>
+                                    <img src={`https://img.youtube.com/vi/${t.video_id}/mqdefault.jpg`} alt={t.title} style={{ width: '120px', borderRadius: '6px', flexShrink: 0 }} />
+                                    <div style={{ flex: 1 }}>
+                                        <strong>{t.title}</strong>
+                                        <br /><small style={{ color: '#888' }}>ID: {t.video_id}</small>
+                                    </div>
+                                    <button onClick={() => handleDelete(t.id)} style={{ background: '#dc3545', color: 'white', border: 'none', padding: '8px 14px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', flexShrink: 0 }}>Delete</button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    }
+    // ───────────────────────────────────────────────────────────────────────────
+
     return (
         <div className="admin-dashboard" style={{ maxWidth: '1200px', margin: '40px auto', padding: '20px', backgroundColor: '#fff', boxShadow: '0 0 20px rgba(0,0,0,0.1)', borderRadius: '10px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', borderBottom: '2px solid #eee', paddingBottom: '10px' }}>
@@ -602,7 +692,7 @@ function AdminDashboard() {
 
             {/* TABS */}
             <div className="tabs" style={{ display: 'flex', gap: '10px', marginBottom: '30px', flexWrap: 'wrap' }}>
-                {['announcements', 'gallery', 'literature', 'prarthana', 'prophecies', 'downloads', 'profiles', 'videoreview', 'newsletter', 'settings'].map(tab => (
+                {['announcements', 'gallery', 'literature', 'prarthana', 'prophecies', 'downloads', 'profiles', 'videoreview', 'virtual_tours', 'newsletter', 'settings'].map(tab => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
@@ -618,7 +708,7 @@ function AdminDashboard() {
                             flex: '1 1 auto'
                         }}
                     >
-                        {tab === 'videoreview' ? 'Video Summaries' : tab === 'newsletter' ? '📧 Newsletter' : tab === 'settings' ? '⚙️ Settings' : tab}
+                        {tab === 'videoreview' ? 'Video Summaries' : tab === 'newsletter' ? '📧 Newsletter' : tab === 'settings' ? '⚙️ Settings' : tab === 'virtual_tours' ? '🗺️ Virtual Tours' : tab}
                     </button>
                 ))}
             </div>
@@ -751,6 +841,8 @@ function AdminDashboard() {
                         </form>
                     </div>
                 </div>
+            ) : activeTab === 'virtual_tours' ? (
+                <VirtualToursPanel BASE_URL={BASE_URL} />
             ) : (
                 <div style={activeTab === 'newsletter' ? { display: 'block' } : { display: 'grid', gridTemplateColumns: '350px 1fr', gap: '40px' }}>
                     {/* ADD NEW FORM */}
