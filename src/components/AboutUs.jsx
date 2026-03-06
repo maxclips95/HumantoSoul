@@ -134,94 +134,117 @@ const SaintCard = ({ saint }) => {
 
 function SantAndSantMat() {
     return (
-        <section style={{ backgroundColor: "#fff5f0", padding: "40px 20px" }}>
+        <div style={{ backgroundColor: "#fdf5f0", paddingBottom: "60px", fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" }}>
 
-            {/* Main Title */}
-            <h1 style={{ textAlign: "center", color: "red", fontWeight: "bold", marginBottom: "40px" }}>
-                Sant and Sant Mat
-            </h1>
+            {/* HERO SECTION */}
+            <section style={{
+                background: "linear-gradient(rgba(196, 30, 58, 0.9), rgba(26, 31, 94, 0.85)), url('/assets/images/ashram-bg.jpg') center/cover",
+                color: "#fff",
+                padding: "80px 20px",
+                textAlign: "center",
+                boxShadow: "0 4px 15px rgba(0,0,0,0.1)"
+            }}>
+                <h1 style={{ fontSize: "2.8rem", fontWeight: "800", marginBottom: "15px", letterSpacing: "1px" }}>
+                    Our Mission &amp; Santmat
+                </h1>
+                <p style={{ fontSize: "1.2rem", maxWidth: "800px", margin: "0 auto", opacity: 0.9, lineHeight: "1.6" }}>
+                    The eternal science of the soul, the journey from illusion to truth, and the urgent call for spiritual awakening before the great transition.
+                </p>
+            </section>
 
-            <div style={{ maxWidth: "1000px", margin: "0 auto", lineHeight: "1.8" }}>
+            <div style={{ maxWidth: "1100px", margin: "-40px auto 0", position: "relative", zIndex: 10, padding: "0 20px" }}>
 
-                {/* Section 1: Origins of Santmat */}
-                <h3 style={{ color: "#c41e3a", marginBottom: "10px" }}>The Origins of Santmat</h3>
-                <p>
-                    Santmat is not a new religion or sect, but the ancient, eternal path of the Sants. It is the science of the soul. While various practices have existed since Satyug, Santmat was formalized and made accessible to the masses in Kaliyug by Kabir Das Ji.
-                </p>
-                <p>
-                    One who has complete knowledge of the beginning and the end, who explains the difference between the two, who reveals the inner path from the beginning to the end, and leads the soul back to its true origin—such an awakened being is called a Sant.
-                </p>
-                <p>
-                    Just as a tree does not eat its own fruit but gives it to others; a river does not drink its own water but gives it to others; it does not bathe itself but cleanses others—likewise are the Sants. They incarnate strictly for the liberation of others.
-                </p>
+                {/* URGENT WARNING SECTION (Yug Parivartan) */}
                 <div style={{
-                    background: "#fff", borderLeft: "4px solid #c41e3a", padding: "15px 20px",
-                    margin: "20px 0", fontStyle: "italic", color: "#555", borderRadius: "0 8px 8px 0",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.05)"
+                    background: "#fff",
+                    borderRadius: "12px",
+                    padding: "40px",
+                    boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
+                    borderTop: "5px solid #d32f2f",
+                    marginBottom: "40px"
                 }}>
-                    "A tree never eats its own fruit, nor does a river store its water.<br />
-                    For the sake of the highest good, the Sants have taken a human body."
-                </div>
-
-                {/* Section 2: Hidden vs Manifest Sants */}
-                <h3 style={{ color: "#c41e3a", marginTop: "35px", marginBottom: "10px" }}>
-                    Hidden and Manifest Sants (Waqt Ke Guru)
-                </h3>
-                <p>
-                    The spiritual status of a True Master (Waqt Ke Guru) is above rishis, munis, incarnate powers, yogis, and yogeshwars. In Santmat, there are two kinds of Sants: Hidden (Gupt) and Manifest (Pragat).
-                </p>
-                <p>
-                    Before Manifest Sants appeared on earth, Hidden Sants lived here and silently took care of the balance of creation. However, when human actions became extremely corrupt and souls forgot their true home, Satpurush (the Supreme Lord) sent one of His divine sons, Jogjeet (Kabir Das Ji), to the earth as a Manifest Sant.
-                </p>
-                <p>
-                    He revealed the secret of Satlok (the True Abode), explaining how the soul descended into Mrityulok (the realm of death and illusion). He disclosed the spiritual secrets of inner sound and light (Surat Shabd Yoga) and provided the method of liberation.
-                </p>
-                <p>
-                    While Hidden Sants maintain the earthly balance, they do not give Naamdaan (Initiation) nor show the path. <strong>Only a living, Manifest Sant (Waqt Ke Guru) can reveal the inner path of salvation.</strong> By connecting the seeker's soul to the divine Sound Current (Shabd), the living Master guides the soul out of the cycle of 84 lakh (8.4 million) species back to its True Home.
-                </p>
-
-                {/* ══════ LINEAGE OF SANTS (Dynamic Grid) ══════ */}
-                <h2 style={{
-                    textAlign: "center", color: "#c41e3a", fontWeight: "bold",
-                    marginTop: "60px", marginBottom: "20px", fontSize: "1.8rem",
-                    borderTop: "2px solid #f0d8d8", paddingTop: "40px"
-                }}>
-                    The Eternal Lineage (Parampara)
-                </h2>
-                <p style={{ textAlign: "center", color: "#666", marginBottom: "40px", maxWidth: "800px", margin: "0 auto 40px" }}>
-                    The divine power of the Master never leaves the earth. When one Manifest Sant departs, the spiritual charge is transferred to the appointed successor to continue the mission of awakening souls.
-                </p>
-
-                <div style={{ textAlign: "center", marginBottom: "30px" }}>
-                    <img
-                        src="/assets/images/lineage1.png"
-                        alt="Lineage of Sants Part 1"
-                        style={{ maxWidth: "100%", height: "auto", display: "block", margin: "0 auto 10px" }}
-                    />
-                    <img
-                        src="/assets/images/lineage2.png"
-                        alt="Lineage of Sants Part 2"
-                        style={{ maxWidth: "100%", height: "auto", display: "block", margin: "0 auto 10px" }}
-                    />
-                    <img
-                        src="/assets/images/lineage3.png"
-                        alt="Lineage of Sants Part 3"
-                        style={{ maxWidth: "100%", height: "auto", display: "block", margin: "0 auto 10px" }}
-                    />
-                    <div style={{ textAlign: "center", display: "inline-block", margin: "0 auto" }}>
-                        <img
-                            src="/assets/images/lineage4.png"
-                            alt="Lineage of Sants Part 4"
-                            style={{ maxWidth: "100%", height: "auto", display: "block", margin: "0 auto 10px" }}
-                        />
-                        <p style={{ fontSize: "1.1rem", fontWeight: "bold", color: "#c41e3a", marginTop: "10px" }}>
-                            Present Spiritual Master
+                    <h2 style={{ color: "#d32f2f", fontSize: "1.8rem", marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}>
+                        <i className="fas fa-exclamation-triangle"></i> The Great Transition: Awakening to Satyug
+                    </h2>
+                    <p style={{ fontSize: "1.1rem", lineHeight: "1.8", color: "#333", marginBottom: "15px" }}>
+                        We are currently living in the most critical period of human history. The dark age of <strong>Kaliyug</strong> is rapidly coming to an end, and within the next few years, the dawn of <strong>Satyug</strong> (the Age of Truth) will establish itself on Earth.
+                    </p>
+                    <p style={{ fontSize: "1.1rem", lineHeight: "1.8", color: "#333", marginBottom: "15px" }}>
+                        Nature is already showing signs of this massive global transition. If humanity does not awaken, transform its destructive habits, and turn towards devotion, the negative forces of Kaliyug will wipe out those who remain attached to sin. <strong>This is a time of immense urgency.</strong>
+                    </p>
+                    <div style={{ background: "#fff5f5", padding: "20px", borderRadius: "8px", borderLeft: "4px solid #d32f2f", marginTop: "20px" }}>
+                        <p style={{ margin: 0, fontWeight: "600", color: "#b71c1c", fontSize: "1.05rem" }}>
+                            "To survive this turbulent transition, one must adopt a pure vegetarian diet, give up intoxication, and take refuge in a True Living Master. Only spiritual wealth and the protective mercy of the Master will save souls during this global purification."
                         </p>
                     </div>
                 </div>
 
+                {/* TWO-COLUMN CONTENT AREA */}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "30px", marginBottom: "50px" }}>
+
+                    {/* The Origins of Santmat */}
+                    <div style={{
+                        flex: "1 1 500px", background: "#fff", padding: "35px",
+                        borderRadius: "12px", boxShadow: "0 5px 20px rgba(0,0,0,0.05)"
+                    }}>
+                        <h3 style={{ color: "#c41e3a", fontSize: "1.5rem", marginBottom: "15px" }}>
+                            <i className="fas fa-om" style={{ marginRight: "10px" }}></i> The Origins of Santmat
+                        </h3>
+                        <p style={{ lineHeight: "1.7", color: "#555", marginBottom: "15px" }}>
+                            Santmat is not a new religion or sect; it is the ancient, eternal path of the Sants. It is the pure science of the soul. While various practices have existed since Satyug, Santmat was formalized and made accessible to the masses in Kaliyug by Kabir Das Ji.
+                        </p>
+                        <p style={{ lineHeight: "1.7", color: "#555" }}>
+                            One who has complete knowledge of the beginning and the end, who reveals the inner path, and leads the soul back to its true origin—such an awakened being is called a Sant. Just as a tree gives its fruit to others and a river its water, Sants incarnate strictly for the liberation of trapped souls.
+                        </p>
+                    </div>
+
+                    {/* Hidden vs Manifest Sants */}
+                    <div style={{
+                        flex: "1 1 500px", background: "#fff", padding: "35px",
+                        borderRadius: "12px", boxShadow: "0 5px 20px rgba(0,0,0,0.05)"
+                    }}>
+                        <h3 style={{ color: "#c41e3a", fontSize: "1.5rem", marginBottom: "15px" }}>
+                            <i className="fas fa-sun" style={{ marginRight: "10px" }}></i> Hidden &amp; Manifest Sants
+                        </h3>
+                        <p style={{ lineHeight: "1.7", color: "#555", marginBottom: "15px" }}>
+                            The spiritual status of a True Master (Waqt Ke Guru) is supreme. In Santmat, there are two kinds of Sants: Hidden (Gupt) and Manifest (Pragat).
+                        </p>
+                        <p style={{ lineHeight: "1.7", color: "#555" }}>
+                            While Hidden Sants maintain the earthly balance silently, they do not give Naamdaan (Initiation) nor show the path. <strong>Only a living, Manifest Sant (Waqt Ke Guru) can reveal the inner path of salvation.</strong> By connecting the seeker's soul to the divine Sound Current (Shabd), the living Master guides the soul out of the cycle of 8.4 million species back to its True Home (Satlok).
+                        </p>
+                    </div>
+
+                </div>
+
+                {/* ══════ LINEAGE OF SANTS (Images) ══════ */}
+                <div style={{ background: "#fff", borderRadius: "12px", padding: "50px 20px", boxShadow: "0 5px 20px rgba(0,0,0,0.05)" }}>
+                    <h2 style={{
+                        textAlign: "center", color: "#1a1f5e", fontWeight: "800",
+                        marginBottom: "15px", fontSize: "2rem"
+                    }}>
+                        The Eternal Lineage (Parampara)
+                    </h2>
+                    <p style={{ textAlign: "center", color: "#666", marginBottom: "40px", maxWidth: "800px", margin: "0 auto", fontSize: "1.1rem" }}>
+                        The divine power of the Master never leaves the earth. When one Manifest Sant departs, the spiritual charge is gracefully transferred to the appointed successor to continue the mission.
+                    </p>
+
+                    <div style={{ textAlign: "center", marginBottom: "10px" }}>
+                        <img src="/assets/images/lineage1.png" alt="Lineage of Sants Part 1" style={{ maxWidth: "100%", height: "auto", display: "block", margin: "0 auto 15px", borderRadius: "8px" }} />
+                        <img src="/assets/images/lineage2.png" alt="Lineage of Sants Part 2" style={{ maxWidth: "100%", height: "auto", display: "block", margin: "0 auto 15px", borderRadius: "8px" }} />
+                        <img src="/assets/images/lineage3.png" alt="Lineage of Sants Part 3" style={{ maxWidth: "100%", height: "auto", display: "block", margin: "0 auto 15px", borderRadius: "8px" }} />
+
+                        <div style={{ textAlign: "center", display: "inline-block", margin: "20px auto 0", background: "#fbf5f5", padding: "15px", borderRadius: "12px", border: "1px solid #f0d8d8" }}>
+                            <img src="/assets/images/lineage4.png" alt="Lineage of Sants Part 4" style={{ maxWidth: "100%", height: "auto", display: "block", margin: "0 auto 10px", borderRadius: "8px" }} />
+                            <p style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#c41e3a", margin: "10px 0 0" }}>
+                                <i className="fas fa-star" style={{ color: "#FFD700", marginRight: "8px" }}></i>
+                                Present Spiritual Master
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-        </section>
+        </div>
     );
 }
 
