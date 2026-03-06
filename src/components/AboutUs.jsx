@@ -192,43 +192,32 @@ function SantAndSantMat() {
                     The divine power of the Master never leaves the earth. When one Manifest Sant departs, the spiritual charge is transferred to the appointed successor to continue the mission of awakening souls.
                 </p>
 
-                <div style={{
-                    display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "25px",
-                    padding: "20px 0"
-                }}>
-                    {saints.map((saint, index) => {
-                        const isLast = index === saints.length - 1;
-                        return (
-                            <div key={index} style={{
-                                position: "relative",
-                                padding: isLast ? "15px" : "0",
-                                background: isLast ? "#fff" : "transparent",
-                                borderRadius: isLast ? "16px" : "0",
-                                boxShadow: isLast ? "0 4px 20px rgba(196,30,58,0.15)" : "none",
-                                border: isLast ? "2px solid #ffcccc" : "none"
-                            }}>
-                                {isLast && (
-                                    <div style={{
-                                        position: "absolute", top: "-12px", left: "50%", transform: "translateX(-50%)",
-                                        background: "#c41e3a", color: "#fff", fontSize: "0.75rem", fontWeight: "bold",
-                                        padding: "4px 12px", borderRadius: "12px", whiteSpace: "nowrap", zIndex: 2
-                                    }}>
-                                        Present Spiritual Master
-                                    </div>
-                                )}
-                                <SaintCard saint={saint} />
-                                {/* Add an arrow after every saint except the last one, visible only on desktop */}
-                                {!isLast && (
-                                    <span style={{
-                                        position: "absolute", right: "-18px", top: "50%", transform: "translateY(-50%)",
-                                        color: "#f0d8d8", fontSize: "1.5rem", pointerEvents: "none"
-                                    }} className="lineage-arrow">
-                                        ➔
-                                    </span>
-                                )}
-                            </div>
-                        );
-                    })}
+                <div style={{ textAlign: "center", marginBottom: "30px" }}>
+                    <img
+                        src="/assets/images/lineage1.png"
+                        alt="Lineage of Sants Part 1"
+                        style={{ maxWidth: "100%", height: "auto", display: "block", margin: "0 auto 10px" }}
+                    />
+                    <img
+                        src="/assets/images/lineage2.png"
+                        alt="Lineage of Sants Part 2"
+                        style={{ maxWidth: "100%", height: "auto", display: "block", margin: "0 auto 10px" }}
+                    />
+                    <img
+                        src="/assets/images/lineage3.png"
+                        alt="Lineage of Sants Part 3"
+                        style={{ maxWidth: "100%", height: "auto", display: "block", margin: "0 auto 10px" }}
+                    />
+                    <div style={{ textAlign: "center", display: "inline-block", margin: "0 auto" }}>
+                        <img
+                            src="/assets/images/lineage4.png"
+                            alt="Lineage of Sants Part 4"
+                            style={{ maxWidth: "100%", height: "auto", display: "block", margin: "0 auto 10px" }}
+                        />
+                        <p style={{ fontSize: "1.1rem", fontWeight: "bold", color: "#c41e3a", marginTop: "10px" }}>
+                            Present Spiritual Master
+                        </p>
+                    </div>
                 </div>
 
             </div>
