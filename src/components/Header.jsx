@@ -20,7 +20,7 @@ function Header() {
       <div className="top-bar">
         <div className="top-bar-inner">
           <Link to="/contact" className="top-link" onClick={closeMenu}>Visit &amp; Connect</Link>
-          <div className="language-selector" style={{ color: '#fff', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div className="language-selector" style={{ color: '#3d2b1f', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <i className="fas fa-globe" style={{ fontSize: '14px' }}></i>
             <div id="google_translate_element" style={{ display: 'inline-block' }}></div>
             <GlobalVoiceSearch />
