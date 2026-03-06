@@ -2,7 +2,7 @@
 import React from "react";
 import Carousel from "../components/Carousel";
 import HeroSection from "../components/HeroSection";
-import AshramTour from "../components/AshramTour";
+
 import YouTubeFeed from "../components/YouTubeFeed";
 import Testimonials from "../components/Testimonials";
 import BlueprintHomeSections from "../components/BlueprintHomeSections";
@@ -45,7 +45,7 @@ export default function Home() {
       {/* EXISTING COMPONENTS — preserved for SEO + existing audience */}
       <Carousel />
       <HeroSection />
-      <AshramTour />
+
       {/* START HERE — Journey for new visitors */}
       <StartHere />
       {/* YOUTUBE SHORTS — below Ashram Tour */}

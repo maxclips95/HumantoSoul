@@ -90,41 +90,7 @@ export default function YouTubeFeed() {
 
 
 
-      {/* FULL */}
-      {full.length > 0 && (
-        <>
-          <h2 className="section-title" style={{ marginTop: '40px' }}>Satsang Videos & Clip</h2>
 
-          <div className="card-grid">
-            {full.slice(0, visibleFull).map((video) => (
-              <div
-                key={video.id}
-                className="card"
-                onClick={() => openModal(video.id)}
-              >
-                <img src={video.thumbnail} alt={video.title} className="card-img" />
-                <div className="card-content">
-                  <h3>{video.title}</h3>
-                  <div onClick={(e) => e.stopPropagation()}>
-                    <ShareButtons title={video.title} url={`https://www.youtube.com/watch?v=${video.id}`} />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {visibleFull < full.length && (
-            <div className="load-more-container">
-              <button
-                className="load-more-btn"
-                onClick={() => setVisibleFull((prev) => prev + 15)}
-              >
-                Load More
-              </button>
-            </div>
-          )}
-        </>
-      )}
 
       {selectedVideo && <VideoModal videoId={selectedVideo} onClose={closeModal} />}
     </section>
