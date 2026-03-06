@@ -80,7 +80,7 @@ export default function MeditationPage() {
                             What Is Dhyan (Meditation)?
                         </h1>
                         <p style={{ fontSize: '1.15rem', lineHeight: 1.8, opacity: 0.9 }}>
-                            The ancient Sant Mat path of Surat Shabd Yoga — practiced for 18 hours a day by Baba Jaigurudev Ji Maharaj himself — is the direct route from the human body to God's eternal realm, Satlok.
+                            The ancient Sant Mat path of Surat Shabd Yoga — perfected by Baba Jaigurudev Ji Maharaj through his own life's sacrifice — is the direct, accessible route for all souls to return to God's eternal realm, Satlok.
                         </p>
                     </div>
                 </div>
@@ -94,7 +94,7 @@ export default function MeditationPage() {
                             Dhyan (ध्यान) is the practice of turning the mind and soul's attention completely inward — away from the outer world — to directly experience the soul (atma) and connect with the Supreme God (Parmatma). It is not merely relaxation or concentration, but the direct path of the soul returning to its True Home.
                         </p>
                         <p>
-                            Baba Jaigurudev Ji Maharaj himself practiced dhyan for <strong>eighteen hours a day</strong> after receiving spiritual initiation (Naamdaan) from his Guru, Ghurelal Ji Maharaj. Through this intense practice, he attained the highest spiritual state and was recognized as the Anami Purush — the Nameless, Formless Supreme Being.
+                            Baba Jaigurudev Ji Maharaj himself practiced dhyan for <strong>eighteen hours a day</strong> after receiving spiritual initiation (Naamdaan) from his Guru, Ghurelal Ji Maharaj. By doing so, he "opened the doors" of the spiritual realm, making this direct connection with God simple and attainable for ordinary people and householders today.
                         </p>
                         <blockquote className="spiritual-quote">
                             "The human body has been given a fixed capital of breaths. Once this count is exhausted, the breath ends, the body falls, and a human being dies."
