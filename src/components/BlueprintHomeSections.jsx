@@ -166,6 +166,10 @@ export default function BlueprintHomeSections() {
                         <strong style={{ color: '#f0c030' }}>Baba Umakant Ji Maharaj</strong>,
                         the living Spiritual Successor of Param Sant Baba Jaigurudev Ji Maharaj (Omnipresent Supreme God).
                         Awaken to your true nature, discover lasting peace, and attain liberation from the cycle of birth and death.
+                        <br /><br />
+                        <strong style={{ color: '#f0c030', fontSize: '1.2rem', display: 'block', marginTop: '10px' }}>
+                            We warmly invite you to visit our Ashram and attend the spiritual programmes in person at least once.
+                        </strong>
                     </p>
                     <div className="bp-hero__buttons">
                         <Link to="/contact" className="bp-btn bp-btn--gold">Start Now 🙏</Link>

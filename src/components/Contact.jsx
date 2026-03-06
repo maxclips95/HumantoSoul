@@ -39,6 +39,13 @@ function Contact() {
 
     return (
         <section className="section" style={{ paddingTop: '20px', paddingBottom: '40px' }}>
+            <div style={{ maxWidth: '1200px', margin: '0 auto 40px auto', textAlign: 'center' }}>
+                <h2 style={{ color: "#c41e3a", fontSize: "2.2rem", marginBottom: "15px" }}>You are Welcome!</h2>
+                <p style={{ fontSize: "1.2rem", color: "#555", maxWidth: "800px", margin: "0 auto" }}>
+                    We invite you to visit our Ashram and attend the spiritual programmes in person at least once.
+                    Experience the divinity and the direct guidance of <strong>Baba Umakant Ji Maharaj</strong>.
+                </p>
+            </div>
 
             <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '20px', marginBottom: '20px' }}>
                 <div style={{ flex: '1 1 300px', backgroundColor: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>

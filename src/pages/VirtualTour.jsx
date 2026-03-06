@@ -99,6 +99,25 @@ export default function VirtualTour() {
                         </div>
                     )}
 
+                    <div style={{
+                        marginTop: "80px",
+                        padding: "40px",
+                        backgroundColor: "#fff",
+                        borderRadius: "20px",
+                        boxShadow: "0 15px 35px rgba(196, 30, 58, 0.08)",
+                        border: "1px solid #f2c6c6"
+                    }}>
+                        <h2 style={{ color: "#c41e3a", marginBottom: "20px", fontSize: "1.8rem" }}>Beyond the Virtual — Visit in Person</h2>
+                        <p style={{ fontSize: "1.1rem", lineHeight: "1.8", color: "#444", margin: "0 auto 30px auto", maxWidth: "850px" }}>
+                            A virtual tour is just the beginning. The spiritual energy, peace, and profound stillness of the Ashram must be experienced in person.
+                            <strong> We warmly invite all seekers to visit us at least once</strong> to attend our spiritual programmes, join the satsang, and feel the divine presence that transforms lives.
+                        </p>
+                        <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                            <a href="https://maps.app.goo.gl/YourGoogleMapsLink" target="_blank" rel="noopener noreferrer" className="bp-btn bp-btn--gold" style={{ textDecoration: 'none' }}>Get Directions →</a>
+                            <Link to="/contact" className="bp-btn bp-btn--outline">Plan Your Visit 🙏</Link>
+                        </div>
+                    </div>
+
                     <p style={{ marginTop: "50px", color: "#aaa", fontSize: "0.9rem" }}>
                         * More ashram locations and virtual tours will be added here in the future.
                     </p>
