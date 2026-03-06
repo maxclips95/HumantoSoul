@@ -37,26 +37,26 @@ export default function VirtualTour() {
                 ]}
             />
 
-            <section className="section" style={{ minHeight: "80vh", backgroundColor: "#fff5f0", padding: "60px 20px" }}>
+            <section className="section" style={{ minHeight: "60vh", backgroundColor: "#fff5f0", padding: "30px 20px" }}>
                 <div style={{ maxWidth: "1200px", margin: "0 auto", textAlign: "center" }}>
 
                     <h1 style={{
                         color: "#c41e3a",
                         textTransform: "uppercase",
                         letterSpacing: "2px",
-                        fontSize: "2.5rem",
+                        fontSize: "2.2rem",
                         fontWeight: "800",
-                        marginBottom: "15px"
+                        marginBottom: "10px"
                     }}>
                         EXPERIENCE THE DIVINE ASHRAM
                     </h1>
 
                     <p style={{
                         color: "#555",
-                        fontSize: "1.15rem",
-                        lineHeight: "1.6",
+                        fontSize: "1.1rem",
+                        lineHeight: "1.4",
                         maxWidth: "750px",
-                        margin: "0 auto 50px auto",
+                        margin: "0 auto 30px auto",
                         fontWeight: "300"
                     }}>
                         Take a virtual journey through the sacred grounds of our Ashram. Feel the peace and spiritual energy from wherever you are.
