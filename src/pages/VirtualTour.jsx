@@ -45,8 +45,8 @@ export default function VirtualTour() {
                         textTransform: "uppercase",
                         letterSpacing: "2px",
                         fontSize: "2.2rem",
-                        fontWeight: "800",
-                        marginBottom: "10px"
+                        fontWeight: "600",
+                        marginBottom: "0.5px"
                     }}>
                         EXPERIENCE THE DIVINE ASHRAM
                     </h1>
@@ -55,7 +55,7 @@ export default function VirtualTour() {
                         color: "#555",
                         fontSize: "1.1rem",
                         lineHeight: "1.4",
-                        maxWidth: "750px",
+                        maxWidth: "950px",
                         margin: "0 auto 30px auto",
                         fontWeight: "300"
                     }}>
@@ -114,13 +114,11 @@ export default function VirtualTour() {
                             <strong> We warmly invite all seekers to visit us at least once</strong> to attend our spiritual programmes, join the satsang, and feel the divine presence that transforms lives.
                         </p>
                         <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
-                            <a href="https://www.google.com/maps/search/?api=1&query=Baba+Jaigurudev+Ashram+Ujjain" target="_blank" rel="noopener noreferrer" className="bp-btn bp-btn--gold" style={{ textDecoration: 'none' }}>Get Directions →</a>
                             <Link to="/contact" className="bp-btn bp-btn--outline">Plan Your Visit 🙏</Link>
                         </div>
                     </div>
 
                     <p style={{ marginTop: "50px", color: "#aaa", fontSize: "0.9rem" }}>
-                        * More ashram locations and virtual tours will be added here in the future.
                     </p>
                 </div>
             </section>
