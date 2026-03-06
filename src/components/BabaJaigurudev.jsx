@@ -53,105 +53,43 @@ function BabaJaigurudev() {
             {/* Content */}
             <div style={{ maxWidth: "1000px", margin: "0 auto", lineHeight: "1.8", fontSize: "0.95rem" }}>
 
+                <h4 style={{ color: "red", marginTop: "10px", fontSize: "1.4rem" }}>
+                    The Descent of the Supreme Being
+                </h4>
                 <p>
-                    The world-renowned Supreme Sant Baba Jaigurudev Ji Maharaj was born in a
-                    small village on the sacred land of Uttar Pradesh, India. From early
-                    childhood, he possessed deep faith in religion and an intense desire
-                    to know the path to the realization of God. His father passed away
-                    during his childhood. Before leaving her body, his mother expressed
-                    her final wish and commanded him to definitely attain God by finding
-                    the true path of divine realization.
+                    Baba Jaigurudev Ji Maharaj is not an ordinary human who was simply born to seek liberation, nor did he simply "die" like mortal beings. He is the Anami Purush (the Supreme Being, God of gods) who consciously descended onto the earth with a profound cosmic mission: to establish <strong>Satyug (the Age of Truth) for 1,000 years</strong>. He landed on Earth to save humanity from the inhumanity, toxicity, wars, and impending destruction of Kaliyug, as Satyug is the only solution to these global crises.
+                </p>
+
+                <p>
+                    To fulfill this massive undertaking and remain unrecognized until the destined time, the Supreme Creator took a human form and enacted a divine play (Leela) of being an ordinary seeker searching for God.
                 </p>
 
                 <h4 style={{ color: "red", marginTop: "25px" }}>
-                    In Search of God from a Young Age
+                    The Divine Play (Leela) of Seeking God
                 </h4>
 
                 <p>
-                    At a very young age, Swami Ji Maharaj set out in search of God. He
-                    devotedly served mahants and priests at many temples, hoping that they
-                    might grant him a vision of God. By serving learned people, he studied
-                    religious scriptures. These scriptures confirmed that God exists, but
-                    did not reveal how He can be attained.
+                    As part of this roleplay, Swami Ji Maharaj outwardly demonstrated an intense desire to find God. He devotedly served mahants and priests at temples and studied religious scriptures. When he did not find the ultimate truth there, he associated with ascetics, bathing them and washing their clothes.
                 </p>
 
                 <p>
-                    Baba Jaigurudev Ji Maharaj then associated with ascetics in disguise,
-                    serving them by bathing them and cleaning their clothes. Despite this,
-                    he did not attain a vision of God. Someone advised him that God could
-                    be attained by offering prayers in a mosque. Following this advice,
-                    he learned namaz by humbly requesting the maulvis.
-                </p>
-
-                <p>
-                    One day, while offering namaz, he heard a heart-wrenching cry from
-                    behind the mosque. He immediately stopped praying and went behind the
-                    mosque, where he saw a goat being slaughtered. By then, he had already
-                    attained a glimpse of higher spiritual awareness. This disturbed him
-                    deeply, and he left that place.
+                    Continuing this divine play, someone advised him to pray in a mosque. He humbly requested maulvis to teach him namaz. However, one day while praying, he heard a heart-wrenching cry and saw a goat being slaughtered behind the mosque. Deeply disturbed by this violence, he immediately left the place, demonstrating his strict message of non-violence and vegetarianism.
                 </p>
 
                 <h4 style={{ color: "red", marginTop: "25px" }}>
-                    Tireless Service for God-Realization
+                    Tireless Service and the Preordained Meeting
                 </h4>
 
                 <p>
-                    During a journey to Kashmir, Swami Ji joined a group of sadhus in search
-                    of God. These sadhus consumed intoxicants such as bhang and cannabis.
-                    Driven by longing for God, Swami Ji served them by preparing bhang and
-                    filling their chillums, though he himself had never even smoked a
-                    bidi. He continued every small and large service solely to attain God.
+                    During a journey to Kashmir, Swami Ji joined a group of sadhus who consumed intoxicants. Driven by his outward "longing" for God, he served them tirelessly, even preparing their chillums, though he himself never consumed any toxins. When a sadhu died instantly from forcefully inhaling a chillum, Swami Ji enacted utter despair, preparing to jump into Dal Lake.
                 </p>
 
                 <p>
-                    One day, a sadhu forcefully inhaled a chillum and died instantly. This
-                    shattered Swami Ji’s faith, filling him with despair. Believing that
-                    God did not exist and there was no path to attain Him, he decided to
-                    end his life by jumping into Dal Lake.
+                    At that moment, a sweet divine voice spoke: “Child, the means to attain God exists. You will receive it from a householder.” Soon after, a trikal-darshi saint informed him that his "search" would end within six months.
                 </p>
 
                 <p>
-                    As he reached the lake, a sweet voice spoke from behind: “Child, the
-                    means to attain God exists. You will receive it from a householder.”
-                    He perceived the form of a divine being. The sweetness and attraction
-                    of the voice dispelled his suicidal thoughts instantly.
-                </p>
-
-                <p>
-                    While returning from Kashmir, he met a trikal-darshi saint who told
-                    him that his wish would be fulfilled within six months.
-                </p>
-
-                <h4 style={{ color: "red", marginTop: "25px" }}>
-                    Meeting the True Guru
-                </h4>
-
-                <p>
-                    This was around the early period of 1945. At that time, the great saint
-                    Ghurelal Ji Maharaj lived in Chirauli village near Aligarh. One day, he
-                    instructed his elder son to bring a young man from the bus stand with
-                    a healthy body, fair complexion, radiant face, and long hair.
-                </p>
-
-                <p>
-                    Guided by divine inspiration, Swami Ji got down at the bus stand. He
-                    was taken to Ghurelal Ji Maharaj, where he recognized the same divine
-                    form he had seen in Kashmir. Swami Ji wept uncontrollably at his Guru’s
-                    feet. Ghurelal Ji Maharaj said, “Why are you crying? You have wandered
-                    enough; now you have arrived.”
-                </p>
-
-                <p>
-                    He initiated Swami Ji into Surat Shabd Yoga and revealed the secret of
-                    God-realization practiced by all true saints. Swami Ji practiced
-                    meditation for eighteen hours a day. After one month, by the Guru’s
-                    grace, he began to experience divine realization. Surviving on one
-                    meal a day, he soon attained the highest spiritual state.
-                </p>
-
-                <p>
-                    Before leaving for his divine abode in 1948, Guru Ji declared that
-                    Tulsidas (Swami Ji) would lead the congregation after him.
+                    In 1945, guided by his own cosmic will, he met the great saint Ghurelal Ji Maharaj in Chirauli. Ghurelal Ji recognized him instantly, saying, “Why are you crying? You have wandered enough; now you have arrived.” Through this preordained meeting, Swami Ji was formally initiated into Surat Shabd Yoga, completing the earthly roleplay of a disciple, ready to begin his true global work as the Awakener of Souls. Before leaving for his divine abode in 1948, Guru Ji declared that Swami Ji would lead the congregation after him.
                 </p>
 
                 <h4 style={{ color: "red", marginTop: "25px" }}>
