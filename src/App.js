@@ -28,8 +28,7 @@ import LiberationPage from './pages/LiberationPage';
 import PeaceAndSocietyPage from './pages/PeaceAndSocietyPage';
 import GlossaryPage from './pages/GlossaryPage';
 import VirtualTour from './pages/VirtualTour';
-
-
+import AppRoutes from './components/common/AppRoutes';
 
 function App() {
   return (
@@ -37,31 +36,7 @@ function App() {
       <ErrorBoundary>
         <Header />
         <main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<AboutUs />} />
-            <Route path="/baba-jaigurudev" element={<BabaJaigurudev />} />
-            <Route path="/baba-umakant" element={<BabaUmakant />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/gallery" element={<Gallery />} />
-            <Route path="/literature" element={<Literature />} />
-            <Route path="/prarthana" element={<Prarthana />} />
-            <Route path="/downloads" element={<DownloadsPage />} />
-            <Route path="/prophecies" element={<Prophecies />} />
-            <Route path="/satvic-lifestyle" element={<SatvicLifestyle />} />
-            <Route path="/announcements" element={<Announcements />} />
-            <Route path="/admin-login" element={<AdminLogin />} />
-            <Route path="/admin-dashboard" element={<AdminDashboard />} />
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/meditation" element={<MeditationPage />} />
-            <Route path="/vegetarian-living" element={<VegetarianLivingPage />} />
-            <Route path="/liberation" element={<LiberationPage />} />
-            <Route path="/peace-and-society" element={<PeaceAndSocietyPage />} />
-            <Route path="/glossary" element={<GlossaryPage />} />
-            <Route path="/virtual-tour" element={<VirtualTour />} />
-            <Route path="/prophecy/:id" element={<ProphecyDetail />} />
-            <Route path="/announcement/:id" element={<AnnouncementDetail />} />
-          </Routes>
+          <AppRoutes />
         </main>
         <VoiceAssistant />
         <Footer />

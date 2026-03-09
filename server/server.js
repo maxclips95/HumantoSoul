@@ -573,13 +573,77 @@ cron.schedule('0 0 */2 * *', () => fetchYouTubeProphecies());
 
 // --- SUPABASE KEEP-ALIVE (Prevent Inactivity Pause) ---
 cron.schedule('0 0 * * *', async () => {
-  logger.info('[Keep-Alive] Running daily ping to Supabase...');
+  console.log('[Keep-Alive] Running daily ping to Supabase...');
   try {
     const { error } = await db.raw.from('announcements').select('id').limit(1);
     if (error) throw error;
-    logger.info('[Keep-Alive] Ping successful.');
+    console.log('[Keep-Alive] Ping successful.');
   } catch (err) {
-    logger.error('[Keep-Alive] Ping failed:', err.message);
+    console.error('[Keep-Alive] Ping failed:', err.message);
+  }
+});
+
+// --- DYNAMIC SITEMAP GENERATOR ---
+app.get('/sitemap.xml', async (req, res) => {
+  try {
+    const baseUrl = 'https://www.humantosoul.com';
+    const supportedLangs = ['en', 'hi', 'es', 'fr', 'de', 'zh', 'ja', 'ru', 'ar', 'pt'];
+
+    // Core Static Routes
+    const staticRoutes = [
+      '/', '/about', '/baba-jaigurudev', '/baba-umakant', '/prophecies',
+      '/meditation', '/vegetarian-living', '/liberation', '/peace-and-society',
+      '/satvic-lifestyle', '/glossary', '/blog', '/announcements',
+      '/prarthana', '/literature', '/gallery', '/downloads', '/contact', '/virtual-tour'
+    ];
+
+    // Helper to generate hreflang matrix string
+    const generateHreflangBlock = (path) => {
+      let block = `\n    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}${path}"/>`;
+      supportedLangs.forEach(lang => {
+        const langPath = lang === 'en' ? path : `/${lang}${path === '/' ? '' : path}`;
+        block += `\n    <xhtml:link rel="alternate" hreflang="${lang}" href="${baseUrl}${langPath}"/>`;
+      });
+      return block;
+    };
+
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">`;
+
+    // 1. Append Static Routes
+    const today = new Date().toISOString().split('T')[0];
+    staticRoutes.forEach(route => {
+      xml += `\n  <url>\n    <loc>${baseUrl}${route}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>${route === '/' || route === '/prophecies' ? 'daily' : 'weekly'}</changefreq>\n    <priority>${route === '/' || route === '/prophecies' ? '1.0' : '0.8'}</priority>${generateHreflangBlock(route)}\n  </url>`;
+    });
+
+    // 2. Fetch all Prophecies (Manual + Automated) from DB with Fallback
+    let allProphecies = [];
+    try {
+      const manualProphecies = await db.selectAll('prophecies');
+      const automatedProphecies = await db.selectAll('automated_prophecies');
+      allProphecies = [...(manualProphecies || []), ...(automatedProphecies || [])];
+    } catch (dbErr) {
+      console.error('[Sitemap] Database connection failed (possible ISP block). Proceeding with static routes only.', dbErr.message);
+    }
+
+    // 3. Append Dynamic Prophecy Routes
+    allProphecies.forEach(item => {
+      if (!item.id) return;
+      const route = `/prophecy/${item.id}`;
+      // Automated items usually have publishedAt or published dates
+      const modDate = item.publishedAt ? new Date(item.publishedAt).toISOString().split('T')[0] :
+        item.published ? new Date(item.published).toISOString().split('T')[0] : today;
+
+      xml += `\n  <url>\n    <loc>${baseUrl}${route}</loc>\n    <lastmod>${modDate}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.9</priority>${generateHreflangBlock(route)}\n  </url>`;
+    });
+
+    xml += `\n</urlset>`;
+
+    res.header('Content-Type', 'application/xml');
+    res.send(xml);
+  } catch (error) {
+    console.error('[Sitemap] Failed to generate sitemap:', error);
+    res.status(500).send('Error generating sitemap');
   }
 });
 
@@ -886,10 +950,23 @@ app.route('/api/prophecies/:id')
   .get(async (req, res) => {
     const { id } = req.params;
     try {
-      let item = await db.selectById('prophecies', id);
-      if (!item) {
-        item = await db.selectById('automated_prophecies', id);
+      // Try manual prophecies first (numeric IDs)
+      let item = null;
+      try {
+        item = await db.selectById('prophecies', id);
+      } catch (e) {
+        // Likely a type mismatch (string ID vs numeric column) — this is expected for automated prophecies
       }
+
+      // If not found in manual, try automated prophecies (YouTube string IDs)
+      if (!item) {
+        try {
+          item = await db.selectById('automated_prophecies', id);
+        } catch (e) {
+          // Not found in automated either
+        }
+      }
+
       if (item) res.json(item);
       else res.status(404).json({ message: 'Prophecy not found' });
     } catch (error) {

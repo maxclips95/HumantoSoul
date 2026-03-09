@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import "../styles/Header.css";
 import GlobalVoiceSearch from "./common/GlobalVoiceSearch";
 
@@ -7,6 +8,20 @@ function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMissionOpen, setIsMissionOpen] = useState(false);
   const [isResourcesOpen, setIsResourcesOpen] = useState(false);
+
+  const { i18n } = useTranslation();
+  const currentLang = i18n.language || 'en';
+
+  const getLocalizedPath = (path) => {
+    // We treat 'en' as the default language with no prefix
+    if (currentLang === 'en' || !currentLang) return path;
+
+    // Prevent double slashing if path is just '/'
+    if (path === '/') return `/${currentLang}`;
+
+    // Guarantee format: /hi/prophecies
+    return `/${currentLang}${path}`;
+  };
 
   const closeMenu = () => {
     setIsMenuOpen(false);
@@ -19,7 +34,7 @@ function Header() {
       {/* TOP UTILITY BAR (Darker Red, Slim) */}
       <div className="top-bar">
         <div className="top-bar-inner">
-          <Link to="/contact" className="top-link" onClick={closeMenu}>Visit &amp; Connect</Link>
+          <Link to={getLocalizedPath("/contact")} className="top-link" onClick={closeMenu}>Visit &amp; Connect</Link>
           <div className="language-selector" style={{ color: '#3d2b1f', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <i className="fas fa-globe" style={{ fontSize: '14px' }}></i>
             <div id="google_translate_element" style={{ display: 'inline-block' }}></div>
@@ -39,7 +54,7 @@ function Header() {
 
         {/* NAVIGATION MENU */}
         <nav className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
-          <Link to="/" className="nav-item" onClick={closeMenu}>Home</Link>
+          <Link to={getLocalizedPath("/")} className="nav-item" onClick={closeMenu}>Home</Link>
 
           {/* MISSION DROPDOWN */}
           <div
@@ -55,19 +70,19 @@ function Header() {
               Mission <span className={`nav-chevron ${isMissionOpen ? 'nav-chevron--open' : ''}`}></span>
             </button>
             <div className={`dropdown-panel ${isMissionOpen ? 'show' : ''}`}>
-              <Link to="/about" className="dropdown-link" onClick={() => { closeMenu(); setIsMissionOpen(false); }}>Our Mission &amp; Santmat</Link>
-              <Link to="/baba-jaigurudev" className="dropdown-link" onClick={() => { closeMenu(); setIsMissionOpen(false); }}>Baba Jaigurudev Ji Maharaj</Link>
-              <Link to="/baba-umakant" className="dropdown-link" onClick={() => { closeMenu(); setIsMissionOpen(false); }}>Baba Umakant Ji Maharaj</Link>
+              <Link to={getLocalizedPath("/about")} className="dropdown-link" onClick={() => { closeMenu(); setIsMissionOpen(false); }}>Our Mission &amp; Santmat</Link>
+              <Link to={getLocalizedPath("/baba-jaigurudev")} className="dropdown-link" onClick={() => { closeMenu(); setIsMissionOpen(false); }}>Baba Jaigurudev Ji Maharaj</Link>
+              <Link to={getLocalizedPath("/baba-umakant")} className="dropdown-link" onClick={() => { closeMenu(); setIsMissionOpen(false); }}>Baba Umakant Ji Maharaj</Link>
             </div>
           </div>
 
-          <Link to="/announcements" className="nav-item" onClick={closeMenu}>Announcements</Link>
-          <Link to="/satvic-lifestyle" className="nav-item" onClick={closeMenu}>Vegetarian Living</Link>
-          <Link to="/prophecies" className="nav-item shine-effect" onClick={closeMenu}>Prophecies</Link>
-          <Link to="/blog" className="nav-item" onClick={closeMenu}>Teachings</Link>
-          <Link to="/gallery" className="nav-item" onClick={closeMenu}>Media</Link>
-          <Link to="/virtual-tour" className="nav-item shine-effect" onClick={closeMenu}>Virtual Tour</Link>
-          <Link to="/downloads" className="nav-item" onClick={closeMenu}>Programmes</Link>
+          <Link to={getLocalizedPath("/announcements")} className="nav-item" onClick={closeMenu}>Announcements</Link>
+          <Link to={getLocalizedPath("/satvic-lifestyle")} className="nav-item" onClick={closeMenu}>Vegetarian Living</Link>
+          <Link to={getLocalizedPath("/prophecies")} className="nav-item shine-effect" onClick={closeMenu}>Prophecies</Link>
+          <Link to={getLocalizedPath("/blog")} className="nav-item" onClick={closeMenu}>Teachings</Link>
+          <Link to={getLocalizedPath("/gallery")} className="nav-item" onClick={closeMenu}>Media</Link>
+          <Link to={getLocalizedPath("/virtual-tour")} className="nav-item shine-effect" onClick={closeMenu}>Virtual Tour</Link>
+          <Link to={getLocalizedPath("/downloads")} className="nav-item" onClick={closeMenu}>Programmes</Link>
 
           {/* RESOURCES DROPDOWN */}
           <div
@@ -83,8 +98,8 @@ function Header() {
               Resources <span className={`nav-chevron ${isResourcesOpen ? 'nav-chevron--open' : ''}`}></span>
             </button>
             <div className={`dropdown-panel ${isResourcesOpen ? 'show' : ''}`}>
-              <Link to="/literature" className="dropdown-link" onClick={() => { closeMenu(); setIsResourcesOpen(false); }}>Literature &amp; Downloads</Link>
-              <Link to="/glossary" className="dropdown-link" onClick={() => { closeMenu(); setIsResourcesOpen(false); }}>Spiritual Glossary</Link>
+              <Link to={getLocalizedPath("/literature")} className="dropdown-link" onClick={() => { closeMenu(); setIsResourcesOpen(false); }}>Literature &amp; Downloads</Link>
+              <Link to={getLocalizedPath("/glossary")} className="dropdown-link" onClick={() => { closeMenu(); setIsResourcesOpen(false); }}>Spiritual Glossary</Link>
             </div>
           </div>
         </nav>
