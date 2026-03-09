@@ -100,7 +100,7 @@ export default function ProphecyDetail() {
                     "@context": "https://schema.org",
                     "@type": "Article",
                     "headline": item.title,
-                    "inLanguage": i18n.language || 'en',
+                    "inLanguage": (i18n.language || 'en').split('-')[0],
                     "image": [
                         item.thumbnail ? (item.thumbnail.startsWith('http') ? item.thumbnail : `https://www.humantosoul.com${item.thumbnail}`) : "https://www.humantosoul.com/assets/images/temple-bg.jpg"
                     ],

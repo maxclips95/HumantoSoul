@@ -26,7 +26,7 @@ const SEO = ({
 }) => {
     const { t, i18n } = useTranslation();
     const location = useLocation();
-    const currentLang = i18n.language || 'en';
+    const currentLang = (i18n.language || 'en').split('-')[0].toLowerCase();
 
     // Normalize path to get the clean base path (strip existing language param)
     let cleanPath = location.pathname;

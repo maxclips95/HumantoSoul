@@ -10,7 +10,8 @@ function Header() {
   const [isResourcesOpen, setIsResourcesOpen] = useState(false);
 
   const { i18n } = useTranslation();
-  const currentLang = i18n.language || 'en';
+  // Normalize to 2-letter code: 'en-US' → 'en', 'hi-IN' → 'hi'
+  const currentLang = (i18n.language || 'en').split('-')[0].toLowerCase();
 
   const getLocalizedPath = (path) => {
     // We treat 'en' as the default language with no prefix

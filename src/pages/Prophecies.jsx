@@ -51,7 +51,7 @@ export default function Prophecies() {
   const [textProphecies, setTextProphecies] = useState([]);
 
   const { i18n } = useTranslation();
-  const currentLang = i18n.language || 'en';
+  const currentLang = (i18n.language || 'en').split('-')[0].toLowerCase();
 
   const getLocalizedLink = (baseId) => {
     return currentLang === 'en' ? `/prophecy/${baseId}` : `/${currentLang}/prophecy/${baseId}`;
