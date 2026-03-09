@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Static pages: Home, About, Contact, Gallery, Blog, etc. -->
+  <sitemap>
+    <loc>https://www.humantosoul.com/sitemap-static.xml</loc>
+    <lastmod>2026-03-09</lastmod>
+  </sitemap>
+
+  <!-- Dynamic prophecy pages — auto-updated every time a prophecy is added -->
+  <sitemap>
+    <loc>https://api.humantosoul.com/sitemap.xml</loc>
+  </sitemap>
+
+</sitemapindex>
